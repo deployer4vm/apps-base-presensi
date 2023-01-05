@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 use App\Mixins\RouterMixin;
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,14 +34,14 @@ class AppServiceProvider extends ServiceProvider
                     $loader->alias($classAliasName, $className);
                 }
             });
-        
+
         // set public path sesuai config
         if(config('AppConfig.system.public_path')){
             $this->app->bind('path.public', function() {
                 return realpath(__DIR__.'/../..'.config('AppConfig.system.public_path'));
             });
         }
-        
+
         //bind interface global
         foreach(config('AppConfig.binding.interface',[]) as $contract => $service){
             $this->app->bind(
@@ -48,7 +49,7 @@ class AppServiceProvider extends ServiceProvider
                 $service
             );
         }
-        
+
         //bind class rebind global
         foreach(config('AppConfig.binding.class',[]) as $class => $newClass){
             // $this->app->extend($class, function ($service, $app) use ($newClass) {
@@ -63,11 +64,11 @@ class AppServiceProvider extends ServiceProvider
         // bind config binding per tenant
         if(config('AppConfig.system.multitenant.active'))$this->bindTenant();
 
-    }    
+    }
 
     // public function autoLoad($className)
     // {
-    //     if($className == 'hpsynapse\moduser\Facades\UserAuth' && !class_exists($className) && config('AppConfig.binding.class.'.$className,false)){            
+    //     if($className == 'hpsynapse\moduser\Facades\UserAuth' && !class_exists($className) && config('AppConfig.binding.class.'.$className,false)){
     //         $loader = \Illuminate\Foundation\AliasLoader::getInstance();
     //         $loader->alias($className, config('AppConfig.binding.class.'.$className));
     //     }
@@ -75,8 +76,8 @@ class AppServiceProvider extends ServiceProvider
 
     protected function bindTenant()
     {
-        $this->app->bind('bindTenant', function ($app,$params) {           
-                
+        $this->app->bind('bindTenant', function ($app,$params) {
+
             //load alias class
             if(config('AppConfig.system.binding.tenant.'.$params['tenant_id'].'.alias',false))
                 $this->app->booting(function() use($params) {
@@ -93,7 +94,7 @@ class AppServiceProvider extends ServiceProvider
                     $service
                 );
             }
-            
+
             //bind class rebind global
             foreach(config('AppConfig.system.binding.tenant.'.$params['tenant_id'].'.class',[]) as $controller => $newClass){
                 // $this->app->extend($class, function ($service, $app) use ($newClass) {
@@ -114,6 +115,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Paginator::useBootstrap();
+
         Schema::defaultStringLength(191);
         Router::mixin(new RouterMixin());
 
@@ -126,7 +129,7 @@ class AppServiceProvider extends ServiceProvider
         //     // $query->time
         //     if(true){//stripos($query->sql,'absensi')!=false && stripos($query->sql,'select')===false){
         //         $sql = str_replace('?', "'?'", $query->sql);
-        //         $sql = vsprintf(str_replace('?', '%s', $sql), $query->bindings);                
+        //         $sql = vsprintf(str_replace('?', '%s', $sql), $query->bindings);
         //         Log::info('[QUERY] : '.$sql);
         //     }
         // });

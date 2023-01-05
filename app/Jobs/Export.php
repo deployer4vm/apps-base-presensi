@@ -23,14 +23,14 @@ class Export implements ShouldQueue
     public $cacheKey,$curQueue,$startTime;
 
     public $tries = 1;
-    // public $retryAfter = 10;
+    // public $backoff = 10;
     public $timeout = 36000;
-    
+
     /**
      * Create a new job instance.
      *
      * @param String $cacheKey key id jobs nya
-     * 
+     *
      * @return void
      */
     public function __construct($cacheKey,$curQueue='export1')
@@ -41,10 +41,10 @@ class Export implements ShouldQueue
     }
 
     public function failed(Throwable $error)
-    {        
+    {
         FExport::setExportJobFailed($this->cacheKey,$error);
     }
-    
+
     /**
      * Execute the job.
      *
@@ -53,7 +53,7 @@ class Export implements ShouldQueue
     public function handle()
     {
         try {
-            FExport::processExport($this->cacheKey,$this->curQueue);        
+            FExport::processExport($this->cacheKey,$this->curQueue);
         } catch (Exception $e) {
             Log::error('Export Jobs '.$this->cacheKey.' ERROR : '.$e->getMessage());
             FExport::setExportJobFailed($this->cacheKey,$e);

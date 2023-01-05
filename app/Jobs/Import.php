@@ -23,14 +23,14 @@ class Import implements ShouldQueue
     public $cacheKey,$curQueue,$startTime;
 
     public $tries = 1;
-    // public $retryAfter = 10;
+    // public $backoff = 10;
     public $timeout = 3600000;//1000 jam
-    
+
     /**
      * Create a new job instance.
      *
      * @param String $cacheKey key id jobs nya
-     * 
+     *
      * @return void
      */
     public function __construct($cacheKey,$curQueue='import1')
@@ -41,10 +41,10 @@ class Import implements ShouldQueue
     }
 
     public function failed(Throwable $error)
-    {        
+    {
         FImport::setImportJobFailed($this->cacheKey,$error);
     }
-    
+
     /**
      * Execute the job.
      *
@@ -53,7 +53,7 @@ class Import implements ShouldQueue
     public function handle()
     {
         try {
-            FImport::processImport($this->cacheKey,$this->curQueue);        
+            FImport::processImport($this->cacheKey,$this->curQueue);
         } catch (Exception $e) {
             Log::error('Import Jobs '.$this->cacheKey.' ERROR : '.$e->getMessage());
             throw $e;

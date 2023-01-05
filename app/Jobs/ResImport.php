@@ -20,7 +20,7 @@ class ResImport implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
     public $repo,$startRow,$addsJobsParam,$resumeParam,$tenantId;
     public $tries = 1;
-    // public $retryAfter = 10;
+    // public $backoff = 10;
     public $timeout = 36000;
 
     /**
@@ -28,7 +28,7 @@ class ResImport implements ShouldQueue
      *
      * @param ResImport $repo instance ResImport
      * @param array $addsJobsParam tambah parameter yang akan di passing ke initImportOnJon
-     * 
+     *
      * @return void
      */
     public function __construct($repo,int $startRow=2,array $addsJobsParam = [],array $resumeParam = [],$tenantId=0)
@@ -41,12 +41,12 @@ class ResImport implements ShouldQueue
     }
 
     public function failed(Throwable $error)
-    {        
-        $repo = new $this->repo;        
+    {
+        $repo = new $this->repo;
         $repo->initImportOnJob($this->addsJobsParam);
         $repo->setImportJobFailed($error);
     }
-    
+
     /**
      * Execute the job.
      *
