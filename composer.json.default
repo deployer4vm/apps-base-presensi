@@ -99,8 +99,11 @@
         },
         {
             "name": "hp-synapse/mod-user",
-            "type": "git",
-            "url": "https://gitlab.com/hp-synapse/mod-user.git"
+            "type": "path",
+            "url": "../mod-user",
+            "options": {
+                "symlink": true
+            }
         }
     ]
 }
