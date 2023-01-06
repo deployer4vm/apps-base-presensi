@@ -32,8 +32,8 @@
         "ramsey/uuid": "^4.2"
     },
     "require-dev": {
-        "facade/ignition": "^2.3.6",
-        "fzaninotto/faker": "^1.9.1",
+        "facade/ignition": "^2.3",
+        "fakerphp/faker": "^1.9.1",
         "laravel/sail": "^1.0",
         "hp-synapse/apps-generator": "dev-master",
         "mockery/mockery": "^1.4",

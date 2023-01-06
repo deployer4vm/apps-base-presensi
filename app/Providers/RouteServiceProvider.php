@@ -108,6 +108,8 @@ class RouteServiceProvider extends ServiceProvider
     {
         require_once app_path('Helpers/Helper.php');
 
+        parent::register();
+
     //     $this->mergeConfigFrom(
     //         __DIR__.'/../config/HPSynapse.php', config_path('hpsynapse.php')
     //     );
