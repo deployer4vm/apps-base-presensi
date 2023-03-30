@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use Exception;
+// use Exception;
 use Throwable;
 
 use Illuminate\Bus\Queueable;
@@ -25,12 +25,12 @@ class Export implements ShouldQueue
     public $tries = 1;
     // public $retryAfter = 10;
     public $timeout = 36000;
-    
+
     /**
      * Create a new job instance.
      *
      * @param String $cacheKey key id jobs nya
-     * 
+     *
      * @return void
      */
     public function __construct($cacheKey,$curQueue='export1')
@@ -41,10 +41,11 @@ class Export implements ShouldQueue
     }
 
     public function failed(Throwable $error)
-    {        
+    {
+        Log::error('Export Jobs2 '.$this->cacheKey.' ERROR : '.$error->getMessage());
         FExport::setExportJobFailed($this->cacheKey,$error);
     }
-    
+
     /**
      * Execute the job.
      *
@@ -52,12 +53,12 @@ class Export implements ShouldQueue
      */
     public function handle()
     {
-        try {
-            FExport::processExport($this->cacheKey,$this->curQueue);        
-        } catch (Exception $e) {
-            Log::error('Export Jobs '.$this->cacheKey.' ERROR : '.$e->getMessage());
-            FExport::setExportJobFailed($this->cacheKey,$e);
-            // throw $e;
-        }
+        // try {
+            FExport::processExport($this->cacheKey,$this->curQueue);
+        // } catch (Throwable $error) {
+        //     Log::error('Export Jobs '.$this->cacheKey.' ERROR : '.$error->getMessage());
+        //     FExport::setExportJobFailed($this->cacheKey,$error);
+        //     // throw $e;
+        // }
     }
 }

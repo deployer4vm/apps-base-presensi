@@ -19,12 +19,11 @@ class TenantController extends BaseController
      */
     public function __construct()
     {
-        
     }
 
     /**
      * initiate tenant app
-     * 
+     *
      * @param Request $request *semua optional
      *      group_app : apps id / path nya
      * @return array
@@ -35,40 +34,44 @@ class TenantController extends BaseController
     public function activeTenant(Request $request)
     {
         $tenant = [
-            'tenant_list'=>'',
-            'active_tenant'=>false,
-            'active_tenant_group'=>false
+            'tenant_list' => '',
+            'active_tenant' => false,
+            'active_tenant_group' => false
         ];
-        $groupApp = config('tenant.group_app',$request->input('group_app'));
-        if($groupApp){
-            $tenant['active_tenant'] = Tenant::where('group_app',$groupApp)->first();
-            if($tenant['active_tenant']){
-                $tenant['active_tenant_group'] = TenantGroupTenant::where('tenant_id',$tenant['active_tenant']->id)->get()->pluck('tenant_group_id');
-                if($tenant['active_tenant_group']->count()<=0) {
+        $groupApp = config('tenant.group_app', $request->input('group_app'));
+        if ($groupApp) {
+            $tenant['active_tenant'] = Tenant::where('group_app', $groupApp)->first();
+            if ($tenant['active_tenant']) {
+                $tenant['active_tenant_group']
+                    = TenantGroupTenant::where('tenant_id', $tenant['active_tenant']->id)
+                        ->select('tenant_group_id')
+                        ->get()
+                        ->pluck('tenant_group_id');
+                if ($tenant['active_tenant_group']->count() <= 0) {
                     $tenant['active_tenant_group'] = false;
-                }else{
+                } else {
                     $tmpTenantGroupList = [];
                     foreach ($tenant['active_tenant_group'] as $value) {
                         $tmpTenantGroupList[] = (int) $value;
                     }
-	                $tenant['active_tenant_group'] = $tmpTenantGroupList;
+                    $tenant['active_tenant_group'] = $tmpTenantGroupList;
                 }
-            }else{
+            } else {
                 $tenant['active_tenant'] = false;
             }
         }
 
-        // $tenant['tenant_list'] = Tenant::all();           
-        
+        // $tenant['tenant_list'] = Tenant::all();
+
         return response()->json($tenant);
     }
 
     /**
      * list tenant group
-     * 
+     *
      * @param Request $request *semua optional
      *      group_app : apps id / path nya
-     * 
+     *
      * @return array list tenant group
      */
     public function tenantGroupList(Request $request)
@@ -79,10 +82,10 @@ class TenantController extends BaseController
 
     /**
      * list tenant group
-     * 
+     *
      * @param Request $request *semua optional
      *      group_app : apps id / path nya
-     * 
+     *
      * @return array list tenant
      */
     public function listTenant(Request $request)
@@ -90,5 +93,4 @@ class TenantController extends BaseController
         $this->output['data'] = Tenant::all();
         return $this->done();
     }
-
 }

@@ -23,28 +23,28 @@ class TokenExpireCheck
     {
         if (Auth::check()) {
             $isWebReq = true;
-            if(($request->expectsJson() || $request->wantsJson() || $request->ajax())) {
+            if (($request->expectsJson() || $request->wantsJson() || $request->ajax())) {
                 $isWebReq = false;
                 $updatedAt = Auth::user()->updated_at;
                 $token = Auth::user()->api_token;
-            }else{
+            } else {
                 $updatedAt = UserAuth::getSessionLastUpdate();
                 $token = UserAuth::getToken();
             }
 
             $lastAccess = (new Carbon($updatedAt))->addMinute(config('session.lifetime'));
 
-            if($lastAccess->lessThan(now())){
-                ApiToken::where('api_token',$token)->delete();
-                if($isWebReq){
+            if ($lastAccess->lessThan(now())) {
+                ApiToken::where('api_token', $token)->delete();
+                if ($isWebReq) {
                     Auth::logout();
-                }else{
+                } else {
                     throw new \Illuminate\Auth\AuthenticationException();
                 }
                 return;
-            }else{
-                ApiToken::where('api_token',$token)->update(['updated_at'=>now()]);
-            }            
+            } else {
+                ApiToken::where('api_token', $token)->update(['updated_at' => now()]);
+            }
         }
         return $next($request);
     }

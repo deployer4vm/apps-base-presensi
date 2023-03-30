@@ -19,17 +19,26 @@ class TenantDomainRedirectCheck
      */
     public function handle($request, Closure $next)
     {
-        if(config('AppConfig.system.multitenant.active')){       
-            // jika redirect maka redirect     
-            if(config('tenant.domain.status')==2) {
+        if (config('AppConfig.system.multitenant.active')) {
+            // jika redirect maka redirect
+            if (config('tenant.domain.status') == 2) {
                 return redirect(config('tenant.domain.redirect'));
 
                 // jika bukan di storage dan di tenant manager maka redirect ke domain utama
-            }else if(
-                (!config('tenant.isOnStorageAlltenant',false) && !config('tenant.isOnTenantManager',false) && !config('tenant.isOnGeneralApi',false) && !config('tenant.id')) ||
-                (config('tenant.isOnStorageAlltenant',false) && request()->segments()[0]!='storage')
-            ){
-                return redirect((request()->secure()?'https://':'http://').config('AppConfig.system.multitenant.main_domain'));
+            } else if (
+                (
+                    !config('tenant.isOnStorageAlltenant', false)
+                    && !config('tenant.isOnTenantManager', false)
+                    && !config('tenant.isOnGeneralApi', false)
+                    && !config('tenant.id')
+                )
+                || (
+                    config('tenant.isOnStorageAlltenant', false)
+                    && request()->segments()[0] != 'storage'
+                )
+            ) {
+                return redirect((request()->secure() ? 'https://' : 'http://')
+                    . config('AppConfig.system.multitenant.main_domain'));
             }
         }
         return $next($request);

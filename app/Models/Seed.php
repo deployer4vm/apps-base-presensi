@@ -12,11 +12,11 @@ class Seed extends BaseModel
      * @var string
      */
     protected $table = 'seeds';
-    
+
     /**
      * The attributes that aren't mass assignable.
      *
      * @var array
      */
-    protected $guarded = ['id','created_at'];
+    protected $guarded = ['id', 'created_at'];
 }

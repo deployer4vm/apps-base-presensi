@@ -49,7 +49,10 @@ class cpanelAPI
     protected $token = FALSE;
     protected $httpMethod = 'GET';
     protected $postData = '';
+
     /**
+     * Constructor
+     *
      * @param $user
      * @param $pass
      * @param $server
@@ -178,10 +181,10 @@ class cpanelAPI
             default:
                 throw new Exception('$this->api is not set or is incorrectly set. The only available options are \'uapi\' or \'api2\'');
         }
-        if($this->httpMethod == 'GET') {
+        if ($this->httpMethod == 'GET') {
             $this->requestUrl .= http_build_query($arguments);
         }
-        if($this->httpMethod == 'POST'){
+        if ($this->httpMethod == 'POST') {
             $this->postData = $arguments;
         }
 
@@ -200,9 +203,9 @@ class cpanelAPI
             $httpHeaders[] = "X-CPANEL-OTP: " . $this->token;
         }
         $ch = curl_init();
-        if($this->httpMethod == 'POST'){
+        if ($this->httpMethod == 'POST') {
             $httpHeaders[] = "Content-type: multipart/form-data";
-            curl_setopt($ch,CURLOPT_POSTFIELDS, $this->postData);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $this->postData);
         }
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);

@@ -20,52 +20,61 @@ class BaseModel extends Model
     {
         return $date->format('Y-m-d H:i:s');
     }
-    
+
     /**
      * override fillable
      */
     public function getFillable()
     {
-        if(empty($this->fillable))$this->setAutoFillableWithCache();
+        if (empty($this->fillable)) $this->setAutoFillableWithCache();
         return $this->fillable;
     }
 
     /**
      * fungsinya untuk load list field tidak live query ke database, tapi ambil dari cache
-     */    
+     */
     public function setAutoFillableWithCache()
     {
         $tableName = $this->getTable();
-        $key = 'autoFillable-'.$this->getConnectionName().'-'.$tableName;
-        $fillableKeyList = CacheConfig::getConfig('autoFillable-list',[],false);
-        $fillable = CacheConfig::getConfig($key,false,false);
-        if($fillable && in_array($key,$fillableKeyList)){
+        $key = 'autoFillable-' . $this->getConnectionName() . '-' . $tableName;
+        $fillableKeyList = CacheConfig::getConfig('autoFillable-list', [], false);
+        $fillable = CacheConfig::getConfig($key, false, false);
+        if ($fillable && in_array($key, $fillableKeyList)) {
             $this->fillable = $fillable;
-        }else{
+        } else {
             $this->setAutoFillable();
-            CacheConfig::setConfig('autoFillable-'.$this->getConnectionName().'-'.$tableName, $this->fillable);
+            CacheConfig::setConfig(
+                'autoFillable-' . $this->getConnectionName() . '-' . $tableName,
+                $this->fillable
+            );
 
-            if(!in_array($key,$fillableKeyList))
+            if (!in_array($key, $fillableKeyList))
                 $fillableKeyList[] = $key;
-                
+
             CacheConfig::setConfig('autoFillable-list', $fillableKeyList);
-        }        
+        }
     }
 
+    /**
+     * Set $fillable from database
+     *
+     * @return void
+     */
     public function setAutoFillable()
     {
-        $fields = Schema::connection($this->getConnectionName())->getColumnListing($this->getTable());
+        $fields = Schema::connection($this->getConnectionName())
+            ->getColumnListing($this->getTable());
         $guarded = $this->getGuarded();
-        $this->fillable = array_filter($fields,function($v) use ($guarded) {
-            return !in_array($v,$guarded);
+        $this->fillable = array_filter($fields, function ($v) use ($guarded) {
+            return !in_array($v, $guarded);
         });
     }
-    
+
     public function createdby()
     {
         return $this->belongsTo('hpsynapse\moduser\Models\User', 'created_by', 'id');
     }
-        
+
     public function updatedby()
     {
         return $this->belongsTo('hpsynapse\moduser\Models\User', 'updated_by', 'id');

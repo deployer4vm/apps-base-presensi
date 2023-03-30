@@ -24,7 +24,7 @@ class ResExport implements ShouldQueue
     public $tries = 1;
     // public $retryAfter = 10;
     public $timeout = 36000;
-    
+
     /**
      * Create a new job instance.
      *
@@ -32,7 +32,7 @@ class ResExport implements ShouldQueue
      * @param array $addsJobsParam tambah parameter yang akan di passing ke initExportOnJon
      * @param string $homeUrl url lengkap ke home index
      * @param array $resumeParam parameter ygn diinpunkan jika berupa proses resume
-     * 
+     *
      * @return void
      */
     public function __construct($repo,array $addsJobsParam = [],string $homeUrl='',array $resumeParam = [],$tenantId=0)
@@ -45,13 +45,13 @@ class ResExport implements ShouldQueue
     }
 
     public function failed(Throwable $error)
-    {        
-        $repo = new $this->repo;        
+    {
+        $repo = new $this->repo;
         $repo->initExportOnJob($this->addsJobsParam);
         $repo->setExportHomeUrl($this->homeUrl);
         $repo->setExportJobFailed($error);
     }
-    
+
     /**
      * Execute the job.
      *
@@ -60,13 +60,16 @@ class ResExport implements ShouldQueue
     public function handle()
     {
         try{
+            if(config('AppConfig.system.multitenant.active'))
+                \App\Facades\Tenant::setActiveTenantById($this->tenantId);
+
             $repo = new $this->repo;
             $repo->setExportTenantId($this->tenantId);
             $repo->initExportOnJob($this->addsJobsParam);
             $repo->setExportHomeUrl($this->homeUrl);
             $repo->setExportAsResume($this->resumeParam);
             $repo->processExport();
-        
+
         } catch (Exception $e) {
             Log::error('ResExport ERROR : '.$e->getMessage());
             throw $e;

@@ -12,16 +12,16 @@ class TenantGroupTenant extends BaseModel
      * @var string
      */
     protected $table = 'tenant_group_tenants';
-    
+
     /**
      * The attributes that aren't mass assignable.
      *
      * @var array
      */
-    protected $guarded = ['id','created_at'];
+    protected $guarded = ['id', 'created_at'];
 
     public function group()
     {
-        return $this->hasOne(TenantGroup::class,'id', 'tenant_group_id');
+        return $this->hasOne(TenantGroup::class, 'id', 'tenant_group_id');
     }
 }

@@ -10,14 +10,14 @@ class Authenticate extends Middleware
 {
     public function handle($request, Closure $next, ...$guards)
     {
-        if($request->header('Authorization', false)==false && $request->header('Syn-Api-Token', false)!=false)
-            $request->headers->add(['Authorization'=>'Bearer '.$request->header('Syn-Api-Token', '')]);
+        if ($request->header('Authorization', false) == false && $request->header('Syn-Api-Token', false) != false)
+            $request->headers->add(['Authorization' => 'Bearer ' . $request->header('Syn-Api-Token', '')]);
 
         $this->authenticate($request, $guards);
 
         return $next($request);
     }
-    
+
     /**
      * Get the path the user should be redirected to when they are not authenticated.
      *
@@ -26,7 +26,7 @@ class Authenticate extends Middleware
      */
     protected function redirectTo($request)
     {
-        if (! ($request->expectsJson() || $request->wantsJson() || $request->ajax())) {
+        if (!($request->expectsJson() || $request->wantsJson() || $request->ajax())) {
             return route('auth.login');
         }
     }

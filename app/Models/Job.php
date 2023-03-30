@@ -12,19 +12,19 @@ class Job extends Model
      * @var string
      */
     protected $table = 'jobs';
-    
+
     /**
      * The attributes that aren't mass assignable.
      *
      * @var array
      */
-    protected $guarded = ['id','created_at'];
+    protected $guarded = ['id', 'created_at'];
 
     // protected $appends = ['formated_payload'];
-    
+
     public function getFormatedPayloadAttribute()
     {
-        $payload = json_decode($this->payload,true);
+        $payload = json_decode($this->payload, true);
         $payload['data']['command'] = (array) unserialize($payload['data']['command']);
         return $payload;
     }

@@ -7,10 +7,13 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Facades\Log;
 use App\Base\Traits\ResCacheTrait;
+use Illuminate\Database\Eloquent\Model;
 
-abstract class BaseRepository {
+abstract class BaseRepository
+{
 
-    use Macroable, ResCacheTrait;
+    use Macroable;
+    use ResCacheTrait;
 
     //default model
     protected $model;
@@ -20,25 +23,19 @@ abstract class BaseRepository {
 
     protected $pagination = [
         'count' => 0,
-        'offset' =>0,
+        'offset' => 0,
         'limit' => 0,
         'currentPage' => 1,
         'pageCount' => 1
-    ];//default hasil list disimpan
+    ]; //default hasil list disimpan
 
     private $paginationDefault = [
         'count' => 0,
-        'offset' =>0,
+        'offset' => 0,
         'limit' => 0,
         'currentPage' => 1,
         'pageCount' => 1
-    ];//default data untuk $pagination
-
-    public function __construct()
-    {
-        if($this->_isSettedIn==false)
-            $this->_callInit();
-    }
+    ]; //default data untuk $pagination
 
     /**
      * BLOCK CLASS DEPENDENCY
@@ -47,20 +44,20 @@ abstract class BaseRepository {
      * class dependendency ini digunakan untuk dependency ke class yg menggunakan bindind interface & model nya.
      * dibuat seperti ini karena saat repository di binding dengan interface, maka sulit untuk repository tersebut mendependency ke repository yg juga binding dengna interface.
      */
-    private $dependencyLoaded = [];//list instance dari class dependency yg telah diload
+    private $dependencyLoaded = []; //list instance dari class dependency yg telah diload
     protected $dependency = [
         // 'jurnal' => 'App\MainApp\Modules\Pembukuan\Contracts\Jurnal' --> list array dependency
     ];
 
     /**
-     * load dependency
+     * Autoload dependency
      */
     public function __get($name)
     {
-        if(isset($this->dependency[$name])){
-            if(!isset($this->dependencyLoaded[$name])){
+        if (isset($this->dependency[$name])) {
+            if (!isset($this->dependencyLoaded[$name])) {
                 $this->dependencyLoaded[$name] = resolve($this->dependency[$name]);
-                if(method_exists($this->dependencyLoaded[$name],'setTenantId'))
+                if (method_exists($this->dependencyLoaded[$name], 'setTenantId'))
                     $this->dependencyLoaded[$name]->setTenantId($this->tenantId);
             }
             return $this->dependencyLoaded[$name];
@@ -78,7 +75,7 @@ abstract class BaseRepository {
      *
      * auto fungsion
      */
-    protected $_isSettedIn = false;//untuk menandai apakah fungsi2 init awal sudah dieksekusi,
+    protected $_initialized = false; //untuk menandai apakah fungsi2 init awal sudah dieksekusi,
     // agar tidak di over exekusi
 
     protected $autoResource = [
@@ -100,213 +97,309 @@ abstract class BaseRepository {
         // 'Workshop' => ['nama'=>'required']
     ];
 
+    public function __construct()
+    {
+        if ($this->_initialized == false)
+            $this->_callInit();
+    }
+
+    /**
+     * Initialize
+     *
+     * @return void
+     */
     public function _callInit()
     {
         $this->setAutoResourceCreateValidate();
         $this->setAutoResourceUpdateValidate();
-        $this->_isSettedIn = true;
+        $this->_initialized = true;
     }
 
     /**
-     * method untuk di override
+     * Override
+     *
+     * Define Validation for Creating Resource
+     *
+     * @return void
      */
     public function setAutoResourceCreateValidate()
     {
-
     }
 
+    /**
+     * Override
+     *
+     * Define Validation for Updating Resource
+     *
+     * @return void
+     */
     public function setAutoResourceUpdateValidate()
     {
-
     }
 
+    /**
+     * Magic function for method with prefix:
+     * - list
+     * - getReadModel
+     * - getWriteModel
+     * - getCreateValidation
+     * - getUpdateValidation
+     * - get
+     * - create
+     * - update
+     * - delete
+     * or with 'Exists' suffix
+     *
+     * @param [type] $name
+     * @param [type] $arguments
+     * @return mixed
+     */
     public function __call($name, $arguments)
     {
-        if(strpos($name,'list')===0){
-            return $this->_autoResourceList($name,$arguments);
-        }else if(strpos($name,'getReadModel')===0){
-            return $this->_autoResourceGetModel($name,true);
-        }else if(strpos($name,'getWriteModel')===0){
-            return $this->_autoResourceGetModel($name,false);
-        }else if(strpos($name,'getCreateValidation')===0){
-            return $this->_autoResourceGetValidation($name,true);
-        }else if(strpos($name,'getUpdateValidation')===0){
-            return $this->_autoResourceGetValidation($name,false);
-        }else if(strpos($name,'get')===0){
-            return $this->_autoResourceGet($name,$arguments);
-        }else if(strpos($name,'create')===0){
-            return $this->_autoResourceCreate($name,$arguments);
-        }else if(strpos($name,'update')===0){
-            return $this->_autoResourceUpdate($name,$arguments);
-        }else if(strpos($name,'delete')===0){
-            return $this->_autoResourceDelete($name,$arguments);
-        }else if(strrpos($name,'Exists')){
-            return $this->_autoResourceExists($name,$arguments);
+        if (strpos($name, 'list') === 0) {
+            return $this->_autoResourceList($name, $arguments);
+        } else if (strpos($name, 'getReadModel') === 0) {
+            return $this->_autoResourceGetModel($name, true);
+        } else if (strpos($name, 'getWriteModel') === 0) {
+            return $this->_autoResourceGetModel($name, false);
+        } else if (strpos($name, 'getCreateValidation') === 0) {
+            return $this->_autoResourceGetValidation($name, true);
+        } else if (strpos($name, 'getUpdateValidation') === 0) {
+            return $this->_autoResourceGetValidation($name, false);
+        } else if (strpos($name, 'get') === 0) {
+            return $this->_autoResourceGet($name, $arguments);
+        } else if (strpos($name, 'create') === 0) {
+            return $this->_autoResourceCreate($name, $arguments);
+        } else if (strpos($name, 'update') === 0) {
+            return $this->_autoResourceUpdate($name, $arguments);
+        } else if (strpos($name, 'delete') === 0) {
+            return $this->_autoResourceDelete($name, $arguments);
+        } else if (strrpos($name, 'Exists')) {
+            return $this->_autoResourceExists($name, $arguments);
         }
 
-        throw new Exception("Method $name is not defined");
+        throw new Exception("Method " . $name . " is not defined");
     }
 
     /**
-     * get model
+     * Get Resource Model
+     *
+     * @param string $name Function/Model Name
+     * @param bool $isRead false = use write resource config
+     *
+     * @return \Illuminate\Database\Eloquent\Model
      */
-    protected function _autoResourceGetModel($name,$isRead=true)
+    protected function _autoResourceGetModel($name, $isRead = true)
     {
-        $model = substr($name, $isRead?12:13);
-        $rw = $isRead?'r':'w';
-        if(is_array($this->autoResource[$model]) && isset($this->autoResource[$model][$rw])){
-            return
-                is_string($this->autoResource[$model][$rw])?
-                new $this->autoResource[$model][$rw]:
-                $this->autoResource[$model][$rw];
-        }else if(!is_array($this->autoResource[$model])){
-            return
-                is_string($this->autoResource[$model])?
-                new $this->autoResource[$model]:
-                $this->autoResource[$model];
+        $model = substr($name, $isRead ? 12 : 13);
+        $rw = $isRead ? 'r' : 'w';
+        if (
+            is_array($this->autoResource[$model])
+            && isset($this->autoResource[$model][$rw])
+        ) {
+            return is_string($this->autoResource[$model][$rw])
+                ? new $this->autoResource[$model][$rw]
+                : $this->autoResource[$model][$rw];
+        } else if (!is_array($this->autoResource[$model])) {
+            return is_string($this->autoResource[$model])
+                ? new $this->autoResource[$model]
+                : $this->autoResource[$model];
         }
 
-        throw new Exception("Method $name is not defined");
+        throw new Exception("Method " . $name . " is not defined");
     }
 
     /**
-     * get validation
+     * Get Resource Validation
+     *
+     * @param string $name Function/Model Name
+     * @param boolean $isCreate Create/Update Validation?
+     * @return array Validation Rules array
      */
-    protected function _autoResourceGetValidation($name,$isCreate=true)
+    protected function _autoResourceGetValidation($name, $isCreate = true)
     {
-        $model = substr($name,19);
-        if($isCreate && isset($this->autoResourceCreateValidate[$model])){
+        $model = substr($name, 19);
+        if ($isCreate && isset($this->autoResourceCreateValidate[$model])) {
             return $this->autoResourceCreateValidate[$model];
-        }else if(isset($this->autoResourceUpdateValidate[$model])){
+        } else if (isset($this->autoResourceUpdateValidate[$model])) {
             return $this->autoResourceUpdateValidate[$model];
         }
 
-        throw new Exception("Method $name is not defined");
+        throw new Exception("Method " . $name . " is not defined");
     }
 
     /**
-     * resource list
+     * Get List from Resource
+     *
+     * @param string $name Function/Model Name
+     * @param array $arguments Function Arguments:
+     *      [
+     *          (array) $filter,
+     *          (int) $offset,
+     *          (int) $limit,
+     *          (array) $orderBy,
+     *          (bool) $returnAsModel
+     *      ]
+     * @return array|\Illuminate\Database\Eloquent\Model jika array, akan berisi data pagination
      */
     protected function _autoResourceList($name, $arguments)
     {
         $model = substr($name, 4);
-        if(isset($this->autoResource[$model])){
+        if (isset($this->autoResource[$model])) {
 
-            $filter = isset($arguments[0])?$arguments[0]:[];
+            $filter = $arguments[0] ?? [];
             //jika tidak menyertakan searchfield maka gunakan default
-            if(!isset($filter['searchField']))
-                $filter['searchField'] =
-                    isset($this->autoResourceSearchField[$model])?
-                    $this->autoResourceSearchField[$model]:
-                    $this->searchField;
+            if (!isset($filter['searchField']))
+                $filter['searchField'] = $this->autoResourceSearchField[$model]
+                    ?? $this->searchField;
 
             return $this->_list(
-                $this->{'getReadModel'.$model}(),
+                $this->{'getReadModel' . $model}(),
                 $filter,
-                isset($arguments[1])?$arguments[1]:0,
-                isset($arguments[2])?$arguments[2]:0,
-                isset($arguments[3])?$arguments[3]:[],
-                isset($arguments[4])?$arguments[4]:false
+                $arguments[1] ?? 0,
+                $arguments[2] ?? 0,
+                $arguments[3] ?? [],
+                $arguments[4] ?? false
             );
         }
 
-        throw new Exception("Method $name is not defined");
+        throw new Exception("Method " . $name . " is not defined");
     }
 
     /**
-     * resource get 1 record
+     * Get 1 Record as Array
+     *
+     * @param string $name Function/Model Name
+     * @param array $arguments Function Arguments:
+     *      [(array|int) $filterOrId]
+     * @return void
      */
     protected function _autoResourceGet($name, $arguments)
     {
         $model = substr($name, 3);
-        if(isset($this->autoResource[$model])){
+        if (isset($this->autoResource[$model])) {
             return $this->_getOne(
-                $this->{'getReadModel'.$model}(),
-                isset($arguments[0])?$arguments[0]:null);
+                $this->{'getReadModel' . $model}(),
+                $arguments[0] ?? null
+            );
         }
 
-        throw new Exception("Method $name is not defined");
+        throw new Exception("Method " . $name . " is not defined");
     }
 
     /**
-     * resource create
+     * Create Resource
+     *
+     * @param string $name Function/Model Name
+     * @param array $arguments array data
+     *      [$arrayData]
+     * @return false|array false = gagal validasi/insert
+     *                     array = sukses, data yang di-insert-kan
      */
     protected function _autoResourceCreate($name, $arguments)
     {
         $model = substr($name, 6);
-        if(isset($this->autoResource[$model])){
-            $createModel = $this->{'getWriteModel'.$model}();
+        if (isset($this->autoResource[$model])) {
+            $createModel = $this->{'getWriteModel' . $model}();
 
-            $data = isset($arguments[0])?$arguments[0]:[];
-            $data = $this->_filterAllowField($data,$createModel->getFillable());
-            if(isset($this->autoResourceCreateValidate[$model])){
+            $data = $arguments[0] ?? [];
+            $data = $this->_filterAllowField($data, $createModel->getFillable());
+            if (isset($this->autoResourceCreateValidate[$model])) {
                 //jika error/tidak valid
-                if(!$this->_createValidate($this->autoResourceCreateValidate[$model], $data)){
+                if (!$this->_createValidate(
+                    $this->autoResourceCreateValidate[$model],
+                    $data
+                )) {
                     return false;
                 }
             }
-            return $this->_create($createModel,$data);
+            return $this->_create($createModel, $data);
         }
 
-        throw new Exception("Method $name is not defined");
+        throw new Exception("Method " . $name . " is not defined");
     }
 
     /**
-     * resource update
+     * Update Resource
+     *
+     * @param string $name Function/Model Name
+     * @param array $arguments Argument for Condition and Updated Data
+     *      [
+     *          $arrayWhereOrId,
+     *          $updatedData
+     *      ]
+     * @return false|int false = gagal validasi/update
+     *                   int = sukses, jumlah affected rows
      */
     protected function _autoResourceUpdate($name, $arguments)
     {
         $model = substr($name, 6);
-        if(isset($this->autoResource[$model])){
-            $updateModel = $this->{'getWriteModel'.$model}();
-            $data = isset($arguments[1])?$arguments[1]:[];
+        if (isset($this->autoResource[$model])) {
+            $updateModel = $this->{'getWriteModel' . $model}();
+            $data = $arguments[1] ?? [];
 
-            $data = $this->_filterAllowField($data,$updateModel->getFillable());
-            if(isset($this->autoResourceUpdateValidate[$model])){
+            $data = $this->_filterAllowField($data, $updateModel->getFillable());
+            if (isset($this->autoResourceUpdateValidate[$model])) {
                 //jika error/tidak valid
-                if(!$this->_updateValidate($this->autoResourceUpdateValidate[$model], $data)){
+                if (!$this->_updateValidate(
+                    $this->autoResourceUpdateValidate[$model],
+                    $data
+                )) {
                     return false;
                 }
             }
             return $this->_update(
                 $updateModel,
-                isset($arguments[0])?$arguments[0]:null,
-                $data);
+                $arguments[0] ?? null,
+                $data
+            );
         }
 
-        throw new Exception("Method $name is not defined");
+        throw new Exception("Method " . $name . " is not defined");
     }
 
     /**
      * resource delete
      */
+    /**
+     * Delete Resource
+     *
+     * @param string $name Function/Model name
+     * @param array $arguments
+     *      [$where]
+     * @return bool
+     */
     protected function _autoResourceDelete($name, $arguments)
     {
         $model = substr($name, 6);
-        if(isset($this->autoResource[$model])){
+        if (isset($this->autoResource[$model])) {
             return $this->_delete(
-                $this->{'getWriteModel'.$model}(),
-                isset($arguments[0])?$arguments[0]:null
-			);
+                $this->{'getWriteModel' . $model}(),
+                $arguments[0] ?? null
+            );
         }
 
-        throw new Exception("Method $name is not defined");
+        throw new Exception("Method " . $name . " is not defined");
     }
 
     /**
-     * resource detect exists
+     * Check if Resource Exists
+     *
+     * @param string $name Function/Model name
+     * @param array $arguments
+     * @return bool
      */
     protected function _autoResourceExists($name, $arguments)
     {
-        $model = ucfirst(substr($name,0, -6));
-        if(isset($this->autoResource[$model])){
+        $model = ucfirst(substr($name, 0, -6));
+        if (isset($this->autoResource[$model])) {
             return $this->_exists(
-                $this->{'getReadModel'.$model}(),
-                isset($arguments[0])?$arguments[0]:null
-			);
+                $this->{'getReadModel' . $model}(),
+                $arguments[0] ?? null
+            );
         }
 
-        throw new Exception("Method $name is not defined");
+        throw new Exception("Method " . $name . " is not defined");
     }
 
     /**
@@ -316,78 +409,105 @@ abstract class BaseRepository {
 
     protected $tenantId = 0;
 
-    public function setTenantId(int $tenantId=0)
+    /**
+     * Set Tenant ID
+     *
+     * @param integer $tenantId
+     * @return void
+     */
+    public function setTenantId(int $tenantId = 0)
     {
         $this->tenantId = $tenantId;
     }
 
-    protected $error = '';//error message string
-    protected $errorValidator = [];//error validator/request
-    protected $errorCode = 0;//error code
+    protected $error = ''; //error message string
+    protected $errorValidator = []; //error validator/request
+    protected $errorCode = 0; //error code
 
-    public function clearError(){
+    /**
+     * Clear error data
+     *
+     * @return void
+     */
+    public function clearError()
+    {
         $this->error = '';
-        $this->errorValidator=[];
-        $this->errorCode=0;
-    }
-
-
-    public function errorFull() {
-        $errorValidator = '';
-        if($this->errorValidator){
-            $errorValidator = '<br><ul>'.implode("\n",array_map(function($v){return '<li>'.$v.'</li>';},$this->errorValidator)).'</ul>';
-        }
-
-        return $this->error.$errorValidator;
+        $this->errorValidator = [];
+        $this->errorCode = 0;
     }
 
     /**
-     * get error string
+     * Get full error message in HTML format
      *
-     * @return string       error string
+     * @return string Error Message
      */
-    public function error() {
+    public function errorFull()
+    {
+        $errorValidator = '';
+        if ($this->errorValidator) {
+            $errorValidator = '<br><ul>' . implode("\n", array_map(function ($v) {
+                return '<li>' . $v . '</li>';
+            }, $this->errorValidator)) . '</ul>';
+        }
+
+        return $this->error . $errorValidator;
+    }
+
+    /**
+     * Get error string
+     *
+     * @return string error string
+     */
+    public function error()
+    {
         return $this->error;
     }
 
     /**
-     * get error string
+     * Get Validation error string
      *
-     * @return string       error string
+     * @return string error string
      */
-    public function errorValidator() {
+    public function errorValidator()
+    {
         return $this->errorValidator;
     }
 
     /**
-     * get error code
+     * Get error code
      *
-     * @return integer       error code
+     * @return int error code
      */
-    public function errorCode() {
+    public function errorCode()
+    {
         return $this->errorCode;
     }
 
     /**
-     * get deafault model
+     * Get Default Eloquent Model
      *
-     * @return eloquent model
+     * @return \Illuminate\Database\Eloquent\Model model
      */
-    public function getModel() {
+    public function getModel()
+    {
         return $this->model;
     }
 
     /**
-     * set/re-set default model
+     * Set Default Model
      *
-     * @param eloquent $model
+     * @param \Illuminate\Database\Eloquent\Model $model
+     * @return void
      */
-    public function setModel($model) {
+    public function setModel(Model $model)
+    {
         $this->model = $model;
     }
 
     /**
-     * get default output untuk listing
+     * Get Default Listing Output
+     *
+     * @return array
      */
     protected function getDefaultListFormat()
     {
@@ -396,11 +516,21 @@ abstract class BaseRepository {
 
     protected $triggerEvent = true;
 
+    /**
+     * Enable Trigger Event
+     *
+     * @return void
+     */
     public function enableEvent()
     {
         $this->triggerEvent = true;
     }
 
+    /**
+     * Disable Trigger Event
+     *
+     * @return void
+     */
     public function disableEvent()
     {
         $this->triggerEvent = false;
@@ -412,7 +542,7 @@ abstract class BaseRepository {
      */
 
     /**
-     * cek apakah key di $inputData ada semua di $availableFields
+     * Cek apakah key di $inputData ada semua di $availableFields
      *
      * @param array         $inputData          array data
      * @param array         $availableFields    list available field nya
@@ -429,7 +559,7 @@ abstract class BaseRepository {
     }
 
     /**
-     * Hapus semua item array $item yang tidak ada di $allowedFields.
+     * Hapus semua item array $data yang tidak ada di $allowedFields.
      *
      * filter array hanya berdasarkan key yg diallow nya saja
      * filter $data yang akan di update / output / field, jika ada field yang tidak sesuai dengan
@@ -450,7 +580,7 @@ abstract class BaseRepository {
     }
 
     /**
-     * Hapus semua item array $item yang ada di $rejectedFields.
+     * Hapus semua item array $data yang ada di $rejectedFields.
      *
      * filter array berdasarkan field yang tidak boleh ada (dihapus)
      * filter data yang akan di update / output / field, jika ada field yang terdaftar
@@ -485,18 +615,17 @@ abstract class BaseRepository {
     }
 
     /**
-     * DONE
-     * generate basic where function
+     * generate/build basic where function
      *
-     * @param eloquent      $model
+     * @param \Illuminate\Database\Eloquent\Model      $model
      * @param array         $filter     synapse where format
      *
-     * @return eloquent
+     * @return \Illuminate\Database\Eloquent\Model
      */
     final protected function _where($model, $where)
     {
         //jika sudah kosong maka langsung kembalikan model nya
-        if(empty($where))return $model;
+        if (empty($where)) return $model;
 
         //jika where di isi selain array maka asumsikan isinya adalah id table
         if (!is_array($where)) {
@@ -506,7 +635,7 @@ abstract class BaseRepository {
         //berarti sudah tidak nested, harusnya yang sudah tidak nested tidak masuk ke sini
         if (isset($where[0]) && !is_array($where[0]) && $where[0] != 'or') {
             $model = $this->__whereNotNested($model, $where);
-        }else{
+        } else {
             $model = $this->__whereNested($model, $where);
         }
 
@@ -516,29 +645,34 @@ abstract class BaseRepository {
     /**
      * helper untuk _where(), memproses array where yang masih nested
      *
-     * @param Eloquent $model
+     * @param \Illuminate\Database\Eloquent\Model $model
      * @param array $where
      *
-     * @return eloquent
+     * @return \Illuminate\Database\Eloquent\Model
      */
-    private function __whereNested($model, $where){
+    private function __whereNested($model, $where)
+    {
 
         foreach ($where as $value) {
             //jika value[1] tidak ada kemungkinan ada yang keliru input format, maka langsung tolak
-            if(!is_array($value) || !array_key_exists(1,$value))return $model;
+            if (!is_array($value) || !array_key_exists(1, $value)) return $model;
 
             //jika sudah tidak nested maka langsung proses
-            if (is_array($value) && !is_array($value[0]) && strtolower($value[0]) != 'or') {
+            if (
+                is_array($value)
+                && !is_array($value[0])
+                && strtolower($value[0]) != 'or'
+            ) {
                 $model = $this->__whereNotNested($model, $value);
-            //jika masih nested maka process recursive lagi
+                //jika masih nested maka process recursive lagi
             } else {
                 $varWhere = 'where';
                 //detek apakah or
-                if(!is_array($value[0]) && strtolower($value[0]) == 'or'){
+                if (!is_array($value[0]) && strtolower($value[0]) == 'or') {
                     unset($value[0]);
                     $varWhere = 'orWhere';
                 }
-                $model = $model->$varWhere(function($model) use ($value){
+                $model = $model->$varWhere(function ($model) use ($value) {
                     $model = $this->_where($model, $value);
                 });
             }
@@ -549,10 +683,10 @@ abstract class BaseRepository {
     /**
      * helper untuk _where(), memproses array where yang sudah tidak nested
      *
-     * @param Eloquent $model
+     * @param \Illuminate\Database\Eloquent\Model $model
      * @param array $where
      *
-     * @return eloquent
+     * @return \Illuminate\Database\Eloquent\Model
      */
     private function __whereNotNested($model, $where)
     {
@@ -561,50 +695,50 @@ abstract class BaseRepository {
         $field = $where[0];
         $isOr = false;
 
-        if(stripos($where[0],'or ')===0){
-            $field = str_ireplace('or ','', $where[0]);
+        if (stripos($where[0], 'or ') === 0) {
+            $field = str_ireplace('or ', '', $where[0]);
             $isOr = true;
         }
 
         //jika ada 3 item berarti menyertakan operator nya juga
-        if(count($where)==3){
+        if (count($where) == 3) {
             $op = $where[1];
             $dVal = $where[2];
-        }else{
+        } else {
             $dVal = $where[1];
         }
 
-		//jika valuenya array berarti diproses menggunakan IN
-        if(is_array($dVal)){
-            if($isOr){
-                if($op=='='){
-                    $model = $model->orWhereIn($field,$dVal);
-                }else{
-                    $model = $model->orWhereNotIn($field,$dVal);
+        //jika valuenya array berarti diprses menggunakan IN
+        if (is_array($dVal)) {
+            if ($isOr) {
+                if ($op == '=') {
+                    $model = $model->orWhereIn($field, $dVal);
+                } else {
+                    $model = $model->orWhereNotIn($field, $dVal);
                 }
-            }else{
-                if($op=='='){
-                    $model = $model->whereIn($field,$dVal);
-                }else{
-                    $model = $model->whereNotIn($field,$dVal);
+            } else {
+                if ($op == '=') {
+                    $model = $model->whereIn($field, $dVal);
+                } else {
+                    $model = $model->whereNotIn($field, $dVal);
                 }
             }
-        }else{
-            if($isOr){
-                if($dVal==='NULL'){
+        } else {
+            if ($isOr) {
+                if ($dVal === 'NULL') {
                     $model = $model->orWhereNull($field);
-                }else if($dVal==='NOT NULL'){
+                } else if ($dVal === 'NOT NULL') {
                     $model = $model->orWhereNotNull($field);
-                }else{
-                    $model = $model->orWhere($field,$op, $dVal);
+                } else {
+                    $model = $model->orWhere($field, $op, $dVal);
                 }
-            }else{
-                if($dVal==='NULL'){
+            } else {
+                if ($dVal === 'NULL') {
                     $model = $model->whereNull($field);
-                }else if($dVal==='NOT NULL'){
+                } else if ($dVal === 'NOT NULL') {
                     $model = $model->whereNotNull($field);
-                }else{
-                    $model = $model->where($field,$op, $dVal);
+                } else {
+                    $model = $model->where($field, $op, $dVal);
                 }
             }
         }
@@ -614,15 +748,15 @@ abstract class BaseRepository {
     /**
      * pemrosesan default search data berdasarkan $q string yg diinput
      *
-     * @param eloquent instance $model
+     * @param \Illuminate\Database\Eloquent\Model $model
      * @param string $q query string
      * @param array $searchField list field yg di search nya
      *
-     * @return eloquent instance
+     * @return \Illuminate\Database\Eloquent\Model
      */
     final protected function _searchString($model, $q, $searchField = false)
     {
-        $model = $model->where(function($query) use ($q, $searchField) {
+        $model = $model->where(function ($query) use ($q, $searchField) {
             foreach ($searchField as $value) {
                 $query = $query->orWhere($value, 'LIKE', '%' . $q . '%');
             }
@@ -633,7 +767,7 @@ abstract class BaseRepository {
     /**
      * Default fungsi list data
      *
-     * @param eloquen instance $model model data yang digunakan
+     * @param \Illuminate\Database\Eloquent\Model instance $model model data yang digunakan
      * @param array $filter filter data jika ada
      *      tenantId|tenant_id      bigint              id tenant yang di filter
      *      q                       string              jika menyertakan ini maka akan dilakuan string filter berdasarkan field $searchField     *
@@ -645,23 +779,28 @@ abstract class BaseRepository {
      *      has                     array|string        list custom has yg akan ditampilkan
      *      idAsKey                 boolean             true jika key data menggunakan ID, false jika urutan array default (default false)
      *
-     *      ADDITIONAL_PARAM        array               where untuk default filter
-     * @param int $offset
-     * @param int $limit                jika 0 maka view all
-     * @param array $orderBy            [['field','DESC/ASC'],['other_field','ASC/DESC']] atau array 1 level jika memang cuma 1 yg di order by nya
-     * @param Boolean $returnModel      True jika yang direturn hasil model eloquen, False jika format _list synapse
-     *                                  Jika true berarti fungsi2 setelah builder (seperti apend) tidak akan tereksekusi
+     *      ADDITIONAL_PARAM array where untuk default filter
+     * @param int $offset, posisi yg pertama kali ditampilkan
+     * @param int $limit jika 0 maka view all, jumlah data yg ditampilkan
+     * @param array $orderBy [['field','DESC/ASC'],['other_field','ASC/DESC']] atau array 1 level jika memang cuma 1 yg di order by nya
+     * @param bool $returnModel True jika yang direturn hasil model eloquen, False jika format _list synapse
      *
      * @return array
      */
-    final protected function _list($model, array $filter = [], int $offset = 0, int $limit = 0, array $orderBy = [], $returnModel=false)
-    {
+    final protected function _list(
+        $model,
+        array $filter = [],
+        int $offset = 0,
+        int $limit = 0,
+        array $orderBy = [],
+        $returnModel = false
+    ) {
 
         if (!empty($orderBy)) {
-            if(!is_array($orderBy[0]))
-				$orderBy=[$orderBy];
+            if (!is_array($orderBy[0]))
+                $orderBy = [$orderBy];
 
-            foreach($orderBy as $oBitem){
+            foreach ($orderBy as $oBitem) {
                 $model = $model->orderBy($oBitem[0], $oBitem[1]);
             }
         }
@@ -674,7 +813,7 @@ abstract class BaseRepository {
                 $idAsKey = true;
                 unset($filter['idAsKey']);
             }
-            $model = $this->_filter($model,$filter);
+            $model = $this->_filter($model, $filter);
             if (isset($filter['hiddenColumn'])) {
                 $hiddenColumn = $filter['hiddenColumn'];
                 unset($filter['hiddenColumn']);
@@ -686,7 +825,7 @@ abstract class BaseRepository {
             unset($filter);
         }
 
-        if(empty($model)){
+        if (empty($model)) {
             $this->pagination = $this->getDefaultListFormat();
             return $this->pagination;
         }
@@ -697,11 +836,11 @@ abstract class BaseRepository {
         $this->pagination['currentPage'] = 1;
         $this->pagination['pageCount'] = 1;
 
-        if ($limit){
+        if ($limit) {
             // $model = $model->limit($limit)->offset($offset);
 
-            $this->pagination['currentPage'] = (int) ceil(($offset+1)/$limit);
-            $this->pagination['pageCount'] = (int) ceil($this->pagination['count']/$limit);
+            $this->pagination['currentPage'] = (int) ceil(($offset + 1) / $limit);
+            $this->pagination['pageCount'] = (int) ceil($this->pagination['count'] / $limit);
         }
 
         if ($model) {
@@ -713,20 +852,26 @@ abstract class BaseRepository {
             //     $this->pagination['data'] = $model->get()->toArray();
             // }
 
-            if($returnModel)
+            if ($returnModel)
                 return $model;
 
             $this->_tmpListData = [];
-            $this->chunkWithLimit($model,100,$offset,$limit?$limit:null, function ($chunkedData) use($appendAttribut) {
-                // $model->chunk(100, function ($data) use($appendAttribut) {
-                if($appendAttribut)
-                    $chunkedData = $chunkedData->append($appendAttribut);
+            $this->chunkWithLimit(
+                $model,
+                100,
+                $offset,
+                $limit ?: null,
+                function ($chunkedData) use ($appendAttribut) {
+                    // $model->chunk(100, function ($data) use($appendAttribut) {
+                    if ($appendAttribut)
+                        $chunkedData = $chunkedData->append($appendAttribut);
 
-                foreach ($chunkedData as $item) {
-                    $this->_tmpListData[] = $item->toArray();
+                    foreach ($chunkedData as $item) {
+                        $this->_tmpListData[] = $item->toArray();
+                    }
+                    usleep(50);
                 }
-                usleep(200);
-            });
+            );
 
             $this->pagination['data'] = $this->_tmpListData;
 
@@ -735,13 +880,13 @@ abstract class BaseRepository {
             if ($hiddenColumn || $idAsKey) {
                 $tmpData = [];
                 foreach ($this->pagination['data'] as $value) {
-                    if($hiddenColumn)
+                    if ($hiddenColumn)
                         foreach ($hiddenColumn as $column) {
                             unset($value[$column]);
                         }
-                    if($idAsKey){
+                    if ($idAsKey) {
                         $tmpData[$value['id']] = $value;
-                    }else{
+                    } else {
                         $tmpData[] = $value;
                     }
                 }
@@ -757,17 +902,31 @@ abstract class BaseRepository {
                 // });
                 // $this->pagination['data'] = $collection->toArray();
             }
-
         } else {
             $this->pagination['data'] = [];
         }
         return $this->pagination;
     }
 
-    private function chunkWithLimit ($model, $count,$offset=0,$remaining=null, callable $callback = null)
-    {
+    /**
+     * Chunk the query with limit and process the chunked result using $callback if given
+     *
+     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param integer $count Jumlah Total Row
+     * @param integer $offset Offset/Starting row
+     * @param integer $remaining Sisa yang belum belum diproses
+     * @param callable $callback Callback function untuk memproses chunk
+     * @return bool false jika $callback me-return false
+     */
+    private function chunkWithLimit(
+        $model,
+        $count,
+        $offset = 0,
+        $remaining = null,
+        callable $callback = null
+    ) {
         do {
-            if (! is_null($remaining)) {
+            if (!is_null($remaining)) {
                 $limit = min($count, $remaining);
             } else {
                 $limit = $count;
@@ -790,7 +949,7 @@ abstract class BaseRepository {
 
             $offset += $countResults;
 
-            if (! is_null($remaining)) {
+            if (!is_null($remaining)) {
                 $remaining -= $countResults;
                 if ($remaining == 0) {
                     break;
@@ -800,39 +959,40 @@ abstract class BaseRepository {
 
         return true;
     }
-    
+
     /**
-     * inisiasi filter import
-     * 
-     * @param Array $filter standard synapse filter ditambah : 
+     * Inisiasi filter import, transform filter ke format where
+     *
+     * @param array $filter standard synapse filter ditambah :
      *      view_import     *Optional, untuk mode tampil data
      *                      - 0 atau jika tidak disertakan maka hanya menampilkan data aktif saja
      *                      - 1 menampilkan import yang on progress saja
      *                      - 2 menampilkan semua
      *      import_id       *Wajib diisi jika view_import = 1, berisi id importId
+     * @return array transformed array
      */
     public function initImportFilter($filter)
     {
-        if(!isset($filter['view_import'])){
+        if (!isset($filter['view_import'])) {
             // jika tidak menyertakan view_import maka tampilkan hanya data publish
             $filter[] = [
-                ['is_import',0],
-                ['OR import_status',1]
+                ['is_import', 0],
+                ['OR import_status', 1]
             ];
-        }else {
+        } else {
             // jika menampilkan hanya data yg sedang import
-            if($filter['view_import']==1){
+            if ($filter['view_import'] == 1) {
                 $filter[] = [
-                    ['is_import',1],
-                    ['import_status',0],
-                    ['import_id',$filter['import_id']]
+                    ['is_import', 1],
+                    ['import_status', 0],
+                    ['import_id', $filter['import_id']]
                 ];
                 unset($filter['import_id']);
-            // jika bukan dua maka hanya tampilkan data publish saja (samakan dengan tidak menyertakan)
-            }else if($filter['view_import']!=2){
+                // jika bukan dua maka hanya tampilkan data publish saja (samakan dengan tidak menyertakan)
+            } else if ($filter['view_import'] != 2) {
                 $filter[] = [
-                    ['is_import',0],
-                    ['OR import_status',1]
+                    ['is_import', 0],
+                    ['OR import_status', 1]
                 ];
             }
             unset($filter['view_import']);
@@ -841,9 +1001,16 @@ abstract class BaseRepository {
         return $filter;
     }
 
-    final protected function _filter($model,array $filter=[])
+    /**
+     * Penerapan Filter array ke Eloquent Model
+     *
+     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param array $filter
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    final protected function _filter($model, array $filter = [])
     {
-        if(empty($model))return $model;
+        if (empty($model)) return $model;
 
         $qSearch = null;
         $searchField = null;
@@ -858,18 +1025,18 @@ abstract class BaseRepository {
             unset($filter['has']);
         }
 
-        if(empty($filter['q']))
+        if (empty($filter['q']))
             unset($filter['q']);
 
         //hiddenColumn digunakan di filter saat result
-        if(isset($filter['hiddenColumn']) || empty($filter['hiddenColumn']))
+        if (isset($filter['hiddenColumn']) || empty($filter['hiddenColumn']))
             unset($filter['hiddenColumn']);
 
         //append digunakan di filter saat result
         if (isset($filter['append']))
             unset($filter['append']);
 
-        if(empty($filter['searchField']))
+        if (empty($filter['searchField']))
             unset($filter['searchField']);
 
         if (isset($filter['q'])) {
@@ -878,10 +1045,10 @@ abstract class BaseRepository {
         }
 
         if (isset($filter['tenant_id'])) {
-            $filter[] = ['tenant_id',$filter['tenant_id']];
+            $filter[] = ['tenant_id', $filter['tenant_id']];
             unset($filter['tenant_id']);
-        }else if (isset($filter['tenantId'])) {
-            $filter[] = ['tenant_id',$filter['tenantId']];
+        } else if (isset($filter['tenantId'])) {
+            $filter[] = ['tenant_id', $filter['tenantId']];
             unset($filter['tenantId']);
         }
 
@@ -906,20 +1073,17 @@ abstract class BaseRepository {
     }
 
     /**
-     * DONE
      * Generate pagination untuk di view blade (menggunakan pagination laravel)
      *
-     * @param String $path path paginationnya
-     * @param Array $pagination
+     * @param string $path path paginationnya
+     * @param array $pagination
      *      count
      *      offset
      *      limit
      *      data
-     * @param String $view view pagination
-     *
      * @return pagination instance
      */
-    final protected function _getPagination(string $path = '', $pagination = false, $view='component.pagination')
+    final protected function _getPagination(string $path = '', $pagination = false, $view = 'component.pagination')
     {
         if (!$path)
             $path = request()->url();
@@ -929,18 +1093,20 @@ abstract class BaseRepository {
     }
 
     /**
-     * fungsi utama untuk get 1 record data
+     * Get 1 record data using Synapse Filter Array
      *
-     * @param eloquen instance  $model
+     * @param \Illuminate\Database\Eloquent\Model instance  $model
      * @param array|int         $filter     synapse array filter format, atau id table
      *
      * @return false|array    false jika gagal, array record jika ada
      */
     final protected function _getOne($model, $filter)
     {
-        if(empty($model))return $model;
+        if (empty($model)) return $model;
         // $data = $this->_getOneModel($model, $filter);
-        if(!is_array($filter))$filter = ['id',$filter];
+        if (!is_array($filter))
+            $filter = ['id', $filter];
+
         $data = $this->_filter($model, $filter)->first();
 
         if ($data && isset($filter['append'])) {
@@ -950,23 +1116,21 @@ abstract class BaseRepository {
     }
 
     /**
-     * DONE
+     * Get 1 record data using Array Where (not synapse defined filter array) and return the Eloquent Model instead of array
      *
-     * fungsi utama untuk get 1 record data
+     * @param \Illuminate\Database\Eloquent\Model $model      model eloquent
+     * @param array|int         $where      array where filter format, atau id table
      *
-     * @param eloquen           $model      model eloquent
-     * @param array|int         $where     synapse array where filter format, atau id table
-     *
-     * @return eloquen                      false jika gagal, aloquent collection jika berhasil
+     * @return false|\Illuminate\Database\Eloquent\Model false jika gagal, aloquent collection jika berhasil
      */
     final protected function _getOneModel($model, $where)
     {
-        if(empty($model))
-			return $model;
+        if (empty($model))
+            return $model;
 
         //jika array berarti berisi where
         if (!is_array($where))
-            $where = [['id',$where]];
+            $where = [['id', $where]];
 
         $data = $this->_where($model, $where);
         $data = $data->first();
@@ -978,22 +1142,21 @@ abstract class BaseRepository {
     }
 
     /**
-     * DONE
-     * detect
+     * Check if data exists
      *
-     * @param eloquen           $model      model eloquent
-     * @param array|int         $filter     synapse array where filter format, atau id table
+     * @param \Illuminate\Database\Eloquent\Model           $model      model eloquent
+     * @param array|int         $ehere     array where filter format, atau id table
      *
      * @return boolean
      */
     final protected function _exists($model, $where): bool
     {
-        if(empty($model))
-			return false;
+        if (empty($model))
+            return false;
 
         //jika array berarti berisi where
         if (!is_array($where))
-            $where = ['id',$where];
+            $where = ['id', $where];
 
         $data = $this->_where($model, $where);
 
@@ -1001,28 +1164,28 @@ abstract class BaseRepository {
     }
 
     /**
-     * insert new record
+     * Insert new record and return the inserted data as array
      *
-     * @param eloquent $model
+     * @param \Illuminate\Database\Eloquent\Model $model
      * @param array $data
-     * @return null|array    null jika gagal, atau array record databasenya jika berhasil
+     * @return false|array    null jika gagal, atau array record databasenya jika berhasil
      */
     final protected function _create($model, array $data)
     {
         $this->clearError();
         //get QueryExeption
         try {
-            if ($data = $model->create($data)) {
-                return $model->find($data->id)->toArray();
+            if (($result = $model->create($data))) {
+                return $model->find($result->id)->toArray();
             }
-        }catch (\Illuminate\Database\QueryException $ex){
+        } catch (\Illuminate\Database\QueryException $ex) {
             $this->error = $ex->getMessage();
         }
-        return null;
+        return false;
     }
 
     /**
-     * validasi menggunakan laravel Validator saat create
+     * Validasi menggunakan laravel Validator saat create
      *
      * @param array $rules validator rule, key : nama field, value : rule
      * @param array $data data input nya
@@ -1030,7 +1193,7 @@ abstract class BaseRepository {
      */
     final protected function _createValidate(array $rules, array $data)
     {
-        $validator = Validator::make($data,$rules);
+        $validator = Validator::make($data, $rules);
         if ($validator->fails()) {
             $this->error = __('alert.form_must_complete_title');
             $this->errorValidator = $validator->errors()->all();
@@ -1043,7 +1206,7 @@ abstract class BaseRepository {
      *
      * Update data
      *
-     * @param eloquent          $model  instance eloquent model yang akan diupdate
+     * @param \Illuminate\Database\Eloquent\Model          $model  instance eloquent model yang akan diupdate
      * @param array|int         $where  array where filter atau string/integer id data
      * @param array             $data   array data yang akan update
      *
@@ -1059,11 +1222,11 @@ abstract class BaseRepository {
 
             $model = $this->_where($model, $where);
 
-            if ($model){
+            if ($model) {
                 $return = $model->update($data);
-                return $return==null?true:$return;
+                return $return == null ? true : $return;
             }
-        }catch (\Illuminate\Database\QueryException $ex){
+        } catch (\Illuminate\Database\QueryException $ex) {
             $this->error = $ex->getMessage();
         }
 
@@ -1071,7 +1234,7 @@ abstract class BaseRepository {
     }
 
     /**
-     * validasi menggunakan laravel Validator saat update
+     * Validasi menggunakan laravel Validator saat update
      *
      * @param array $rules validator rule, key : nama field, value : rule
      * @param array $data data input nya
@@ -1080,19 +1243,19 @@ abstract class BaseRepository {
     final protected function _updateValidate(array $rules, array &$data)
     {
         $validateRule = [];
-        foreach($rules as $field => $rule){
+        foreach ($rules as $field => $rule) {
             //jika data disertakan maka proses validasinya
-            if(isset($data[$field])){
+            if (isset($data[$field])) {
                 //jika rule nya kosong berarti tandanya jangan dimasukan
-                if(empty($rule)){
+                if (empty($rule)) {
                     unset($data[$field]);
-                }else{
+                } else {
                     $validateRule[$field] = $rule;
                 }
             }
         }
 
-        $validator = Validator::make($data,$validateRule);
+        $validator = Validator::make($data, $validateRule);
 
         if ($validator->fails()) {
             $this->error = __('alert.form_must_complete_title');
@@ -1113,17 +1276,17 @@ abstract class BaseRepository {
      */
     final protected function _delete($model, $where): bool
     {
-        if(empty($model))
-			return false;
+        if (empty($model))
+            return false;
 
         $model = $this->_where($model, $where);
 
         if ($model != false) {
-            if($model->count()<=0)
+            if ($model->count() <= 0)
                 return true;
             if ($model->delete())
                 return true;
-        }else{
+        } else {
             $this->error = __('lang.data_not_found');
         }
 
@@ -1145,19 +1308,23 @@ abstract class BaseRepository {
      *
      * @return array|null
      */
-    public function getList(array $filter = [], int $offset = 0, int $limit = 0, array $orderBy = [])
-    {
+    public function getList(
+        array $filter = [],
+        int $offset = 0,
+        int $limit = 0,
+        array $orderBy = []
+    ) {
         return $this->_list($this->model, $filter, $offset, $limit, $orderBy);
     }
 
     /**
      * Default pagination function
      *
-     * @param String $path
-     * @param Array $pagination data pagination
-     * @param String $view view pagination
+     * @param string $path
+     * @param array $pagination data pagination
+     * @param string $view view pagination
      *
-     * @return pagination laravel object
+     * @return \Illuminate\Pagination\Paginator laravel object
      */
     public function getPagination($path = '', $pagination = false, $view = 'component.pagination')
     {
@@ -1183,13 +1350,13 @@ abstract class BaseRepository {
      *
      * @return boolean
      */
-    public function exists($where):bool
+    public function exists($where): bool
     {
         return $this->_exists($this->model, $where);
     }
 
     /**
-     * default create new data function
+     * Create new data on default model
      *
      * @param array $data
      *
@@ -1201,6 +1368,7 @@ abstract class BaseRepository {
     }
 
     /**
+     * Update data on default model
      *
      * @param array|integer     $key
      * @param array             $data
@@ -1213,11 +1381,12 @@ abstract class BaseRepository {
     }
 
     /**
-     * @param array|int         $where  array synapse where format atau integer id data
+     * Delete data on default model
+     *
+     * @param bool
      */
     public function delete($where)
     {
         return $this->_delete($this->model, $where);
     }
-
 }

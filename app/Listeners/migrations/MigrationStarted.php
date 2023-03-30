@@ -21,15 +21,14 @@ use Illuminate\Support\Facades\Log;
 class MigrationStarted
 {
     use ResetModelCacheTraits;
-    
+
     /**
      * @param  object  $event
-     * 
+     *
      * @return void
      */
     public function handle($event)
-    { 
+    {
         // $this->resetCache('MigrationStarted',$event);
     }
-
 }

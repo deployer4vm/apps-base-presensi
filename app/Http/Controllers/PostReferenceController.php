@@ -26,9 +26,9 @@ class PostReferenceController extends BaseController
     /**
      * GET - /sys/postref/
      * get post reff
-     * 
+     *
      * @param Request $request
-     *      form_id 
+     *      form_id
      *      tenant_id *optional
      *      user_id *optional
      *
@@ -38,15 +38,14 @@ class PostReferenceController extends BaseController
     {
         $this->output['data'] = PostReference::getPostRef(
             $request->input('form_id'),
-            $request->input('tenant_id',config('tenant.id',false)),
-            $request->input('user_id',UserAuth::user('id'))
-        ); 
+            $request->input('tenant_id', config('tenant.id', false)),
+            $request->input('user_id', UserAuth::user('id'))
+        );
 
-        if(!$this->output['data']){
+        if (!$this->output['data']) {
             $this->setError(PostReference::error());
-        }          
-        
+        }
+
         return $this->done();
     }
-
 }
