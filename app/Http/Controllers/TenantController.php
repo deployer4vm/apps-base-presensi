@@ -40,13 +40,12 @@ class TenantController extends BaseController
         ];
         $groupApp = config('tenant.group_app', $request->input('group_app'));
         if ($groupApp) {
-            $tenant['active_tenant'] = Tenant::where('group_app', $groupApp)->first();
+            $tenant['active_tenant'] = Tenant::with(['instanceData'])->where('group_app', $groupApp)->first();
             if ($tenant['active_tenant']) {
-                $tenant['active_tenant_group']
-                    = TenantGroupTenant::where('tenant_id', $tenant['active_tenant']->id)
-                        ->select('tenant_group_id')
-                        ->get()
-                        ->pluck('tenant_group_id');
+                $tenant['active_tenant_group'] = TenantGroupTenant::where('tenant_id', $tenant['active_tenant']->id)
+                    ->select('tenant_group_id')
+                    ->get()
+                    ->pluck('tenant_group_id');
                 if ($tenant['active_tenant_group']->count() <= 0) {
                     $tenant['active_tenant_group'] = false;
                 } else {

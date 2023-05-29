@@ -4,6 +4,9 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Artisan;
 
+use App\Models\Tenant as MTenant;
+use App\Facades\Tenant;
+
 class Utilities
 {
     /**
@@ -246,5 +249,37 @@ class Utilities
         if ($group == 'tenant') return $queueList;
 
         return $queueList;
+    }
+
+    /**
+     * Loop semua tenant
+     *
+     * @param Function $callBack            fungsi callback yang akan diloopigng nya
+     * @param Array|Number $tenantIds       kosongkan jika looping seluruh tenant,
+     *                                      atau isi dengan list id tenant
+     */
+    public static function loopTenant($callBack, $tenantIds = [])
+    {
+        if (empty($tenantIds)) {
+            $tenantList = MTenant::get();
+        } else {
+            $tenantIds = is_array($tenantIds) ? $tenantIds : [$tenantIds];
+            $tenantList = MTenant::whereIn('id', $tenantIds)->get();
+        }
+
+        foreach ($tenantList as $tenant) {
+            if ($tenant->status) {
+                if (!empty($tenantIds) && !in_array($tenant->id, $tenantIds))
+                    continue;
+
+                if (!Tenant::dbExists($tenant->id))
+                    continue;
+
+                Tenant::setDB($tenant->id);
+                $conTenant = config('database.perTenant') . $tenant->id;
+
+                $callBack($tenant, $conTenant);
+            }
+        }
     }
 }

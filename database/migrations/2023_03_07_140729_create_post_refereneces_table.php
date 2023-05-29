@@ -24,6 +24,11 @@ class CreatePostReferenecesTable extends Migration
             $table->timestamps();
 
             $table->unique('ref_id');
+
+            $table->index('tenant_id');
+            $table->index('user_id');
+            $table->index('form_id');
+            $table->index('status');
         });
 
         $this->createPerTenant('post_references', function (Blueprint $table) {
@@ -35,6 +40,11 @@ class CreatePostReferenecesTable extends Migration
             $table->timestamps();
 
             $table->unique('ref_id');
+            
+            $table->index('tenant_id');
+            $table->index('user_id');
+            $table->index('form_id');
+            $table->index('status');
         });
     }
 

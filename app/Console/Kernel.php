@@ -32,6 +32,9 @@ class Kernel extends ConsoleKernel
         // $schedule->command('synapse:syshealthcheck')->everyMinute();
         $schedule->command('synapse:calculateTenantResource')->everySixHours();
 
+        // eksekusi garbage collector post reference tiap tengah malam
+        $schedule->command('synapse:postRefGc')->daily();
+        
         // jalankan queue worker jika mode nya menggunakan scheduler
         if (config('AppConfig.system.jobs.worker_mode', 1) == 1)
             $this->runQueueWorker($schedule);

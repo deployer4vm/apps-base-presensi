@@ -38,11 +38,7 @@ class ConfigController extends BaseController
      */
     public function readList(Request $request)
     {
-        if (UserAuth::user('is_mobile')) {
-            $model = new MConfig();
-        } else {
-            $model = MConfig::select(['group', 'key', 'value']);
-        }
+        $model = MConfig::select(['group', 'key', 'value']);
 
         $model = $model->where('tenant_id', $request->input('tenant_id', config('tenant.id', 0)));
 

@@ -15,6 +15,8 @@ class AddTenantIdColumnToConfigTable extends Migration
     {
         Schema::table('config', function (Blueprint $table) {
             $table->unsignedBigInteger('tenant_id')->default(0)->comment('tenant id dan workshop id sama jadi bisa merelasi ke keduanya, 0 : berarti termasuk disemua tenant atau bukan multitenant')->after('id');
+            
+            $table->index('tenant_id');
         });
     }
 

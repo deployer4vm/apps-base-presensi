@@ -260,9 +260,8 @@ export default {
                 if(curTenantGroup.length && curTenantGroup.length > 0){
                     var arr = this.tenantGroup;// list id tenant group tenant aktif                    
                     //jika tidak ada group berarti sedang di tenant manager
-                    if (arr.length == undefined)                        
-                        arr = [0];
-                    
+                    if (arr == null || arr.length == undefined)                        
+                        arr = [0];                    
                     return curTenantGroup.some(r => arr.indexOf(r) >= 0);
                 }else{
                     return curTenantGroup == 0 || (curTenantGroup == 1 && !isOnTenantManager) || (curTenantGroup == 2 && isOnTenantManager);

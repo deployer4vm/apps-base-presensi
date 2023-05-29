@@ -207,6 +207,7 @@ class Excel
         //    set will be iterated.
         $result = [];
         foreach ($cellIterator as $key2 => $cell) {
+            // $result[$key2] = $cell->getFormattedValue();
             $result[$key2] = $cell->getValue();
         }
         $rowIterator = null;
@@ -231,7 +232,8 @@ class Excel
     {
 
         foreach ($data as $key => $value) {
-            $option = ['quote' => 'auto'];
+            $option = ['quote' => 'auto', 'type' => 'default'];
+            // $option = ['quote'=>'auto'];
 
             //jika array berarti menggunakan format sendiri
             if (is_array($value)) {
@@ -305,8 +307,7 @@ class Excel
         //jika value diawali dengan - atau angka maka kasih quote
         if (
             $quote != 'no'
-            && (
-                $quote == 'yes'
+            && ($quote == 'yes'
                 || strpos($value, '-') === 0
                 || preg_match('/^\d/', $value) === 1
             )
@@ -322,6 +323,18 @@ class Excel
         // $reader->getActiveSheet()->getStyle($key)->setQuotePrefix(true);
     }
 
+    /**
+     * Tambah sheet baru
+     */
+    public function createSheet(&$reader)
+    {
+        $objPHPExcel->createSheet();
+        return $objPHPExcel;
+    }
+
+    /**
+     * Insert Row Baru
+     */
     public function insertRow(&$reader, $row, $templateVar)
     {
         $reader->getActiveSheet()->insertNewRowBefore($row, 1);
@@ -330,6 +343,15 @@ class Excel
             $newvar[$key . $row] = $value;
         }
         return $this->setCell($reader, $newvar);
+    }
+
+    /**
+     * tambah kolom baru
+     */
+    public function insertNewColumnBefore(&$reader, $column, $count = 1)
+    {
+        $reader->getActiveSheet()->insertNewColumnBefore($column, $count);
+        return $reader;
     }
 
     public function download(&$reader)

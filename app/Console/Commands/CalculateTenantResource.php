@@ -48,8 +48,7 @@ class CalculateTenantResource extends Command
             ]);
         }
 
-        $this->info('Renant resource recalculated !');
-
+        $this->info('Tenant resource recalculated !');
         $this->info('SUCCESS!');
     }
 }

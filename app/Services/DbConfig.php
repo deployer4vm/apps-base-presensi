@@ -90,7 +90,7 @@ class DbConfig extends BaseRepository
         $tenantId = 0,
         $castAsArray = false
     ) {
-        $data = $this->_getOne(new MConfig, [
+        $data = $this->_getOne(MConfig::select('value'), [
             ['tenant_id', $tenantId],
             ['group', $group],
             ['key', $key]
@@ -152,7 +152,7 @@ class DbConfig extends BaseRepository
      */
     private function _listConfig($group, $tenantId = 0, $returnValue = false)
     {
-        $list = $this->_list(new Mconfig, [
+        $list = $this->_list(MConfig::select(['value', 'key']), [
             ['tenant_id', $tenantId],
             ['group', $group]
         ]);

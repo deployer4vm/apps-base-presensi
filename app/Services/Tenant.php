@@ -175,9 +175,15 @@ class Tenant extends BaseRepository
                 = $tenant->toArray();
             $this->_tmpTenantListByDomain[$domain]['domain'] = $domainData->toArray();
 
-            // $this->_tmpTenantListByDomain[$domain] = $this->getTenantModel()->whereHas('domain',function($m) use($domain){
-            //     $m->where('domain',$domain)->where('status',1);
-            // })->first();
+            if ($this->_tmpTenantListByDomain[$domain]) {
+                $this->_tmpTenantListByDomain[$domain] = $this->_tmpTenantListByDomain[$domain]->toArray();
+                $this->_tmpTenantListByDomain[$domain]['domain'] = $domainData->toArray();
+            } else {
+                return false;
+            }
+
+            $this->_tmpTenantListByGroupApp[$this->_tmpTenantListByDomain[$domain]['group_app']] = $this->_tmpTenantListByDomain[$domain];
+            $this->_tmpTenantList[$this->_tmpTenantListByDomain[$domain]['id']] = $this->_tmpTenantListByDomain[$domain];
         }
 
         return $this->_tmpTenantListByDomain[$domain];
@@ -382,11 +388,11 @@ class Tenant extends BaseRepository
      * START - GROUP MANAGE PEMISAHAN DATABASE ATAU TABLE PER TENANT
      */
 
-     /**
-      * Get Tenant Default Model
-      *
-      * @return \Illuminate\Database\Eloquent\Model
-      */
+    /**
+     * Get Tenant Default Model
+     *
+     * @return \Illuminate\Database\Eloquent\Model
+     */
     private function getTenantModel()
     {
         if (!config('AppConfig.system.multitenant.table_instance', false)) {
@@ -603,8 +609,10 @@ class Tenant extends BaseRepository
                 )));
                 $tmpClass = new $migrationClass;
                 if (method_exists($tmpClass, 'tenantMigrateMode')) {
-                    if (!property_exists($tmpClass, 'tenantId')
-                        || $tmpClass->tenantId == $tenantId) {
+                    if (
+                        !property_exists($tmpClass, 'tenantId')
+                        || $tmpClass->tenantId == $tenantId
+                    ) {
                         $tmpClass->setTenantMigrateMode(true);
                         $tmpClass->setTenantId($tenantId);
                         $tmpClass->up();
@@ -648,8 +656,10 @@ class Tenant extends BaseRepository
                 $tmpClass = new $seedClass;
                 // hanya meng-seed yang seed pertenant saja
                 if (method_exists($tmpClass, 'tenantSeedMode')) {
-                    if (!property_exists($tmpClass, 'tenantId')
-                        || $tmpClass->tenantId == $tenantId) {
+                    if (
+                        !property_exists($tmpClass, 'tenantId')
+                        || $tmpClass->tenantId == $tenantId
+                    ) {
                         $tmpClass->setTenantSeedMode(true);
                         $tmpClass->setTenantId($tenantId);
                         $tmpClass->run();
@@ -672,8 +682,7 @@ class Tenant extends BaseRepository
     {
         if (
             ($dbServerId == 0 && config('xmlapi.dbcreate_use_cpanel'))
-            || (
-                $dbServerId != 0
+            || ($dbServerId != 0
                 && config(
                     "database.multi_database_server.servers." . $dbServerId . ".cpanel.dbcreate_use_cpanel",
                     false
@@ -930,12 +939,12 @@ class Tenant extends BaseRepository
      * CRUD tenant
      */
 
-     /**
-      * Create Tenant
-      *
-      * @param array $input
-      * @return false|array
-      */
+    /**
+     * Create Tenant
+     *
+     * @param array $input
+     * @return false|array
+     */
     public function createTenant($input)
     {
         if (!isset($input['group_app'])) {

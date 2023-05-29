@@ -25,7 +25,7 @@ $disk = [
     ],
 
     // disk local public khusus multi tenant, untuk file yg general lintas tenant (diakses berbarangan)
-    'public_alltenant' => [ 
+    'alltenant_public' => [ 
         'driver' => 'local',
         'root' => storage_path('app/public/tenant_0'),
         'url' => '/storage/public',
