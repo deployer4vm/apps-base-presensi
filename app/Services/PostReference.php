@@ -10,7 +10,7 @@ use App\Models\PostReference as MPostReference;
 use App\Models\PostReferenceGlobal as PostReferenceGlobal;
 
 class PostReference //extends BaseRepository
-{   
+{
 
     private $_tmpRefIdTry = 0;
     private $_tmpRefIdNow = '';
@@ -20,46 +20,54 @@ class PostReference //extends BaseRepository
     {
         return $this->error;
     }
+
+    /**
+     * Get Tenant Model
+     *
+     * @param integer $tenantId
+     * @return \Illuminate\Database\Eloquent\Model
+     */
     private function getModel($tenantId)
     {
-        if($tenantId){
+        if ($tenantId) {
             return new MPostReference();
-        }else{
+        } else {
             return new PostReferenceGlobal();
         }
     }
 
     /**
      * generate & get ref_id
-     * 
-     * @return String||False    string ref_id
+     *
+     * @return false|string    string ref_id
      */
-    public function getPostRef($formId,$tenantId=false,$userId=false)
+    public function getPostRef($formId, $tenantId = false, $userId = false)
     {
-        if(empty($formId)){
+        if (empty($formId)) {
             $this->error = 'Form ID tidak boleh kosong';
             return false;
         }
 
-        $tenantId = empty($tenantId)?config('tenant.id',0):$tenantId;
-        $userId = empty($userId)?(UserAuth::user('id')??0):$userId;
+        $tenantId = empty($tenantId) ? config('tenant.id', 0) : $tenantId;
+        $userId = empty($userId) ? (UserAuth::user('id') ?? 0) : $userId;
 
-        if(!$userId){
+        if (!$userId) {
             $this->error = 'User tidak terdefinisi';
             return false;
         }
-        
+
         // generate refId yg uniq
         $this->_tmpRefIdNow = now()->format('YmdHis');
-        $refId = $this->generateRandomrefId($formId,$tenantId,$userId);
-        while($this->getModel($tenantId)
-            ->where('form_id',$formId)
-            ->where('ref_id',$refId)
-            ->where('tenant_id',$tenantId)
-            ->where('user_id',$userId)
-            ->where('status',0)
-            ->exists()){
-            $refId = $this->generateRandomrefId($formId,$tenantId,$userId);
+        $refId = $this->generateRandomrefId($formId, $tenantId, $userId);
+        while ($this->getModel($tenantId)
+            ->where('form_id', $formId)
+            ->where('ref_id', $refId)
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $userId)
+            ->where('status', 0)
+            ->exists()
+        ) {
+            $refId = $this->generateRandomrefId($formId, $tenantId, $userId);
         }
 
         $this->getModel($tenantId)->create([
@@ -67,44 +75,62 @@ class PostReference //extends BaseRepository
             'tenant_id' => $tenantId,
             'user_id' => $userId,
             'form_id' => $formId,
-            'status' => 0,// new input
+            'status' => 0, // new input
         ]);
 
         return $refId;
     }
-    
-    private function generateRandomrefId($formId,$tenantId,$userId)
+
+    /**
+     * Generate Ra=ndom Ref If
+     *
+     * @param integer $formId
+     * @param integer $tenantId
+     * @param integer $userId
+     * @return string
+     */
+    private function generateRandomrefId($formId, $tenantId, $userId)
     {
-        $tmpKey = $tenantId.'-'.$userId.'-'.$formId.'-'.$this->_tmpRefIdNow.'-'.$this->_tmpRefIdTry;
+        $tmpKey = $tenantId . '-'
+            . $userId . '-'
+            . $formId . '-'
+            . $this->_tmpRefIdNow . '-'
+            . $this->_tmpRefIdTry;
         $this->_tmpRefIdTry++;
         return md5($tmpKey);
     }
 
     /**
-     * @return Boolean True jika valid, False jika gagal atau jika sudah tidak valid
+     * Mark Post Ref ID as Used
+     *
+     * @param integer $formId
+     * @param string $refId
+     * @param integer $tenantId
+     * @param integer $userId
+     * @return boolean True jika valid, False jika gagal atau jika sudah tidak valid
      */
-    public function usePostRef($formId,$refId,$tenantId=false,$userId=false)
+    public function usePostRef($formId, $refId, $tenantId = false, $userId = false)
     {
-        if(empty($formId)){
+        if (empty($formId)) {
             $this->error = 'Form ID tidak boleh kosong';
             return false;
         }
-        if(empty($refId)){
+        if (empty($refId)) {
             $this->error = 'Ref ID tidak boleh kosong';
             return false;
         }
 
-        $tenantId = empty($tenantId)?config('tenant.id',0):$tenantId;
-        $userId = empty($userId)?(UserAuth::user('id')??0):$userId;
+        $tenantId = $tenantId ?: config('tenant.id', 0);
+        $userId = $userId ?: UserAuth::user('id') ?? 0;
 
         $tmp = $this->getModel($tenantId)
-            ->where('form_id',$formId)
-            ->where('ref_id',$refId)
-            ->where('tenant_id',$tenantId)
-            ->where('user_id',$userId)
-            ->where('status',0);
+            ->where('form_id', $formId)
+            ->where('ref_id', $refId)
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $userId)
+            ->where('status', 0);
 
-        if($tmp->exists()){
+        if ($tmp->exists()) {
             $tmp->delete();
             return true;
         }

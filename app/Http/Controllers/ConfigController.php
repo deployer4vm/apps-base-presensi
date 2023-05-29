@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 use App\Models\MConfig;
 use App\Facades\DbConfig;
 use App\Facades\CacheConfig;
 
 use App\Base\BaseController;
+
+use hpsynapse\moduser\Facades\UserAuth;
 
 class ConfigController extends BaseController
 {
@@ -35,7 +38,11 @@ class ConfigController extends BaseController
      */
     public function readList(Request $request)
     {
-        $model = new MConfig;
+        if (UserAuth::user('is_mobile')) {
+            $model = new MConfig();
+        } else {
+            $model = MConfig::select(['group', 'key', 'value']);
+        }
 
         $model = $model->where('tenant_id', $request->input('tenant_id', config('tenant.id', 0)));
 
@@ -88,6 +95,7 @@ class ConfigController extends BaseController
                     } else {
                         $updateData['group'] = $value['group'];
                         $updateData['key'] = $value['key'];
+                        $updateData['tenant_id'] = $tenantId;
                         $model->create($updateData);
                     }
                 }

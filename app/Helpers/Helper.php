@@ -12,13 +12,14 @@ if (!function_exists('recuresive_array_merge')) {
     {
         $merged = $array1;
         foreach ($array2 as $key => $value) {
-            $merged[$key] = $value;
             if (is_array($value) && isset($merged[$key]) && is_array($merged[$key])) {
                 $merged[$key] = recuresive_array_merge($merged[$key], $value);
             } else if (is_numeric($key)) {
                 if (!in_array($value, $merged)) {
                     $merged[] = $value;
                 }
+            } else {
+                $merged[$key] = $value;
             }
         }
         return $merged;
@@ -80,7 +81,7 @@ if (!function_exists('route_web_opt')) {
 }
 
 if (!function_exists('is_route')) {
-    /*
+    /**
      * detect apakah route yang sedang diakses sekarang adalah route tertentu
      *
      * @param string $routeName nama route yang akan dicek
@@ -255,9 +256,14 @@ if (!function_exists('clean_number_format')) {
 
 if (!function_exists('template_assets')) {
 
-    /*
-    * generate file url ke assets template yang aktiv : mainurl.tld/assets/template/TEMPLATENAME/
-    */
+    /**
+     * generate file url ke assets template yang aktiv : mainurl.tld/assets/template/TEMPLATENAME/
+     *
+     * @param string $folder
+     * @param string $file
+     *
+     * @return string Full URL
+     */
     function template_assets($folder = '', $file = '')
     {
         return request()->getScheme() . '://' . request()->getHttpHost()

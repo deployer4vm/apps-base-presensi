@@ -411,8 +411,8 @@ trait ResExportTrait
 
 
             $this->appendExportLog('<span class="text-info">Jobs started at : <b>'
-            . now()->format('Y-m-d H:i:s')
-            . '</b></span><br>');
+                . now()->format('Y-m-d H:i:s')
+                . '</b></span><br>');
             $this->appendExportLog('Url will be at : ' . $config['urlFilename'] . '<br>');
             $reader = Excel::load(
                 $this->_exportTemplate ?: 'generalExport.xlsx',
@@ -432,8 +432,8 @@ trait ResExportTrait
         } else {
             $this->appendExportLog('<span class="text-info">Continuing process from previous jobs</span>...<br>');
             $this->appendExportLog('<span class="text-info">Jobs started at : <b>'
-            . now()->format('Y-m-d H:i:s')
-            . '</b></span><br>');
+                . now()->format('Y-m-d H:i:s')
+                . '</b></span><br>');
 
             $fileName = $this->_exportUploadPath . $config['filename'];
             $reader = Excel::load(public_path($fileName), 'Xlsx', false);

@@ -3,9 +3,12 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\App;
+use Exception;
 
-class Trans
-{   
+use App\Base\BaseRepository;
+
+class Trans extends BaseRepository
+{
 
     public function fallbackLocal()
     {
@@ -19,6 +22,6 @@ class Trans
 
     public function chose($lang)
     {
-        return isset($lang[$this->getLocale()])?$lang[$this->getLocale()]:(isset($lang[$this->fallbackLocal()])?$lang[$this->fallbackLocal()]:$lang);
+        return $lang[$this->getLocale()] ?? $lang[$this->fallbackLocal()] ?? $lang;
     }
 }

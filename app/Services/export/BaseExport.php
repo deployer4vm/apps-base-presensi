@@ -1418,8 +1418,14 @@ class BaseExport extends BaseRepository
      *
      * @param String $cacheKey key / kode unik per export
      */
-    private function breakToNextExport($cacheKey, $tmpFilename, &$reader, &$writer, $lastExcelRow = 1, $lastTableRow = 1)
-    {
+    private function breakToNextExport(
+        $cacheKey,
+        $tmpFilename,
+        &$reader,
+        &$writer,
+        $lastExcelRow = 1,
+        $lastTableRow = 1
+    ) {
         $exportData = $this->getExport($cacheKey);
         if ($exportData == false) return false;
 

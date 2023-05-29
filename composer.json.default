@@ -38,7 +38,7 @@
         "nunomaduro/collision": "^4.1",
         "orangehill/iseed": "^2.6",
         "phpunit/phpunit": "^8.5",
-        "reliese/laravel": "^0.0.14"  
+        "reliese/laravel": "^0.0.14"
     },
     "config": {
         "optimize-autoloader": true,
@@ -82,7 +82,7 @@
         {
             "name": "hp-synapse/apps-generator",
             "type": "path",
-            "url": "../apps-generator",
+            "url": "../../apps-generator",
             "options": {
                 "symlink": true
             }
@@ -90,15 +90,74 @@
         {
             "name": "hp-synapse/apps-manager",
             "type": "path",
-            "url": "../apps-manager",
+            "url": "../../apps-manager",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "name": "hp-synapse/mod-accounting",
+            "type": "path",
+            "url": "../../mod-accounting",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "name": "hp-synapse/mod-coop",
+            "type": "path",
+            "url": "../../mod-coop",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "name": "hp-synapse/mod-coop-sp",
+            "type": "path",
+            "url": "../../mod-coop-sp",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "name": "hp-synapse/mod-cp",
+            "type": "path",
+            "url": "../../mod-cp",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "name": "hp-synapse/mod-digitalpayment",
+            "type": "path",
+            "url": "../../mod-digitalpayment",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "name": "hp-synapse/mod-ppob",
+            "type": "path",
+            "url": "../../mod-ppob",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "name": "hp-synapse/mod-sewa",
+            "type": "path",
+            "url": "../../mod-sewa",
             "options": {
                 "symlink": true
             }
         },
         {
             "name": "hp-synapse/mod-user",
-            "type": "git",
-            "url": "https://gitlab.com/hp-synapse/mod-user.git"
+            "type": "path",
+            "url": "../../mod-user",
+            "options": {
+                "symlink": true
+            }
         }
     ]
 }
