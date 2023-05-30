@@ -581,7 +581,7 @@ abstract class BaseRepository
 
     /**
      * Hapus semua item array $data yang ada di $rejectedFields.
-     *
+     * 
      * filter array berdasarkan field yang tidak boleh ada (dihapus)
      * filter data yang akan di update / output / field, jika ada field yang terdaftar
      * di rejectedField maka akan dihapus

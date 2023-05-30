@@ -97,6 +97,23 @@ class Excel
             ->getStartColor()
             ->setARGB($bgcolor);
         return $reader;
+
+    }
+
+    /**
+     * @param String $from range yg akan dicopy, misal 'A1:A10'
+     * @param String $to range yg dituju untuk paset style, misal 'B1:B10'
+     */
+    public function copyRange(&$reader,$from,$to)
+    {
+        $cellValues = $reader->getActiveSheet()->rangeToArray($from);
+        $reader->getActiveSheet()->fromArray($cellValues, null, $to);
+
+        $cellStyle = $reader->getActiveSheet()
+            ->duplicateStyle(
+                $reader->getActiveSheet()->getStyle($from),
+                $to
+            );
     }
 
     /**

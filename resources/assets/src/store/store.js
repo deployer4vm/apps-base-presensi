@@ -25,17 +25,18 @@ const vuexPersist = new VuexPersist({
     //cache semua state kecuali template state
     reducer: (state) => {
         let newState = {
-            'auth':state.auth,
-            'trans':state.trans
+            'auth': state.auth,
+            'trans': state.trans
         };
         if (globals().AppConfig.system.multitenant.active) {
             newState.tenant = state.tenant;
         }
-        
-        _.forEach(state,(value, index) => {
+
+        _.forEach(state, (value, index) => {
             //registrasikan vuexPersist jika diaktikan atau jika diset per store nya
-            if ((globals().AppConfig.system.web_state_persistant && value.persistant == undefined) || value.persistant == true) {
-                if(index != 'template'){
+            if ((globals().AppConfig.system.web_state_persistant && value.persistant == undefined)
+                || value.persistant == true) {
+                if (index != 'template') {
                     newState[index] = value;
                 }
             }

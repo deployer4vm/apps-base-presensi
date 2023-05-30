@@ -39,6 +39,8 @@ Route::group(['prefix'=>'system-queue'],function(){
 });
 
 Route::get('/storage{any}', 'StorageController@index')->where('any', '.*');
+Route::get('/file{any}', 'StorageController@index')->where('any', '.*');
+
 //jika artisan web access aktif, maka buka
 if(config('AppConfig.system.has_artisan_web_access',false)){
     $artisanEndpoind = config('AppConfig.system.has_artisan_web_access','/update/run-artisan/').'{action}';

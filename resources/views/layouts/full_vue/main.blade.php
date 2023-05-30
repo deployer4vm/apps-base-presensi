@@ -6,7 +6,8 @@
     <meta http-equiv="x-ua-compatible" content="IE=edge,chrome=1">
     <meta name="robots" content="noindex,nofollow">
     <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('AppConfig.system.template.admin.title') }}</title>
@@ -14,54 +15,57 @@
     <link rel="shortcut icon" href="{{asset(config('AppConfig.system.template.favicon','assets/images/favicon.ico'))}}"/>
     
     <!-- Main font -->
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i,900" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i,900"
+        rel="stylesheet">
 
     <!-- Icons. Uncomment required icon fonts -->
-    @if(config('AppConfig.system.web_admin.assets_template.font.fontawesome'))
-    <link rel="stylesheet" href="{{ asset('/dist/vendor/fonts/fontawesome.css') }}">
+    @if (config('AppConfig.system.web_admin.assets_template.font.fontawesome'))
+        <link rel="stylesheet" href="{{ asset('/dist/vendor/fonts/fontawesome.css') }}">
     @endif
-    @if(config('AppConfig.system.web_admin.assets_template.font.ionicons'))
-    <link rel="stylesheet" href="{{ asset('/dist/vendor/fonts/ionicons.css') }}">
+    @if (config('AppConfig.system.web_admin.assets_template.font.ionicons'))
+        <link rel="stylesheet" href="{{ asset('/dist/vendor/fonts/ionicons.css') }}">
     @endif
-    @if(config('AppConfig.system.web_admin.assets_template.font.linearicons'))
-    <link rel="stylesheet" href="{{ asset('/dist/vendor/fonts/linearicons.css') }}">
+    @if (config('AppConfig.system.web_admin.assets_template.font.linearicons'))
+        <link rel="stylesheet" href="{{ asset('/dist/vendor/fonts/linearicons.css') }}">
     @endif
-    @if(config('AppConfig.system.web_admin.assets_template.font.open-iconic'))
-    <link rel="stylesheet" href="{{ asset('/dist/vendor/fonts/open-iconic.css') }}">
+    @if (config('AppConfig.system.web_admin.assets_template.font.open-iconic'))
+        <link rel="stylesheet" href="{{ asset('/dist/vendor/fonts/open-iconic.css') }}">
     @endif
-    @if(config('AppConfig.system.web_admin.assets_template.font.pe-icon-7-stroke'))
-    <link rel="stylesheet" href="{{ asset('/dist/vendor/fonts/pe-icon-7-stroke.css') }}">
+    @if (config('AppConfig.system.web_admin.assets_template.font.pe-icon-7-stroke'))
+        <link rel="stylesheet" href="{{ asset('/dist/vendor/fonts/pe-icon-7-stroke.css') }}">
     @endif
-    
+
     <link href="{{ asset('/dist/css/bootstrap.css') }}" rel="stylesheet">
     <link href="{{ asset('/dist/css/appwork.css') }}" rel="stylesheet">
     <link href="{{ asset('/dist/css/theme-app.css') }}" rel="stylesheet">
     <link href="{{ asset('/dist/css/colors.css') }}" rel="stylesheet">
     <link href="{{ asset('/dist/css/uikit.css') }}" rel="stylesheet">
     <link href="{{ asset('/dist/css/style.css') }}" rel="stylesheet">
-    
-    @if(config('AppConfig.system.web_admin.assets_link'))
-    @foreach (config('AppConfig.system.web_admin.assets_link') as $value)
-    <link rel="stylesheet" href="{{ asset($value) }}">
-    @endforeach
+
+    @if (config('AppConfig.system.web_admin.assets_link'))
+        @foreach (config('AppConfig.system.web_admin.assets_link') as $value)
+            <link rel="stylesheet" href="{{ asset($value) }}">
+        @endforeach
     @endif
 
     <script>
-    @if(config('AppConfig.system.multitenant.active'))
-        var tenantId = {{config('tenant.id','false')}};        
-        var isOnTenantManager = {{config('tenant.isOnTenantManager',false)?'true':'false'}};
-        var tenantData = <?php echo json_encode(config('tenant',[]),JSON_PRETTY_PRINT) ?>;
-    @endif
-    var onIframe = {{isset($_GET['onIframeConfig'])?'true':'false'}};
-    @if(isset($_GET['onIframeConfig']))
-        var byPassViewConfig = {
-            showNavbar:{{isset($_GET['onIframeConfig']['showNavbar']) && $_GET['byPassViewConfig']['showNavbar'] == 0 ? '0': '1' }},
-            showSidenav:{{isset($_GET['onIframeConfig']['showSidenav']) && $_GET['byPassViewConfig']['showSidenav'] == 0 ? '0': '1' }},
-            showFooter:{{isset($_GET['onIframeConfig']['showFooter']) && $_GET['byPassViewConfig']['showFooter'] == 0 ? '0': '1' }}
-        };
-    @endif
+        @if (config('AppConfig.system.multitenant.active'))
+            var tenantId = {{ config('tenant.id', 'false') }};
+            var isOnTenantManager = {{ config('tenant.isOnTenantManager', false) ? 'true' : 'false' }};
+            var tenantData = <?php echo json_encode(config('tenant', []), JSON_PRETTY_PRINT); ?>;
+        @endif
+        var onIframe = {{  config('AppConfig.system.coop_var.force_on_iframe', 1) || isset($_GET['onIframeConfig']) ? 'true' : 'false' }};
+        @if (config('AppConfig.system.coop_var.force_on_iframe', 1) || isset($_GET['onIframeConfig']))
+            var byPassViewConfig = {
+                showNavbar: {{ config('AppConfig.system.coop_var.force_on_iframe', 1) || (isset($_GET['onIframeConfig']['showNavbar']) && $_GET['byPassViewConfig']['showNavbar'] == 0) ? '0' : '1' }},
+                showSidenav: {{ config('AppConfig.system.coop_var.force_on_iframe', 1) || (isset($_GET['onIframeConfig']['showSidenav']) && $_GET['byPassViewConfig']['showSidenav'] == 0) ? '0' : '1' }},
+                showFooter: {{ config('AppConfig.system.coop_var.force_on_iframe', 1) || (isset($_GET['onIframeConfig']['showFooter']) && $_GET['byPassViewConfig']['showFooter'] == 0) ? '0' : '1' }}
+            };
+        @endif
+        var first_login = {{$_GET['first_login'] ? 'true' : 'false'}};
+        // {{ config('AppConfig.system.coop_var.force_on_iframe', true) }}
     </script>
-    
+
     <style>
         .app-splash-screen {
             background: #fff;
@@ -88,7 +92,8 @@
 
         }
         .app-splash-screen-content .logo {
-            max-width: 70px; max-height: 70px;
+            max-width: 70px;
+            max-height: 70px;
         }
         .lds-ring {
             display: inline-block;
@@ -103,10 +108,10 @@
             width: 64px;
             height: 64px;
             margin: 8px;
-            border: 8px solid rgba(0,0,0,0.5);
+            border: 8px solid rgba(0, 0, 0, 0.5);
             border-radius: 50%;
             animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-            border-color: rgba(0,0,0,0.5) transparent transparent transparent;
+            border-color: rgba(0, 0, 0, 0.5) transparent transparent transparent;
         }
         .lds-ring div:nth-child(1) {
             animation-delay: -0.45s;
@@ -129,7 +134,7 @@
         #warningbox.hide {
             display: none;
         }
-        
+
         #warningbox.show {
             display: block;
         }
@@ -141,31 +146,39 @@
     <div class="app-splash-screen">
         <div class="app-splash-screen-content">
             <div class="app-splash-screen-content-inner">
-                @if(config('AppConfig.system.template.logo'))<img class="logo" src="{{asset(config('AppConfig.system.template.logo'))}}">@endif
+                @if (config('AppConfig.system.template.logo'))
+                    <img class="logo" src="{{ asset(config('AppConfig.system.template.logo')) }}">
+                @endif
                 <div class="text-large font-weight-bolder">{{ config('AppConfig.system.template.admin.title') }}</div>
                 <div>{{ config('AppConfig.system.template.admin.footer.text') }}</div>
                 <hr>
                 <div>
-                    <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+                    <div class="lds-ring">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
                 </div>
-                <small class="text-light">{{__('lang.system_app_loading_text')}}</small>
-                
+                <small class="text-light">{{ __('lang.system_app_loading_text') }}</small>
+
                 <div id="warningbox" class="card bg-warning hide" style="position: absolute; top:0; left:0;">
                     <div class="card-body">
-                        <h5 class="card-title">{{__('alert.system_app_load_fail_title')}}</h5>
-                        <p class="card-text">{{__('alert.system_app_load_fail_text')}}</p>
-                        <a href="{{url('/')}}" class="btn btn-danger">{{__('lang.system_app_load_button_text')}}</a>
+                        <h5 class="card-title">{{ __('alert.system_app_load_fail_title') }}</h5>
+                        <p class="card-text">{{ __('alert.system_app_load_fail_text') }}</p>
+                        <a href="{{ url('/') }}"
+                            class="btn btn-danger">{{ __('lang.system_app_load_button_text') }}</a>
                     </div>
                 </div>
 
-                <script>        
+                <script>
                     // Remove initial splash screen
-                    var splashScreen;    
-                    setTimeout(function () {
+                    var splashScreen;
+                    setTimeout(function() {
                         splashScreen = document.querySelector(".app-splash-screen");
                         var warning = document.getElementById('warningbox');
                         //jika splashscreen masih ada berarti error
-                        if (splashScreen) { 
+                        if (splashScreen) {
                             warning.classList.remove('hide');
                             warning.classList.add('show');
                         }
@@ -179,29 +192,29 @@
 
     <div id="app"></div>
 
-    @if(config('AppConfig.system.web_admin.assets_js'))
-    @foreach (config('AppConfig.system.web_admin.assets_js') as $value)
-    <script src="{{ asset($value) }}"></script>
-    @endforeach
+    @if (config('AppConfig.system.web_admin.assets_js'))
+        @foreach (config('AppConfig.system.web_admin.assets_js') as $value)
+            <script src="{{ asset($value) }}"></script>
+        @endforeach
     @endif
 
     <!-- Layout helpers -->
     <script src="{{ asset('/dist/vendor/js/layout-helpers.js') }}"></script>
     <script src="{{ mix('/dist/app.js') }}"></script>
 
-    @if(config('AppConfig.system.has_editor',true))
-    <script>
-        var editorUrl = {
-            filemanager: '{{config("AppConfig.system.multitenant.active",false)?route("sys.editor.filemanager",["group_app"=>config("tenant.group_app")]):route("sys.editor.filemanager")}}',
-            upload: '{{config("AppConfig.system.multitenant.active",false)?route("sys.editor.upload",["group_app"=>config("tenant.group_app")]):route("sys.editor.upload")}}'
-        };
-        // Echo.channel('notif')
-        //     .listen('SendNotif', (e) => {
-        //         console.log('masuk cuy',e.message);
-        //     });
-    </script>
-    <script src="{{ asset('/dist/vendor/libs/kindeditor/kindeditor.js') }}"></script>
-    <script src="{{ asset('/dist/vendor/libs/kindeditor/lang/en.js') }}"></script>
+    @if (config('AppConfig.system.has_editor', true))
+        <script>
+            var editorUrl = {
+                filemanager: '{{ config('AppConfig.system.multitenant.active', false) ? route('sys.editor.filemanager', ['group_app' => config('tenant.group_app')]) : route('sys.editor.filemanager') }}',
+                upload: '{{ config('AppConfig.system.multitenant.active', false) ? route('sys.editor.upload', ['group_app' => config('tenant.group_app')]) : route('sys.editor.upload') }}'
+            };
+            // Echo.channel('notif')
+            //     .listen('SendNotif', (e) => {
+            //         console.log('masuk cuy',e.message);
+            //     });
+        </script>
+        <script src="{{ asset('/dist/vendor/libs/kindeditor/kindeditor.js') }}"></script>
+        <script src="{{ asset('/dist/vendor/libs/kindeditor/lang/en.js') }}"></script>
     @endif
 </body>
 </html>

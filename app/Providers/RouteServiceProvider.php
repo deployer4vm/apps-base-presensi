@@ -34,8 +34,8 @@ class RouteServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->bootMigration();
-            //detect app_group mmulti tenant
         } else if (config('AppConfig.system.multitenant.active', false)) {
+            //detect app_group mmulti tenant
             $this->AppGroupCheck();
         }
 
@@ -44,11 +44,11 @@ class RouteServiceProvider extends ServiceProvider
 
     private function AppGroupCheck()
     {
-        // jika detect by subfolder
         if (config('AppConfig.system.multitenant.detect_mode', 1) == 1) {
+            // jika detect by subfolder
             \App\Facades\Tenant::setActiveTenantByGroup();
-            // jika detect by subdomain/domain
         } else {
+            // jika detect by subdomain/domain
             \App\Facades\Tenant::setActiveTenantByDomain();
         }
 

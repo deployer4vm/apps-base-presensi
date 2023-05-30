@@ -88,7 +88,7 @@ class Handler extends ExceptionHandler
                         'code' => 401
                     ]);
                 }
-                }
+            }
         } else if ($exception instanceof \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException) {
             if ($isApi) {
                 return response()->json([

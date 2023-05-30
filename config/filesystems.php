@@ -44,15 +44,15 @@ $disk = [
 ];
 
 $s3count = 1;
-while (env('S3_MULTISERVER_'.$s3count.'_ACCESS_KEY_ID',false)) {
-    $disk['s3_'.$s3count] = [
+while (env('S3_MULTISERVER_' . $s3count . '_ACCESS_KEY_ID', false)) {
+    $disk['s3_' . $s3count] = [
         'driver' => 's3',
-        'key' => env('S3_MULTISERVER_'.$s3count.'_ACCESS_KEY_ID'),
-        'secret' => env('S3_MULTISERVER_'.$s3count.'_SECRET_ACCESS_KEY'),
-        'region' => env('S3_MULTISERVER_'.$s3count.'_DEFAULT_REGION'),
-        'bucket' => env('S3_MULTISERVER_'.$s3count.'_BUCKET'),
-        'url' => env('S3_MULTISERVER_'.$s3count.'_URL'),
-        'endpoint' => env('S3_MULTISERVER_'.$s3count.'_ENDPOINT'),
+        'key' => env('S3_MULTISERVER_' . $s3count . '_ACCESS_KEY_ID'),
+        'secret' => env('S3_MULTISERVER_' . $s3count . '_SECRET_ACCESS_KEY'),
+        'region' => env('S3_MULTISERVER_' . $s3count . '_DEFAULT_REGION'),
+        'bucket' => env('S3_MULTISERVER_' . $s3count . '_BUCKET'),
+        'url' => env('S3_MULTISERVER_' . $s3count . '_URL'),
+        'endpoint' => env('S3_MULTISERVER_' . $s3count . '_ENDPOINT'),
     ];
     $s3count++;
 }
@@ -71,6 +71,7 @@ return [
     |
     */
 
+    // di sistem multi tenant, default disk akan diset ke default disk tenant
     'default' => env('FILESYSTEM_DRIVER', 'local'),
 
     /*
@@ -101,7 +102,7 @@ return [
 
     // apakah menggunakan multi s3 server
     's3_multi_server' => env('S3_MULTISERVER_ENABLE', false),
-    's3c_ount'=> $s3count,//jumlah server S3 multitenant nya
+    's3_count' => $s3count, //jumlah server S3 multitenant nya
 
     'disks' => $disk,
 

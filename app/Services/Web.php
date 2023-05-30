@@ -27,10 +27,10 @@ class Web extends BaseRepository
     {
         if (is_array($text))
             $text =
-        $this->breadcrumbs[] = [
-            'text' => $text,
-            'route' => is_array($route) ? route($route[0], $route[1] ?? []) : $route
-        ];
+                $this->breadcrumbs[] = [
+                    'text' => $text,
+                    'route' => is_array($route) ? route($route[0], $route[1] ?? []) : $route
+                ];
     }
 
     /**

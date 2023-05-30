@@ -33,7 +33,7 @@ class GenerateTenant extends Command
      */
     public function handle()
     {
-        $tenants = DB::table('tenants')->select(['id','db','s3storage','status'])->get();
+        $tenants = DB::table('tenants')->select(['id', 'db', 's3storage', 'status'])->get();
         $tenatIdList = [];
         foreach ($tenants as $tenant) {
             $tenatIdList[$tenant->id] = [

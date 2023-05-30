@@ -15,7 +15,7 @@
      -->
         <b-row class="mb-4">
             <b-col md='3' class="text-right mt-2">
-                <span class="form-label">Upload File Import</span>
+                <span class="form-label">{{ Trans.get('lang.import.label.upload_file') }}</span>
             </b-col>
             <b-col md='9'>
                 <b-input-group>
@@ -41,7 +41,7 @@
         <div class="text-right">                                    
             <b-btn variant="success" @click="uploadImpoart()"
                 :disabled="!canUpload"> 
-                <span class="ion ion-md-cloud-upload"></span> &nbsp; Upload
+                <span class="ion ion-md-cloud-upload"></span> &nbsp; {{ Trans.get('lang.upload') }}
             </b-btn> 
         </div>            
         
@@ -62,8 +62,8 @@
             <hr>
             <div class="row mb-2">
                 <div class="col" v-if="importStatus.status==3 || importStatus.status==6 || importStatus.status==8">
-                    Tanggal import : <b v-text="importStatus.inputTime"></b><br>
-                    Data count : <b v-text="importStatus.processedCount"></b>
+                    {{ Trans.get('lang.import.label.import_date') }} : <b v-text="importStatus.inputTime"></b><br>
+                    {{ Trans.get('lang.import.label.data_count') }} : <b v-text="importStatus.processedCount"></b>
                 </div>
                 <!-- download format file -->
                 <div class="col text-right" v-if="isFileFormat && apiUrl.formatFile">                    
@@ -71,44 +71,44 @@
                         apiUrl.formatFile,
                         apiImportFileFormatFilename?apiImportFileFormatFilename:'Import Format File.xlsx'
                     )"> 
-                        <span class="ion ion-md-cloud-download"></span> &nbsp; Download Format File Import
+                        <span class="ion ion-md-cloud-download"></span> &nbsp; {{ Trans.get('lang.import.label.download_format') }}
                     </b-btn> 
                                     
                     <b-btn v-if="apiImportFileFormatInfo" variant="success" @click="showInfoUpload"> 
-                        <span class="ion ion-md-information-circle-outline"></span> Panduan
+                        <span class="ion ion-md-information-circle-outline"></span> {{ Trans.get('lang.import.label.guide') }}
                     </b-btn> 
                     
-                    <div><i>Silahkan download format file yang telah disediakan, dan jangan mengubah struktur kolom dan urutan baris data.</i></div>
+                    <div><i>{{ Trans.get('lang.import.label.guide_description') }}</i></div>
                 </div>
             </div>
 
             <div class="alert alert-success show pr-0" style="max-height: 300px; overflow-x: auto;">
                 <template v-if="importStatus.status==1 || importStatus.status==2 || importStatus.status==4 || importStatus.status==5 || importStatus.status==7">
                     <i v-if="importStatus.status==1 || importStatus.status==2">
-                        File import sedang diproses, mohon tunggu...
+                       {{ Trans.get('lang.import.alert.start_proccess') }}
                     </i>
                     <i v-else-if="importStatus.status==4" class="text-danger">
-                        Import gagal !
+                        {{ Trans.get('lang.import.alert.import_failed') }} !
                     </i>
                     <i v-else-if="importStatus.status==5">
-                        Approve on progress
+                         {{ Trans.get('lang.import.alert.approve_progress') }}
                     </i>
                     <i v-else-if="importStatus.status==7">
-                        Cancel import on progress
+                         {{ Trans.get('lang.import.alert.cancel_progress') }}
                     </i> - 
                     <b>
-                        Processed count : <span v-text="importStatus.processedCount"></span>
+                         {{ Trans.get('lang.import.label.proccess_count') }} : <span v-text="importStatus.processedCount"></span>
                     </b>
                     <div v-html="importStatus.log" class="p-1" style="background: rgba(0,0,0,0.1); max-height: 200px; overflow-x: auto;"></div>
                 </template>
                 <!-- jika berhasil -->
                 <template v-else-if="importStatus.status==3 || importStatus.status==6 || importStatus.status==8">
-                    <i>Log import terakhir :</i>
+                    <i> {{ Trans.get('lang.import.label.last_log') }} :</i>
                     <div v-html="importStatus.log" class="p-1" style="background: rgba(0,0,0,0.1); max-height: 200px; overflow-x: auto;"></div>
                 </template>    
                 <!-- jika belum ada data import sama sekali sebelumnya -->
                 <template v-else>
-                    <i><b class="text-danger">-belum ada file import-</b></i>
+                    <i><b class="text-danger">-{{ Trans.get('lang.import.label.empty_file') }}-</b></i>
                 </template>                      
             </div>
 
@@ -118,20 +118,20 @@
         <div class="m-2 text-right" v-if="(importStatus.status==3 || importStatus.status==4) && isImportApproval==1">
             <hr>
             <b-btn variant="success" class="m-1" @click="approveImport()">
-                <span class="ion ion-ios-checkmark-circle"></span>&nbsp; Approve
+                <span class="ion ion-ios-checkmark-circle"></span>&nbsp; {{ Trans.get('lang.import.label.approve') }}
             </b-btn> 
             <b-btn variant="danger" class="m-1" @click="cancelImport()">
-                <span class="ion ion-md-close"></span>&nbsp; Cancel Import
+                <span class="ion ion-md-close"></span>&nbsp; {{ Trans.get('lang.import.label.cancel') }}
             </b-btn>
 
             <div class="m-2">
-                <i>Jika data telah sesuai maka silahkan <b>Approve</b> untuk menambahkan data hasil import, jika belum sesuai silahkan <b>Cancel Import</b> dan ulang proses import</i>
+                <i v-html="Trans.get('lang.import.label.approve_description')"></i>
             </div>
         </div>
 
         <b-modal id="modals-import-panduan" :size="'md'" centered no-fade>
             <div slot="modal-title">
-                Panduan
+                {{ Trans.get('lang.import.label.guide') }}
             </div>
             <div v-if="apiImportFileFormatInfo" v-html="apiImportFileFormatInfo"></div>
         </b-modal>
@@ -265,13 +265,13 @@
                     
                     this.$emit('on-start',this.importStatus);
 
-                    this.Web.showAlert({text: "File import berhasil diupload dan sedang diproses, silahkan tunggu hingga proses import selesai",type: "success"});
+                    this.Web.showAlert({text: this.Trans.get('lang.import.alert.proccess_upload'),type: "success"});
                     setTimeout(function() {
                         that.getImportStatus();
                     },1000); 
                 }).catch((res)=>{
                     this.isImportOnProcess = false;
-                    this.Web.showAlert({text: "Upload file import gagal : " + res.message,type: "warning"});
+                    this.Web.showAlert({text: this.Trans.get('lang.import.alert.upload_failed') + ' : ' + res.message,type: "warning"});
                 });
             },
             //get status terakhir import
@@ -294,13 +294,13 @@
                             
                             this.$emit('on-finish',this.importStatus);
                             
-                            this.Web.showAlert({text: "Proses import selesai.",type: "success"});
+                            this.Web.showAlert({text: this.Trans.get('lang.import.alert.import_finish'),type: "success"});
                         //jika import selesai dan gagal
                         }else if(this.importStatus.status==4 && !firstLoad){
 
                             this.$emit('on-fail',this.importStatus);
 
-                            this.Web.showAlert({text: "Proses import gagal.",type: "danger"});
+                            this.Web.showAlert({text: this.Trans.get('lang.import.alert.import_failed'),type: "danger"});
                         // //jika approve import selesai dan berhasil                          
                         // }else if(this.importStatus.status==0 && oldStatus.status == 6 && !firstLoad){
                             
@@ -320,7 +320,7 @@
                             this.importFile = null;
                         }                      
                     }).catch((res)=>{
-                        this.Web.showAlert({text: "Access status import gagal : " + res.message,type: "warning"});
+                        this.Web.showAlert({text: this.Trans.get('lang.import.alert.access_failed')+" : " + res.message,type: "warning"});
                     });
             },
             approveImport(){
@@ -333,7 +333,7 @@
 
                         this.$emit('on-approve-finish',this.importStatus);
 
-                        this.Web.showAlert({text: "Data import diapprove.",type: "success"});
+                        this.Web.showAlert({text: this.Trans.get('lang.import.alert.approved'),type: "success"});
                         setTimeout(function() {
                             that.getImportStatus();
                         },1000);
@@ -341,7 +341,7 @@
                         setTimeout(function() {
                             that.getImportStatus();
                         },1000);
-                        this.Web.showAlert({text: "Request approve gagal : " + res.message,type: "warning"});
+                        this.Web.showAlert({text: this.Trans.get('lang.import.alert.request_approve_failed')+" : " + res.message,type: "warning"});
                     });
             },
             cancelImport(){
@@ -353,7 +353,7 @@
 
                         this.$emit('on-cancel-finish',this.importStatus);
 
-                        this.Web.showAlert({text: "Data import dibatalkan.",type: "success"});
+                        this.Web.showAlert({text: this.Trans.get('lang.import.alert.cancel'),type: "success"});
                         setTimeout(function() {
                             that.getImportStatus();
                         },1000);
@@ -361,7 +361,7 @@
                         setTimeout(function() {
                             that.getImportStatus();
                         },1000);
-                        this.Web.showAlert({text: "Request pembatalan gagal : " + res.message,type: "warning"});
+                        this.Web.showAlert({text: this.Trans.get('lang.import.alert.request_cancel_failed')+" : " + res.message,type: "warning"});
                     });
             }
         }

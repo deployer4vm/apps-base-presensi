@@ -1202,83 +1202,6 @@ class BaseExport extends BaseRepository
         // }
         return true;
     }
-    
-    private function processExportArray(
-        $data,
-        $cacheKey, 
-        &$isFirstRow,
-        &$reader,
-        &$writer,
-        $startTime,
-        $exportData,
-        $border,
-        $styleBorder,
-        $tmpFilename
-    ){
-        foreach ($data as $dataRow) {
-            // jika main looping langsung di bypass
-            if(!empty($exportData['template']['coreMainLoopingMethod'])){
-                $exportData['template']['coreMainLoopingMethod'][0]::{$exportData['template']['coreMainLoopingMethod'][1]}(
-                    $exportData,
-                    $reader,
-                    $writer,
-                    $dataRow
-                );
-                continue;
-            }    
-
-            //jika tanpa template dan row 1 maka simpan nama2 kolomnya, untuk dijadikan header caption
-            if($isFirstRow && empty($exportData['template']['filepath'])){                
-                $headerColumn = $this->formatExportExcelHeader($cacheKey,$dataRow);
-
-                //kolom terakhir header
-                // $countHeader = count($headerColumn);
-                $styleHeading = (new StyleBuilder())
-                    ->setFontBold()
-                    ->setBorder($border)
-                    ->setBackgroundColor('CCCCCC')
-                    ->build();
-
-                $writer->addRow(
-                    WriterEntityFactory::createRowFromArray($headerColumn,$styleHeading)
-                );
-                
-                $isFirstRow = false;//tandai flag first row agar tidak masuk ke sini lg di row selanjutnya
-            }
-
-            // format record sesuai data yang diimport sekarang
-            $insertRow = $this->formatExportExcelRow($cacheKey,$dataRow,$GLOBALS['synapse_export_indexExcelRow'],$GLOBALS['synapse_export_indexData']);
-
-            // jika menyertakan fungsi callback untuk format dataRow maka eksekusi
-            if(!empty($exportData['template']['coreRowFormaterMethod'])){
-                $insertRow = $exportData['template']['coreRowFormaterMethod'][0]::{$exportData['template']['coreRowFormaterMethod'][1]}(
-                    $exportData, // data export cache
-                    $insertRow, // record data yang sudah diformat
-                    $dataRow, // record data yang diexport, diambil dari database
-                    $GLOBALS['synapse_export_indexExcelRow'],// index/nomor urut baris excel yang saat ini diinsert
-                    $GLOBALS['synapse_export_indexData']+1 // index/nomor urut data yang saat ini sedang diinsert
-                );
-
-                // jika false berarti diskip
-                if($insertRow==false)
-                    continue;
-            }               
-            // $reader = Excel::insertRow($reader, $GLOBALS['synapse_export_indexExcelRow'], $insertRow);
-
-            $writer->addRow(
-                WriterEntityFactory::createRowFromArray($insertRow,$styleBorder)
-            );
-
-            $GLOBALS['synapse_export_indexExcelRow']++;
-            $GLOBALS['synapse_export_indexData']++;                     
-            
-            // jika false berarti di cancel
-            if($this->_checkAndCounter($cacheKey)==false){
-                return false;
-            }        
-        }
-    }
-
 
     private function processExportArray(
         $data,
@@ -1334,7 +1257,7 @@ class BaseExport extends BaseRepository
 
             // jika menyertakan fungsi callback untuk format dataRow maka eksekusi
             if (!empty($exportData['template']['coreRowFormaterMethod'])) {
-                $rowFormatterMethod = $exportData['template']['coreRowFormaterMethod']
+                $rowFormatterMethod = $exportData['template']['coreRowFormaterMethod'];
                 $insertRow = $rowFormatterMethod[0]::{$rowFormatterMethod[1]}(
                     $exportData, // data export cache
                     $insertRow, // record data yang sudah diformat

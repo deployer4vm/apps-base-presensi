@@ -133,14 +133,14 @@ class BaseController extends LaravelBaseController
         $this->output['message_type'] = $type;
         $this->output['errors'] =
             $error === true || $error === 1 || $error === false
-            ? [true]
-            : $error;
+                ? [true]
+                : $error;
 
         if (!is_null($response)) {
             $this->response =
                 $response === true || $response === 1 || $response === false
-                ? redirect(url()->previous())->withInput()
-                : $response;
+                    ? redirect(url()->previous())->withInput()
+                    : $response;
         }
 
         if ($this->isWebCall() && $this->forceOutput != 2) {

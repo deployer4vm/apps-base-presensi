@@ -13,7 +13,7 @@ import Notifications from 'vue-notification';
 import Toasted from 'vue-toasted';
 import Echo from 'laravel-echo';
 
-if(globals().AppConfig.system.broadcast.services_enabled.pusher){
+if (globals().AppConfig.system.broadcast.services_enabled.pusher) {
     /**
      * Echo exposes an expressive API for subscribing to channels and listening
      * for events that are broadcast by Laravel. Echo and event broadcasting
@@ -23,28 +23,28 @@ if(globals().AppConfig.system.broadcast.services_enabled.pusher){
         broadcaster: 'pusher',
         key: process.env.MIX_PUSHER_APP_KEY,
         cluster: process.env.MIX_PUSHER_APP_CLUSTER,
-        enabledTransports: ['ws','wss'],
+        enabledTransports: ['ws', 'wss'],
         disableStats: true,
-        forceTLS: process.env.LARAVEL_WEBSOCKETS_SSL?true:false
+        forceTLS: process.env.LARAVEL_WEBSOCKETS_SSL ? true : false
     };
 
-    if(globals().AppConfig.system.broadcast.local_server_enabled){
+    if (globals().AppConfig.system.broadcast.local_server_enabled) {
         echoConfig.wsHost = window.location.hostname;
-        echoConfig.wssPort = window.location.hostname;
-        echoConfig.wsPort = process.env.LARAVEL_WEBSOCKETS_PORT?process.env.LARAVEL_WEBSOCKETS_PORT:6001;
-        echoConfig.wssPort = process.env.LARAVEL_WEBSOCKETS_PORT?process.env.LARAVEL_WEBSOCKETS_PORT:6001;
+        echoConfig.wssHost = window.location.hostname;
+        echoConfig.wsPort = process.env.LARAVEL_WEBSOCKETS_PORT ? process.env.LARAVEL_WEBSOCKETS_PORT : 6001;
+        echoConfig.wssPort = process.env.LARAVEL_WEBSOCKETS_PORT ? process.env.LARAVEL_WEBSOCKETS_PORT : 6001;
     }
 
     window.Pusher = require('pusher-js');
     window.Echo = new Echo(echoConfig);
 }
 
-if(globals().AppConfig.system.web_serviceworker==1){
+if (globals().AppConfig.system.web_serviceworker == 1) {
     navigator.serviceWorker.register('/sw.js');
 }
 
 // vue general global event bus
-window.EventBus = new Vue({store});
+window.EventBus = new Vue({ store });
 
 Vue.use(Vuelidate);
 Vue.use(Notifications);
@@ -115,14 +115,14 @@ var VM = new Vue({
         this.Web.router = this.$router;
         this.Web.notify = this.$notify;
         this.Web.bvModal = this.$bvModal;
-        this.Web.endpoint = this.AppConfig.endpoint; 
+        this.Web.endpoint = this.AppConfig.endpoint;
         this.Web.multitenantConfig = this.AppConfig.system.multitenant;
-        
+
         //initiate language helper
         this.Trans.store = this.$store;
         this.Trans.router = this.$router;
-        this.Trans.loadLang(()=>{
-            //load default lang             
+        this.Trans.loadLang(() => {
+            //load default lang
             this.Web.langDefault = {
                 title: this.Trans.get('alert.info_title'),
                 text: this.Trans.get('alert.default_text')
@@ -133,44 +133,44 @@ var VM = new Vue({
                 that.layoutHelpers.destroy();
                 that.layoutHelpers.init();
                 that.layoutHelpers.update();
-                that.layoutHelpers.setAutoUpdate(true);                
-            }, 100); 
+                that.layoutHelpers.setAutoUpdate(true);
+            }, 100);
         });
 
         //set bahasa untuk alert token invalid
-        setTimeout(()=>{
-            if(this.Trans.get('alert.session_expired')!='alert.session_expired')
+        setTimeout(() => {
+            if (this.Trans.get('alert.session_expired') != 'alert.session_expired')
                 this.LocalApi.errAlertText.text = this.Trans.get('alert.session_expired');
-        },300);        
+        }, 300);
 
         //jika ada fitur auth dan sedang posisi login maka implementAcl
-        if(
+        if (
             this.AppConfig.packageLocal.moduser != undefined
-            && this.AppConfig.packageLocal.moduser.enable 
+            && this.AppConfig.packageLocal.moduser.enable
             && this.AppConfig.system.has_auth
-            ) {
+        ) {
 
             //init helper UserAuth
             this.UserAuth.store = this.$store;
             this.UserAuth.router = this.$router;
-            
+
             //set token LocalApi jika sudah login
-            if(this.UserAuth.isLogin()){
-                this.LocalApi.defaults.headers.common['Authorization'] = 'Bearer ' + this.UserAuth.getToken(); 
+            if (this.UserAuth.isLogin()) {
+                this.LocalApi.defaults.headers.common['Authorization'] = 'Bearer ' + this.UserAuth.getToken();
                 this.LocalApi.defaults.headers.common['Syn-Api-Token'] = this.UserAuth.getToken();
             }
-            
-            if(this.AppConfig.system.has_acl && this.UserAuth.isLogin()){
-                //set ACL jika memiliki akses ke module user auth 
-                this.UserAuth.implementAcl().then((val)=>{
+
+            if (this.AppConfig.system.has_acl && this.UserAuth.isLogin()) {
+                //set ACL jika memiliki akses ke module user auth
+                this.UserAuth.implementAcl().then((val) => {
                     //initialsize vuex template
                     this.Web.initTemplateState();
                 });
 
-            }else{
+            } else {
                 this.Web.initTemplateState();
-            }            
-            
+            }
+
         } else {
             //initialsize vuex template
             this.Web.initTemplateState();

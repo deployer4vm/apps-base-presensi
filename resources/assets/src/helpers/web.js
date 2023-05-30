@@ -24,7 +24,7 @@ export default {
      * ROUTE & ENDPOINT RELATED FUNCTION
      * =======================================================================
      */
-   //get path yg sedang diakses sekarang
+    //get path yg sedang diakses sekarang
     get curEndpoint() {
         return this.router.currentRoute.path;
     },
@@ -66,33 +66,33 @@ export default {
             path = this.router.currentRoute.path;
         }
         let adminEndpoint = this.getEndpoint(this.endpoint.admin.app);
-        
+
         return path.indexOf(adminEndpoint) === 0;
     },
-    //----------go to------    
+    //----------go to------
     goToDefaultTenant() {
         // console.log('go to default tenant : ', this.router.resolve(this.multitenantConfig.default_route).href);
         this.router.push(this.multitenantConfig.default_route);
-    },    
+    },
     goToCurrentTenant() {
         // console.log('go to current tenant : ',this.getTenantGroupApp(), this.router.resolve({name: "home",params:{group_app: this.getTenantGroupApp()}}).href);
         this.goTo("home");
-    },   
+    },
     goToTenant(groupApp) {
-        this.goTo("home",groupApp);
-    },  
-    goTo(routeName,groupApp=false) {
-        if(groupApp==false)groupApp = this.getTenantGroupApp();
-        console.log('go to : ', this.router.resolve({name: routeName,params:{group_app: groupApp}}));
-        this.router.push({name: routeName,params:{group_app: groupApp}});
-    },   
+        this.goTo("home", groupApp);
+    },
+    goTo(routeName, groupApp = false) {
+        if (groupApp == false) groupApp = this.getTenantGroupApp();
+        console.log('go to : ', this.router.resolve({ name: routeName, params: { group_app: groupApp } }));
+        this.router.push({ name: routeName, params: { group_app: groupApp } });
+    },
     /**
      * =======================================================================
      * WEB TENANT MANAGE RELATED FUNCTION
      * =======================================================================
      */
     isMultiTenant() {
-        return this.multitenantConfig.active?true:false;
+        return this.multitenantConfig.active ? true : false;
     },
     isTenantLoaded() {
         return this.store.getters.isTenantLoaded;
@@ -101,35 +101,35 @@ export default {
         return isOnTenantManager//this.store.getters.isOnTenantManager;
     },
     getEndpoint(endPoint) {
-        return endPoint.replace(':group_app',this.router.currentRoute.params.group_app);
+        return endPoint.replace(':group_app', this.router.currentRoute.params.group_app);
     },
-    loadTenant (groupApp) {
-        if(!this.store.getters.isTenantLoaded || groupApp != this.store.getters.getTenantGroupApp){
-            return this.store.dispatch('reloadTenant',groupApp).then((val)=>{
-                if(!val){
+    loadTenant(groupApp) {
+        if (!this.store.getters.isTenantLoaded || groupApp != this.store.getters.getTenantGroupApp) {
+            return this.store.dispatch('reloadTenant', groupApp).then((val) => {
+                if (!val) {
                     return false;
                 }
                 this.tenantList = this.store.getters.getTenantList;
                 return true;
             });
-        }else{
+        } else {
             this.tenantList = this.store.getters.getTenantList;
-            return new Promise((resolve,reject)=>{
+            return new Promise((resolve, reject) => {
                 resolve(true);
             });
         }
     },
     //force reload tenant data from server
     reLoadTenant(groupApp) {
-        this.store.dispatch('reloadTenant',groupApp).then((val)=>{
+        return this.store.dispatch('reloadTenant', groupApp).then((val) => {
             this.tenantList = this.store.getters.getTenantList;
-        });       
+        });
     },
     // set tenant aktif adalah aplikasi tenant manager nya
-    setTenantManagementIsActive(group_app='') {
-        this.store.commit('setTenant',{
-            active_tenant_group:[],
-            active_tenant:{
+    setTenantManagementIsActive(group_app = '') {
+        this.store.commit('setTenant', {
+            active_tenant_group: [],
+            active_tenant: {
                 id: 0,
                 name: 'Tenant Management',
                 group_app: group_app,
@@ -168,10 +168,14 @@ export default {
     /**
      * --- multi tenant component & data share
      */
-    multiTenantLoadMixin(moduleNamepsace, componentName,tenantId=false) {
-        if(!tenantId)
+    multiTenantLoadMixin(moduleNamepsace, componentName, tenantId = false) {
+        if (!tenantId)
             tenantId = this.getTenantId();
-        return modulesMultitenant[tenantId] && modulesMultitenant[tenantId][moduleNamepsace] && modulesMultitenant[tenantId][moduleNamepsace][componentName]?modulesMultitenant[tenantId][moduleNamepsace][componentName]:[];
+        return modulesMultitenant[tenantId]
+            && modulesMultitenant[tenantId][moduleNamepsace]
+            && modulesMultitenant[tenantId][moduleNamepsace][componentName]
+                ? modulesMultitenant[tenantId][moduleNamepsace][componentName]
+                : [];
     },
     /**
      * =======================================================================
@@ -179,69 +183,72 @@ export default {
      * =======================================================================
      */
     //initialize template store vuex
-    initTemplateState () {
+    initTemplateState() {
         return this.store.dispatch("initTemplateState");
-    },    
-    setLoadingPage(showLoading=false,message='') {
-        if(this.store!=null) {
-            this.store.commit("setMessagePageLoading",message);
-            this.store.commit("setPageLoading",showLoading);
+    },
+    setLoadingPage(showLoading = false, message = '') {
+        if (this.store != null) {
+            this.store.commit("setMessagePageLoading", message);
+            this.store.commit("setPageLoading", showLoading);
         }
     },
     /**
      * set show / hide element yg bisa hide/show berdasarkan config per module
-     * 
+     *
      * @param {string} module nama namespace module
      */
     setShow(module) {
-        if(
-            globals().AppConfig.packageLocal[module].template && 
-            globals().AppConfig.packageLocal[module].template.admin && 
+        if (
+            globals().AppConfig.packageLocal[module].template &&
+            globals().AppConfig.packageLocal[module].template.admin &&
             globals().AppConfig.packageLocal[module].template.admin
         ) {
             //hide / show navbar (header)
-            if((!onIframe && globals().AppConfig.packageLocal[module].template.admin.navbar) || (onIframe && byPassViewConfig.showNavbar)){
+            if ((!onIframe && globals().AppConfig.packageLocal[module].template.admin.navbar)
+                || (onIframe && byPassViewConfig.showNavbar)) {
                 this.setShowNavbar(true);
-            }else{
-                this.setShowNavbar(false);                
+            } else {
+                this.setShowNavbar(false);
             }
 
             //hide / show sidenave (menu utama)
-            if((!onIframe && globals().AppConfig.packageLocal[module].template.admin.sidenav) || (onIframe && byPassViewConfig.showSidenav)){
+            if ((!onIframe && globals().AppConfig.packageLocal[module].template.admin.sidenav)
+                || (onIframe && byPassViewConfig.showSidenav)) {
                 this.setShowSidenav(true);
-            }else{
-                this.setShowSidenav(false);                
+            } else {
+                this.setShowSidenav(false);
             }
 
             //hide / show footer
-            if((!onIframe && globals().AppConfig.packageLocal[module].template.admin.footer) || (onIframe && byPassViewConfig.showFooter)){
+            if ((!onIframe && globals().AppConfig.packageLocal[module].template.admin.footer)
+                || (onIframe && byPassViewConfig.showFooter)) {
                 this.setShowFooter(true);
-            }else{
-                this.setShowFooter(false);                
+            } else {
+                this.setShowFooter(false);
             }
-            
-        }else if(onIframe){
+
+        } else if (onIframe) {
             //hide / show navbar (header)
-            if(byPassViewConfig.showNavbar){
+            if (byPassViewConfig.showNavbar) {
                 this.setShowNavbar(true);
-            }else{
-                this.setShowNavbar(false);                
+            } else {
+                this.setShowNavbar(false);
             }
 
             //hide / show sidenave (menu utama)
-            if(byPassViewConfig.showSidenav){
+            if (byPassViewConfig.showSidenav) {
                 this.setShowSidenav(true);
-            }else{
-                this.setShowSidenav(false);                
+            } else {
+                this.setShowSidenav(false);
             }
 
             //hide / show footer
-            if(byPassViewConfig.showFooter){
+            if (byPassViewConfig.showFooter) {
                 this.setShowFooter(true);
-            }else{
-                this.setShowFooter(false);                
+            } else {
+                this.setShowFooter(false);
             }
-        }else{
+        } else {
             this.setShowAll();
         }
         return this;
@@ -285,7 +292,7 @@ export default {
     // {
     //     this.store.commit("setAdminTitle", this.store.getters.getAdminTitle + ' - ' + title);
     // },
-    // setAdminTitle(newTitle) 
+    // setAdminTitle(newTitle)
     // {
     //     this.store.commit("setAdminTitle", newTitle);
     // },
@@ -317,30 +324,32 @@ export default {
         return this;
     },
     setSidenavHorizontal(isHorizontal) {
-        this.store.commit("setSidenavHorizontal", isHorizontal?true:false);
+        this.store.commit("setSidenavHorizontal", isHorizontal ? true : false);
         return this;
     },
     setSidenavHorizontalDefault() {
-        this.store.commit("setSidenavHorizontal", globals().AppConfig.system.web_admin.sidenav_horizontal==1?true:false);
+        this.store.commit(
+            "setSidenavHorizontal",
+            globals().AppConfig.system.web_admin.sidenav_horizontal == 1 ? true : false
+        );
         return this;
     },
     /**
      * BODY (content utama)
      * --------------------------------------------------------------
      */
-    getBreadcrumb() 
-    {
+    getBreadcrumb() {
         return this.store.getters.getBreadcrumb;
     },
-    addBreadcrumb(text, href=false) {
+    addBreadcrumb(text, href = false) {
         var tmpLink = {
             text: text,
             active: true
         };
-        if(href.name != undefined){
+        if (href.name != undefined) {
             tmpLink.to = href;
-        }else{
-            tmpLink.href = href?href:'#';
+        } else {
+            tmpLink.href = href ? href : '#';
         }
         this.store.dispatch("addBreadcrumb", tmpLink);
         return this;
@@ -388,7 +397,7 @@ export default {
         if (!params.text) params.text = this.langDefault.text;
         if (!params.styleType) params.styleType = "hover";
         if (!params.position) params.position = "top-center";
-        
+
         if (this._showAlert_type[params.type] == undefined)
             params.type = "info";
         if (this._showAlert_position[params.position] == undefined)
@@ -418,7 +427,7 @@ export default {
         } else {
             let duration = 3000;
             let newDur = parseInt(params.text.length / 20) * 1000;
-            if(newDur > duration)duration = newDur;
+            if (newDur > duration) duration = newDur;
             this.notify({
                 group: this._showAlert_position[params.position],
                 type: this._showAlert_type[params.type],
@@ -447,5 +456,5 @@ export default {
         dark: "bg-dark text-white"
     },
     //tampilkan alert di halaman selanjutnya
-    showNextAlert() {}
+    showNextAlert() { }
 };

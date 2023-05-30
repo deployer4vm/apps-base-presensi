@@ -6,16 +6,18 @@ $mysqlPerTenant = [
     'cpanel' => [
         'dbcreate_use_cpanel' => env('CPANEL_CREATEDB_PERTENANT', false),
         'domain' => env('CPANEL_DOMAIN_PERTENANT'),
-        'port' => env('CPANEL_PORT_PERTENANT',2083),
+        'port' => env('CPANEL_PORT_PERTENANT', 2083),
         'username' => env('CPANEL_USERNAME_PERTENANT'),
         'password' => env('CPANEL_PASSWORD_PERTENANT')
     ],
-    'name' => env('DB_NAME_PERTENANT', 'Main DB Server'),
-    'driver' => env('DB_DRIVER_PERTENANT', 'mysql'),
+    'name' => env('DB_PERTENANT_NAME', 'Default Tenant DB Server'),
+    'driver' => env('DB_PERTENANT_DRIVER', 'mysql'),
     'url' => env('DATABASE_URL'),
     'host' => env('DB_HOST_PERTENANT', '127.0.0.1'),
     'port' => env('DB_PORT_PERTENANT', '3306'),
-    'database_prefix' => env('DB_DATABASE_PREFIX_PERTENANT', env('DB_DATABASE_PERTENANT',env('DB_DATABASE', 'forge'))),
+    'database_prefix' => env('DB_DATABASE_PREFIX_PERTENANT',
+        env('DB_DATABASE_PERTENANT',
+        env('DB_DATABASE', 'forge'))),
     'database' => env('DB_DATABASE_PERTENANT', env('DB_DATABASE', 'forge')),
     'username' => env('DB_USERNAME_PERTENANT', 'forge'),
     'password' => env('DB_PASSWORD_PERTENANT', ''),
@@ -41,13 +43,13 @@ $mysqlPerTenant = [
 ];
 
 $multiDatabaseServer = [
-    'enable'=> env('DB_MULTISERVER_ENABLE', false),
-    'server_count'=> 2, // jumlah db server, minimal 1 (main server)
-    'servers'=>[
+    'enable' => env('DB_MULTISERVER_ENABLE', false),
+    'server_count' => 2, // jumlah db server, minimal 1 (main server)
+    'servers' => [
         // server 0 adalah server database yg juga digunakan di default connection
         [
-            'name' => env('DB_NAME', 'Main DB Server'),
-            'driver' => env('DB_DRIVER', 'mysql'),
+            'name' => env('DB_MULTISERVER_MAIN_NAME', 'Main DB Server'),
+            'driver' => env('DB_MULTISERVER_MAIN_DRIVER', 'mysql'),
             'url' => env('DATABASE_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
@@ -66,6 +68,7 @@ $multiDatabaseServer = [
                 // 'NO_ZERO_IN_DATE',
                 // 'NO_ZERO_DATE',
                 'ERROR_FOR_DIVISION_BY_ZERO',
+                'NO_AUTO_CREATE_USER',
                 // 'NO_ENGINE_SUBSTITUTION',
             ],
             'engine' => 'InnoDB',
@@ -78,27 +81,32 @@ $multiDatabaseServer = [
     ]
 ];
 
-$i=2;
-while (env('DB_MULTISERVER_'.$i.'_HOST',false)) {
+$i = 2;
+while (env('DB_MULTISERVER_' . $i . '_HOST', false)) {
     $multiDatabaseServer['servers'][] = [
         // config cpanel untuk server lain
         'cpanel' => [
-            'dbcreate_use_cpanel' => env('DB_MULTISERVER_'.$i.'_CPANEL_CREATEDB', false),
-            'domain' => env('DB_MULTISERVER_'.$i.'_CPANEL_DOMAIN'),
-            'port' => env('DB_MULTISERVER_'.$i.'_CPANEL_PORT',2083),
-            'username' => env('DB_MULTISERVER_'.$i.'_CPANEL_USERNAME'),
-            'password' => env('DB_MULTISERVER_'.$i.'_CPANEL_PASSWORD')
+            'dbcreate_use_cpanel' => env('DB_MULTISERVER_' . $i . '_CPANEL_CREATEDB', false),
+            'domain' => env('DB_MULTISERVER_' . $i . '_CPANEL_DOMAIN'),
+            'port' => env('DB_MULTISERVER_' . $i . '_CPANEL_PORT', 2083),
+            'username' => env('DB_MULTISERVER_' . $i . '_CPANEL_USERNAME'),
+            'password' => env('DB_MULTISERVER_' . $i . '_CPANEL_PASSWORD')
         ],
-        'name' => env('DB_MULTISERVER_'.$i.'_NAME', 'Main DB Server'),
-        'driver' => env('DB_MULTISERVER_'.$i.'_DRIVER', 'mysql'),
+        'name' => env('DB_MULTISERVER_' . $i . '_NAME', 'DB Server ' . $i),
+        'driver' => env('DB_MULTISERVER_' . $i . '_DRIVER', 'mysql'),
         'url' => env('DATABASE_URL'),
-        'host' => env('DB_MULTISERVER_'.$i.'_HOST', '127.0.0.1'),
-        'port' => env('DB_MULTISERVER_'.$i.'_PORT', '3306'),
-        'database_prefix' => env('DB_MULTISERVER_'.$i.'_DATABASE_PREFIX', env('DB_DATABASE_PREFIX_PERTENANT', env('DB_DATABASE_PERTENANT',env('DB_DATABASE', 'forge')))),
-        'database' => env('DB_MULTISERVER_'.$i.'_DATABASE', env('DB_DATABASE', 'forge')),
-        'username' => env('DB_MULTISERVER_'.$i.'_USERNAME', 'forge'),
-        'password' => env('DB_MULTISERVER_'.$i.'_PASSWORD', ''),
-        'unix_socket' => env('DB_MULTISERVER_'.$i.'SOCKET', ''),
+        'host' => env('DB_MULTISERVER_' . $i . '_HOST', '127.0.0.1'),
+        'port' => env('DB_MULTISERVER_' . $i . '_PORT', '3306'),
+        'database_prefix' => env('DB_MULTISERVER_' . $i . '_DATABASE_PREFIX',
+            env('DB_DATABASE_PREFIX_PERTENANT',
+                env('DB_DATABASE_PERTENANT',
+                    env('DB_DATABASE', 'forge')))),
+        'database' => env('DB_MULTISERVER_' . $i . '_DATABASE',
+            env('DB_DATABASE_PERTENANT',
+                env('DB_DATABASE', 'forge'))),
+        'username' => env('DB_MULTISERVER_' . $i . '_USERNAME', 'forge'),
+        'password' => env('DB_MULTISERVER_' . $i . '_PASSWORD', ''),
+        'unix_socket' => env('DB_MULTISERVER_' . $i . 'SOCKET', ''),
         'charset' => 'utf8mb4',
         'collation' => 'utf8mb4_unicode_ci',
         'prefix' => '',
@@ -110,6 +118,7 @@ while (env('DB_MULTISERVER_'.$i.'_HOST',false)) {
             // 'NO_ZERO_IN_DATE',
             // 'NO_ZERO_DATE',
             'ERROR_FOR_DIVISION_BY_ZERO',
+            'NO_AUTO_CREATE_USER',
             // 'NO_ENGINE_SUBSTITUTION',
         ],
         'engine' => 'InnoDB',
@@ -169,7 +178,7 @@ return [
     */
 
     'default' => env('DB_CONNECTION', 'mysql'),
-    'perTenant' => env('DB_CONNECTION_PERTENANT', 'mysql'),
+    'perTenant' => env('DB_CONNECTION_PERTENANT', 'mysqlPerTenant'),
 
     /*
     |--------------------------------------------------------------------------
