@@ -32,10 +32,10 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        if($this->app->runningInConsole()){
+        if ($this->app->runningInConsole()) {
             $this->bootMigration();
-        //detect app_group mmulti tenant
-        }else if(config('AppConfig.system.multitenant.active',false)){
+        } else if (config('AppConfig.system.multitenant.active', false)) {
+            //detect app_group mmulti tenant
             $this->AppGroupCheck();
         }
 
@@ -44,45 +44,52 @@ class RouteServiceProvider extends ServiceProvider
 
     private function AppGroupCheck()
     {
-        // jika detect by subfolder
-        if(config('AppConfig.system.multitenant.detect_mode',1)==1){
+        if (config('AppConfig.system.multitenant.detect_mode', 1) == 1) {
+            // jika detect by subfolder
             \App\Facades\Tenant::setActiveTenantByGroup();
-
-        // jika detect by subdomain
-        }else{
+        } else {
+            // jika detect by subdomain/domain
             \App\Facades\Tenant::setActiveTenantByDomain();
         }
 
         // tambah prefix untuk multi tenant
         $tmpConfig = config('filesystems.disks.local');
         $tmpConfig['root_old'] = $tmpConfig['root'];
-        $tmpConfig['root'] = $tmpConfig['root'].'/tenant_'.config('tenant.id',0);
+        $tmpConfig['root'] = $tmpConfig['root'] . '/tenant_' . config('tenant.id', 0);
         app()->config['filesystems.disks.local'] = $tmpConfig;
 
         // jika tenant aktif menggunakan s3 storage, maka set default dan public jadi s3 stroage bersangkutan
-        if(config('tenant.s3storage',0)){
-            app()->config['filesystems.default'] = 's3_'.config('tenant.s3storage');
-            $tmpConfig = config('filesystems.disks.s3_'.config('tenant.s3storage'));
+        if (config('tenant.s3storage', 0)) {
+            // set default ke s3 tenant
+            app()->config['filesystems.default'] = 's3_' . config('tenant.s3storage');
+
+            // set public storage ke s3 public tenant
+            $tmpConfig = config('filesystems.disks.s3_' . config('tenant.s3storage'));
             $tmpConfig['visibility'] = 'public';
             app()->config['filesystems.disks.public'] = $tmpConfig;
-        }else{
+        } else {
             // tambah prefix untuk multi tenant
             $tmpConfig = config('filesystems.disks.public');
             $tmpConfig['root_old'] = $tmpConfig['root'];
-            $tmpConfig['root'] = $tmpConfig['root'].'/tenant_'.config('tenant.id',0);
+            $tmpConfig['root'] = $tmpConfig['root'] . '/tenant_' . config('tenant.id', 0);
             app()->config['filesystems.disks.public'] = $tmpConfig;
         }
 
         // set domain khusus untuk cdn multi tenant
         $tmpConfig = config('filesystems.disks.alltenant');
-        $tmpConfig['url'] = config('AppConfig.system.multitenant.alltenant_storage_domain',config('AppConfig.system.multitenant.owner_domain','')).$tmpConfig['url'];
+        $tmpConfig['url'] = config(
+            'AppConfig.system.multitenant.alltenant_storage_domain',
+            config('AppConfig.system.multitenant.owner_domain', '')
+        ) . $tmpConfig['url'];
         app()->config['filesystems.disks.alltenant'] = $tmpConfig;
 
         // set domain khusus untuk cdn multi tenant
         $tmpConfig = config('filesystems.disks.alltenant_public');
-        $tmpConfig['url'] = config('AppConfig.system.multitenant.alltenant_storage_domain',config('AppConfig.system.multitenant.owner_domain','')).$tmpConfig['url'];
+        $tmpConfig['url'] = config(
+            'AppConfig.system.multitenant.alltenant_storage_domain',
+            config('AppConfig.system.multitenant.owner_domain', '')
+        ) . $tmpConfig['url'];
         app()->config['filesystems.disks.alltenant_public'] = $tmpConfig;
-
     }
 
     /**
@@ -110,12 +117,13 @@ class RouteServiceProvider extends ServiceProvider
 
         parent::register();
 
-    //     $this->mergeConfigFrom(
-    //         __DIR__.'/../config/HPSynapse.php', config_path('hpsynapse.php')
-    //     );
-    //    $this->app->singleton('breadcrumb', function ($app) {
-    //        return new \hpsynapse\appscore\Services\Breadcrumb();
-    //    });
+        // $this->mergeConfigFrom(
+        //     __DIR__ . '/../config/HPSynapse.php',
+        //     config_path('hpsynapse.php')
+        // );
+        // $this->app->singleton('breadcrumb', function ($app) {
+        //     return new \hpsynapse\appscore\Services\Breadcrumb();
+        // });
     }
 
     /**
@@ -126,7 +134,7 @@ class RouteServiceProvider extends ServiceProvider
     public function map()
     {
         // if(!$this->app->runningInConsole())
-            $this->registerControllerNamespace();
+        $this->registerControllerNamespace();
     }
 
     /**
@@ -135,8 +143,8 @@ class RouteServiceProvider extends ServiceProvider
     protected function registerControllerNamespace()
     {
         $controllerPaths = array_merge(
-            config('hpsynapse.controller_path.pertenant.'.config('tenant.id',0),[]),
-            config('hpsynapse.controller_path.general',[])
+            config('hpsynapse.controller_path.pertenant.' . config('tenant.id', 0), []),
+            config('hpsynapse.controller_path.general', []),
         );
 
         foreach ($controllerPaths as $namespace => $pathToModule) {
@@ -146,7 +154,7 @@ class RouteServiceProvider extends ServiceProvider
                 'routes' => false
             ];
 
-            $moduleNamespace = explode("\\",trim($namespace,"\\"));
+            $moduleNamespace = explode("\\", trim($namespace, "\\"));
             $moduleNamespace = array_pop($moduleNamespace);
 
             $namespace .= 'Controllers';
@@ -158,11 +166,20 @@ class RouteServiceProvider extends ServiceProvider
                 // var_dump([$namespace,$path]);echo('<br><br>');
 
                 //load general route tambahan jika ada
-                if($pathBinding = config('AppConfig.binding.route.'.$moduleNamespace.'.'.($isApi?'api':'web'),false)){
+                if (
+                    $pathBinding = config(
+                        'AppConfig.binding.route.' . $moduleNamespace . '.' . ($isApi ? 'api' : 'web'),
+                        false
+                    )
+                ) {
                     $pathBinding = app_path('MainApp' . DIRECTORY_SEPARATOR . $pathBinding);
                     if (file_exists($pathBinding)) {
                         Route::middleware($isApi ? ['api'] : ['web'])
-                            ->prefix($isApi && $moduleNamespace != 'moduser' ? config('AppConfig.endpoint.laravel.api.'.$moduleNamespace) : '')
+                            ->prefix(
+                                $isApi && $moduleNamespace != 'moduser'
+                                    ? config('AppConfig.endpoint.laravel.api.' . $moduleNamespace)
+                                    : ''
+                            )
                             ->namespace($namespace)
                             ->group($pathBinding);
                     }
@@ -174,7 +191,11 @@ class RouteServiceProvider extends ServiceProvider
 
                 // register router utama per module
                 Route::middleware($isApi ? ['api'] : ['web'])
-                    ->prefix($isApi && $moduleNamespace != 'moduser' ? config('AppConfig.endpoint.laravel.api.'.$moduleNamespace) : '')
+                    ->prefix(
+                        $isApi && $moduleNamespace != 'moduser'
+                            ? config('AppConfig.endpoint.laravel.api.' . $moduleNamespace)
+                            : ''
+                    )
                     ->namespace($namespace)
                     ->group($path);
             }
@@ -185,7 +206,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapWebRoutes();
 
         //jika full_vue aktif maka load route config nya
-        if(config('AppConfig.system.web_admin.full_vue'))
+        if (config('AppConfig.system.web_admin.full_vue'))
             $this->mapWebFullVueRoutes();
     }
 
@@ -197,16 +218,16 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapWebFullVueRoutes()
     {
         $adminEndpoint = config('AppConfig.endpoint.laravel.admin.app');
-        if($adminEndpoint!='/' && !empty($adminEndpoint)){
+        if ($adminEndpoint != '/' && !empty($adminEndpoint)) {
             Route::middleware('web')
-                ->get($adminEndpoint, function(){
+                ->get($adminEndpoint, function () {
                     return view('layouts.full_vue.main');
                 });
-        }else{
+        } else {
             $adminEndpoint = '';
         }
         Route::middleware('web')
-            ->get($adminEndpoint.'{any}', function(){
+            ->get($adminEndpoint . '{any}', function () {
                 return view('layouts.full_vue.main');
             })->where('any', '.*');
     }

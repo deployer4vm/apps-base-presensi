@@ -2,43 +2,57 @@
 
 namespace App\Services;
 
+use Exception;
 use App\Facades\Trans;
+use App\Base\BaseRepository;
 
-class Web
-{   
+class Web extends BaseRepository
+{
 
     /**
      * BREAD CRUMB
      * -------------------------------------------------------------------------
      */
 
-    private 
-        $breadcrumbs = [],
-        $breadcrumbTitle = '';
+    private $breadcrumbs = [];
+    private $breadcrumbTitle = '';
 
     /**
-     * 
-     * @param String $text
-     * @param String|Array $route
+     * Add Breadcrumb item
+     *
+     * @param string $text
+     * @param string|array $route
      */
     public function addBreadcrumb($text, $route = '#')
     {
-        $this->breadcrumbs[] = [
-            'text' => $text,
-            'route' => is_array($route)?route($route[0],isset($route[1])?$route[1]:[]):$route
-        ];
+        if (is_array($text))
+            $text =
+                $this->breadcrumbs[] = [
+                    'text' => $text,
+                    'route' => is_array($route) ? route($route[0], $route[1] ?? []) : $route
+                ];
     }
 
+    /**
+     * Get Breacrumbs Array
+     *
+     * @return array
+     */
     public function getBreadcrumb()
     {
         return $this->breadcrumbs;
     }
-    
-    public function resetBreadcrumb($setHome=true,$homeRoute='dashboard')
+
+    /**
+     * Reset Breadcrumbs
+     *
+     * @return void
+     */
+    public function resetBreadcrumb()
     {
         $this->breadcrumbs = [];
-        if($setHome)
-            $this->addBreadcrumb(__('lang.home'),[$homeRoute]);
+        if ($setHome)
+            $this->addBreadcrumb(__('lang.home'), [$homeRoute]);
     }
 
     public function setBreadcrumbTitle($title)
@@ -48,13 +62,11 @@ class Web
 
     public function appendBreadcrumbTitle($title)
     {
-        return $this->breadcrumbTitle =  $this->breadcrumbTitle.' \ '.Trans::chose($title);
+        return $this->breadcrumbTitle =  $this->breadcrumbTitle . ' \ ' . Trans::chose($title);
     }
 
     public function getBreadcrumbTitle()
     {
         return $this->breadcrumbTitle;
     }
-
-
 }

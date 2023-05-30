@@ -11,14 +11,14 @@ use App\Jobs\RestoreBackup;
 
 class RunRestore extends Command
 {
-    
+
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'synapse:runrestore'
-    . '{backupDate : tanggal backup YYYY-MM-DD} ';
+    protected $signature = 'synapse:runrestore '
+        . '{backupDate : tanggal backup YYYY-MM-DD} ';
 
     /**
      * The console command description.
@@ -34,9 +34,8 @@ class RunRestore extends Command
      */
     public function handle()
     {
-        $backupDate = $this->argument('backupDate'); 
+        $backupDate = $this->argument('backupDate');
         RestoreBackup::dispatch($backupDate);
         $this->info('SUCCESS!');
-
     }
 }

@@ -50,9 +50,17 @@ const mutations = {
 
 const actions = {
     reloadConfig({commit,getters},data={}){
+
+        var saveState = data.saveState;
+        if(data.saveState)
+            delete data.saveState;
+
         return globals()
             .LocalApi.get(getters.apiEndpoint,{params: data}).then((val)=>{
-                commit('setConfig',val.data);            
+                
+                if(saveState==undefined||saveState)
+                    commit('setConfig',val.data);   
+                               
                 return true;
             }).catch((err)=>{
                 console.log('Config file error.',err);
@@ -60,8 +68,9 @@ const actions = {
     },
     saveConfig({commit,getters},data={}){
         return globals()
-            .LocalApi.post(getters.apiEndpoint,{data: data}).then((val)=>{
-                commit('setConfig',val.data);            
+            .LocalApi.post(getters.apiEndpoint,{data: data.data}).then((val)=>{
+                if(data.saveState==undefined||data.saveState)
+                    commit('setConfig',val.data);                
                 return true;
             }).catch((err)=>{
                 console.log('Config file error.',err);

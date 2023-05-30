@@ -20,11 +20,15 @@ class CreateTenantDomainsTable extends Migration
             $table->unsignedBigInteger('created_by')->default(0);
             $table->unsignedBigInteger('updated_by')->default(0);
 
-            $table->text('domain');
+            $table->string('domain',255);
             $table->unsignedTinyInteger('status')->default(1);
             $table->text('redirect')->nullable();
 
             $table->timestamps();
+            
+            $table->index('tenant_id');
+            $table->index('domain');
+            $table->index('status');
         });
         
         // migrate existing DB Domain

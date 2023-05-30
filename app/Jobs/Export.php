@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use Exception;
+// use Exception;
 use Throwable;
 
 use Illuminate\Bus\Queueable;
@@ -42,6 +42,7 @@ class Export implements ShouldQueue
 
     public function failed(Throwable $error)
     {
+        Log::error('Export Jobs2 '.$this->cacheKey.' ERROR : '.$error->getMessage());
         FExport::setExportJobFailed($this->cacheKey,$error);
     }
 

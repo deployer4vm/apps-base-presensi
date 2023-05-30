@@ -28,16 +28,19 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // * * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1
-                
+
         // $schedule->command('synapse:syshealthcheck')->everyMinute();
         $schedule->command('synapse:calculateTenantResource')->everySixHours();
 
+        // eksekusi garbage collector post reference tiap tengah malam
+        $schedule->command('synapse:postRefGc')->daily();
+        
         // jalankan queue worker jika mode nya menggunakan scheduler
-        if(config('AppConfig.system.jobs.worker_mode',1)==1)
-            $this->runQueueWorker($schedule);      
+        if (config('AppConfig.system.jobs.worker_mode', 1) == 1)
+            $this->runQueueWorker($schedule);
 
-        // jika websockets aktif maka aktifkan
-        if(config('AppConfig.packageLocal.moduser.broadcast.local_server_enabled')){
+        // jika websockets aktif maka aktifkan worker server socket nya
+        if (config('AppConfig.packageLocal.moduser.broadcast.local_server_enabled')) {
             $schedule->command('websockets:serve')->everyMinute()->withoutOverlapping();
         }
 
@@ -46,16 +49,14 @@ class Kernel extends ConsoleKernel
     }
 
     protected function runQueueWorker(&$schedule)
-    {        
-
+    {
         $queueList = Utilities::listQueueCommand();
 
-        foreach($queueList as $command)
-            $schedule->command($command)->everyMinute()->withoutOverlapping();        
+        foreach ($queueList as $command)
+            $schedule->command($command)->everyMinute()->withoutOverlapping();
 
         // entah kenapa karena sering error jadi restart aja queuenya tiap setangah jam
         $schedule->command('queue:restart')->everyThirtyMinutes();
-        
     }
 
     /**
@@ -66,7 +67,7 @@ class Kernel extends ConsoleKernel
     protected function commands()
     {
         $this->load(app_path('MainApp/Console/Commands'));
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }

@@ -16,8 +16,8 @@ class TranslationServiceProvider extends BaseTranslationServiceProvider
     protected function registerLoader()
     {
         $langPath = array_merge(
-            config('hpsynapse.lang_path.pertenant.'.config('tenant.id',0),[]),            
-            config('hpsynapse.lang_path.general',[])
+            config('hpsynapse.lang_path.general', []),
+            config('hpsynapse.lang_path.pertenant.' . config('tenant.id', 0), []),
         );
 
         $this->app->singleton('translation.loader', function ($app) use ($langPath) {

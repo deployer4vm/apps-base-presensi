@@ -2,9 +2,9 @@
 
 use Illuminate\Support\Str;
 
-if(env('SESSION_LIFETIME',false)){
+if (env('SESSION_LIFETIME', false)) {
     $lifetime = config('AppConfig.packageLocal.moduser.session_lifetime');
-}else{
+} else {
     $lifetime = env('SESSION_LIFETIME');
 }
 
@@ -134,7 +134,7 @@ return [
 
     'cookie' => env(
         'SESSION_COOKIE',
-        Str::slug(env('APP_NAME', 'laravel'), '_').'_session'
+        Str::slug(env('APP_NAME', 'laravel'), '_') . '_session'
     ),
 
     /*

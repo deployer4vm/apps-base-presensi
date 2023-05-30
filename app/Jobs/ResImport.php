@@ -54,6 +54,8 @@ class ResImport implements ShouldQueue
      */
     public function handle()
     {
+        if(config('AppConfig.system.multitenant.active'))
+            \App\Facades\Tenant::setActiveTenantById($this->tenantId);
         $repo = new $this->repo;
         $repo->setImportTenantId($this->tenantId);
         $repo->initImportOnJob($this->addsJobsParam);

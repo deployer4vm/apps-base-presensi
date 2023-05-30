@@ -10,14 +10,22 @@ var template = `
                         type="file" 
                         accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" 
                         class="form-control" name="importFile" 
-                        ref="file" v-on:change="handleFileUpload()" :disabled="onImportProcess">
+                        ref="file" 
+                        v-on:change="handleFileUpload()" 
+                        :disabled="onImportProcess">
                 </div>
             </div>
 
             <div class="form-group row" v-if="showTransactionDate">
                 <label class="col-form-label col-sm-2 text-sm-right" v-text="transactionDateCaption"></label>
                 <div class="col-sm-8">
-                    <input type="text" class="form-control datepicker-base transaction-date" :placeholder="transactionDateCaption" name="transactionDate" v-model="form.transactionDate" :disabled="onImportProcess">
+                    <input 
+                        type="text" 
+                        class="form-control datepicker-base transaction-date" 
+                        :placeholder="transactionDateCaption" 
+                        name="transactionDate" 
+                        v-model="importForm.transactionDate" 
+                        :disabled="onImportProcess">
                 </div>
             </div>
             
@@ -34,7 +42,10 @@ var template = `
         <i>Uploading...</i>
     </div>   
     <!-- jika sedang dalam proses import -->
-    <div v-else-if="importStatus.status==2" class="alert alert-success show d-inline-blcok pr-0" style="max-height: 300px; overflow-x: auto;">
+    <div 
+        v-else-if="importStatus.status==2"
+        class="alert alert-success show d-inline-blcok pr-0" 
+        style="max-height: 300px; overflow-x: auto;">
         <i>Import data sedang diproses, mohon tunggu...</i> - 
         <b>
             Data count : <span v-text="importStatus.count"></span></b> - <b>Processed count : <span v-text="importStatus.processedCount"></span>
@@ -62,26 +73,30 @@ var template = `
 `;
 var cImport = Vue.component("c-import", {
     template: template,
-    props: [
-        "api-import-upload",
-        "api-import-approve",
-        "api-import-status",
-        "api-import-cancel",
-
-        "last-transaction-date",//string format date Y-m-d
-        "transaction-date-caption",//string caption
-        "show-transaction-date",//true/false
-
-        //list event callback
-        "on-start",
-        "on-get-status",
-        "on-finish",
-        "on-fail",
-        "on-approve",
-        "on-cancel",
-        "on-approve-finish",
-        "on-cancel-finish"
-    ],
+    props: {
+        "api-import-upload": {},
+        "api-import-approve": {},
+        "api-import-status": {},
+        "api-import-cancel": {},
+        "last-transaction-date": {
+            type: String,
+            default: moment().format('YYYY-MM-DD')
+        },
+        "transaction-date-caption": {
+            type: String,
+            default: 'Date'
+        },
+        "addsparam": {},
+        "show-transaction-date": {},
+        "on-start": {},
+        "on-get-status": {},
+        "on-finish": {},
+        "on-fail": {},
+        "on-approve": {},
+        "on-cancel": {},
+        "on-approve-finish": {},
+        "on-cancel-finish": {}
+    },
     $_veeValidate: {
         validator: "new"
     },

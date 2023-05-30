@@ -18,9 +18,10 @@ class IframeLoadCheck
     public function handle($request, Closure $next)
     {
         // jika ada parameter onIframeConfig maka langsung hapus agar tidak
-        // masuk request parameter 
+        // masuk request parameter
         if($request->input('onIframeConfig'))
             unset($request['onIframeConfig']);
+
         return $next($request);
     }
 }

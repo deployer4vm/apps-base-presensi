@@ -12,14 +12,14 @@ use App\Services\Utilities;
 
 class QueueList extends Command
 {
-    
+
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
     protected $signature = 'synapse:queuelist '
-    . '{group? : group name (default, tenant, additional)} ';
+        . '{group? : group name (default, tenant, additional)} ';
 
     /**
      * The console command description.
@@ -36,14 +36,13 @@ class QueueList extends Command
     public function handle()
     {
         $group = $this->argument('group');
-        
-        if($group && !in_array($group,[
-            'default','tenant','additional'
-        ]))$group=false;
 
-        $queueList = Utilities::listQueueCommand($group?$group:false);
-        $projectPath = base_path().DIRECTORY_SEPARATOR.'artisan ';
-        foreach($queueList as $command)
-            echo 'php '.$projectPath.$command."\n";
+        if ($group && !in_array($group, ['default', 'tenant', 'additional']))
+            $group = false;
+
+        $queueList = Utilities::listQueueCommand($group ?: false);
+        $projectPath = base_path() . DIRECTORY_SEPARATOR . 'artisan ';
+        foreach ($queueList as $command)
+            echo 'php ' . $projectPath . $command . "\n";
     }
 }

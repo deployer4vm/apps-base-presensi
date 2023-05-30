@@ -59,6 +59,16 @@ class DatabaseSeeder extends Seeder
                 
             }
         }
+        
+        if(empty($runAbleSeeds)){            
+            if(isset($this->command)) {
+                $this->command->getOutput()->writeln("<error>No new seed detected !</error>");
+            }else{
+                echo 'No new seed detected !';
+            }
+            return;
+        }
+
         //jika mode nya 1 tenant 1 database
         if(config('AppConfig.system.multitenant.active',false) && config('AppConfig.system.multitenant.data_mode',1)!=1){  
 
@@ -104,8 +114,8 @@ class DatabaseSeeder extends Seeder
 
                             Tenant::setActiveTenantById($tenant['id']);
 
-                            if(method_exists($tmpClass,'setTenantId'))
-                                $tmpClass->setTenantId($tenant['id']);
+                            // if(method_exists($tmpClass,'setTenantId'))
+                            $tmpClass->setTenantId($tenant['id']);
 
                             try {
                                 $tmpClass->run();

@@ -3,7 +3,7 @@
  * GENERAL TEMPLATE LANGUAGE
  */
 return [
-	'home' => 'Beranda',
+    'home' => 'Beranda',
     //-- general heading caption 
     'form' => 'Form',
     'form_attribute' => 'Form :attribute',
@@ -26,13 +26,13 @@ return [
     'done' => 'Done',
     'exit' => 'Keluar',
     'back' => 'Kembali',
-    'edit' => 'Edit',
-    'delete' => 'Delete',
+    'delete' => 'Hapus',
     'search' => 'Cari',
     'view' => 'Tampilkan',
     'view_all' => 'Tampilkan Semua',
     'view_detail' => 'Tampilkan Detail',
     'filter' => 'Filter',
+    'keyword' => 'Kata kunci...',
     'upload' => 'Upload',
     'upload_attribute' => 'Upload :attribute',
     'download' => 'Download',
@@ -47,10 +47,21 @@ return [
     'keyword' => 'Kata kunci...',
     'loading_data' => 'Loading',
     'data_not_found' => 'Data tidak ditemukan',
-    'data_attribute_not_found' => 'Data :attribute tidak ditemukan',    
+    'data_attribute_not_found' => 'Data :attribute tidak ditemukan',
     'data_attribute_cannot_be_empty' => 'Data :attribute tidak boleh kosong',
     'no_data' => 'Belum ada data',
+    //-- general label
+    'detail' => 'Detail',
+    'status' => 'Status',
     'select' => 'Pilih',
+    'active' => 'Aktif',
+    'inactive' => 'Tidak Aktif',
+    'publish' => 'Publish',
+    'draft' => 'Draft',
+    'disable' => 'Disable',
+    'enable' => 'Enable',
+    'file' => 'File',
+    'no_file' => 'Tidak ada file',
     //-- home template    
     'system_app_loading_text' => 'Loading application data...',
     'system_app_load_button_text' => 'Reload',
@@ -83,22 +94,25 @@ return [
         'november' => 'November',
         'december' => 'Desember'
     ],
-    // --- general table
-    'table'=>[
+
+    //-- general table
+    'table' => [
         'header' => [
             'filter' => [
                 'range_start' => 'Tanggal Awal',
                 'range_end' => 'Tanggal Akhir'
             ]
         ],
-        'column_name'=>[
+        'column_name' => [
             'no'=>'No',
+            'insert_time' => 'Tanggal Dibuat',
             'status'=>'Status',
             'total'=>'Total',
             'sub_total'=>'Sub Total',
             'action'=>'Aksi'
-        ]
-    ],    
+        ],
+        'label' => [],
+    ],
 
     //-- general form
     'form' => [

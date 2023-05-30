@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Route;
  */
 
 $group = [
-    'prefix' => config('AppConfig.system.config_endpoint','sys/config'),// default : /sys/config
+    'prefix' => config('AppConfig.system.config_endpoint','/sys/config'),// default : /sys/config
 ];
 
 Route::group($group,function(){
@@ -49,14 +49,14 @@ Route::group($group,function(){
  */
 
 $group = [
-    'prefix' => config('AppConfig.system.multitenant.api_endpoint.tenant','sys/tenant'),
+    'prefix' => config('AppConfig.system.multitenant.api_endpoint.tenant','/sys/tenant'),
     // 'middleware' => 'auth:api'
 ];
 Route::group($group,function(){  
     // /api/sys/tenant/active
-    Route::get(config('AppConfig.system.multitenant.api_endpoint.tenant_active'),'TenantController@activeTenant');    
+    Route::get(config('AppConfig.system.multitenant.api_endpoint.tenant_active','/active'),'TenantController@activeTenant');    
     // /api/sys/tenant/group
-    Route::get(config('AppConfig.system.multitenant.api_endpoint.tenant_group'),'TenantController@tenantGroupList');
+    Route::get(config('AppConfig.system.multitenant.api_endpoint.tenant_group','/group'),'TenantController@tenantGroupList');
     //----read tenant resource
     //list tenant - /api/sys/tenant
     Route::get('/','TenantController@listTenant');
@@ -67,11 +67,26 @@ Route::group($group,function(){
  * -------------------------------------------------
  */
 // /api/sys/lang
-Route::get(config('AppConfig.system.lang_endpoint','sys/lang'),'LangController@readList');
+Route::get(config('AppConfig.system.lang_endpoint','/sys/lang'),'LangController@readList');
 
 /**
  * kindeditor
  * -------------------------------------------------
  */
-Route::match(['post','get'],config('AppConfig.system.editor_endpoint.upload','sys/editor/upload'),'KindeditorController@upload')->name('sys.editor.upload');
-Route::match(['post','get'],config('AppConfig.system.editor_endpoint.filemanager','sys/editor/filemanager'),'KindeditorController@filemanager')->name('sys.editor.filemanager');
+Route::match(['post','get'],config('AppConfig.system.editor_endpoint.upload','/sys/editor/upload'),'KindeditorController@upload')->name('sys.editor.upload');
+Route::match(['post','get'],config('AppConfig.system.editor_endpoint.filemanager','/sys/editor/filemanager'),'KindeditorController@filemanager')->name('sys.editor.filemanager');
+
+/**
+ * Post reference
+ * -------------------------------------------------
+ */
+
+$group = [
+    'prefix' => config('AppConfig.system.post_ref_endpoint','/sys/postref'),
+    // 'middleware' => 'auth:api'
+];
+Route::group($group,function(){  
+    // register 1 post ref id
+    Route::get('/','PostReferenceController@getRef');
+
+});

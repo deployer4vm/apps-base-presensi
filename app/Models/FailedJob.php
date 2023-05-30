@@ -12,7 +12,7 @@ class FailedJob extends Model
      * @var string
      */
     protected $table = 'failed_jobs';
-    
+
     /**
      * The attributes that aren't mass assignable.
      *

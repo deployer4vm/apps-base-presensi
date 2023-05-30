@@ -2,20 +2,30 @@
 
 namespace App\Base;
 
-use Illuminate\Http\Request;
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Routing\Controller as LaravelBaseController;
-use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Base\Traits\ResCacheTrait;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller as LaravelBaseController;
 use Illuminate\Support\Facades\Session;
 
 class BaseController extends LaravelBaseController
 {
-    use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+    use AuthorizesRequests;
+    use DispatchesJobs;
+    use ValidatesRequests;
     use ResCacheTrait;
 
-    //default data parameter untuk responseable
+    const MESSAGE_TYPE_INFO = "info";
+    const MESSAGE_TYPE_WARNING = "warning";
+    const MESSAGE_TYPE_DANGER = "danger";
+
+    /**
+     * default data parameter untuk Responseable
+     *
+     * @var array
+     */
     protected $output = [
         'status' => 200,
         'message' => '',
@@ -29,9 +39,21 @@ class BaseController extends LaravelBaseController
     /**
      * boolean nama variable wrap/grouping data di view (web request)
      */
-    protected $isViewVarWraped = false; //apakah seluruh variable diwrap/grupping ke variable $viewWrapVarName
-    protected $viewWrapVarName = 'data'; //nama variable wrap/grouping ,untuk data berbentuk list array, jadi di view akan jadi output->output['data'][VAR_NAME] dan di api akan jadi output->output['data']
+    /**
+     * apakah seluruh variable diwrap/grupping ke variable $viewWrapVarName
+     *
+     * @var boolean
+     */
 
+    protected $isViewVarWraped = false;
+    /**
+     * nama variable wrap/grouping,
+     * untuk data berbentuk list array,
+     * jadi di view akan jadi output->output['data'][VAR_NAME] dan di api akan jadi output->output['data']
+     *
+     * @var string
+     */
+    protected $viewWrapVarName = 'data'; //
 
     //default response paramter untuk
     protected $response = '';
@@ -44,7 +66,7 @@ class BaseController extends LaravelBaseController
 
     /**
      * Set $this->output['data']
-     * 
+     *
      * @param mixed Output Data
      * @return $this
      */
@@ -56,7 +78,7 @@ class BaseController extends LaravelBaseController
 
     /**
      * Set $this->output['params']
-     * 
+     *
      * @param array Output Parameters
      * @return $this
      */
@@ -65,9 +87,11 @@ class BaseController extends LaravelBaseController
         $this->output['params'] = $params;
         return $this;
     }
-    
+
     /**
-     * 
+     * Get Params
+     *
+     * @return array $this->output['params']
      */
     protected function getParams()
     {
@@ -76,12 +100,12 @@ class BaseController extends LaravelBaseController
 
     /**
      * Set $this->output['message'] dan $this->output['message_info']
-     * 
+     *
      * @param string Message
      * @param string type: info, warning, danger
      * @return $this
      */
-    protected function setMessage($message, $type = 'info')
+    protected function setMessage($message, $type = self::MESSAGE_TYPE_INFO)
     {
         $this->output['message'] = $message;
         $this->output['message_type'] = $type;
@@ -89,60 +113,75 @@ class BaseController extends LaravelBaseController
     }
 
     /**
-     * 
+     * Set Warning Status Output
+     *
      * @param string $message
      * @param string $type 'warning','info','warning','danger'
      * @param integer $code http response code
-     * @param mix $error
-     * @param mix $response
+     * @param mixed $error
+     * @param mixed $response
      */
-    protected function setWarning($message, $type = 'warning', $code = 400, $error = false, $response = null)
-    {
+    protected function setWarning(
+        $message,
+        $type = self::MESSAGE_TYPE_WARNING,
+        $code = 400,
+        $error = false,
+        $response = null
+    ) {
         $this->output['status'] = $code;
         $this->output['message'] = $message;
         $this->output['message_type'] = $type;
-        $this->output['errors'] = $error === true || $error === 1 || $error === false ? [true] : $error;
+        $this->output['errors'] =
+            $error === true || $error === 1 || $error === false
+                ? [true]
+                : $error;
 
         if (!is_null($response)) {
             $this->response =
-                $response === true || $response === 1 || $response === false ?
-                redirect(url()->previous())->withInput() :
-                $response;
+                $response === true || $response === 1 || $response === false
+                    ? redirect(url()->previous())->withInput()
+                    : $response;
         }
 
-        if ($this->isWebCall() && $this->forceOutput != 2)
+        if ($this->isWebCall() && $this->forceOutput != 2) {
             Session::put('alert', [
                 'type' => $type,
-                'message' => $message
+                'message' => $message,
             ]);
+        }
     }
 
     /**
-     * 
+     * Set Error Output
+     *
      * @param string $message
-     * @param mix $error
+     * @param mixed $error
      * @param integer $code
-     * @param type $response
+     * @param mixed $response
      */
-    protected function setError($message, $error = false, $code = 400, $response = null)
-    {
-        $this->setWarning($message, 'danger', $code, $error, $response);
+    protected function setError(
+        $message,
+        $error = false,
+        $code = 400,
+        $response = null
+    ) {
+        $this->setWarning($message, self::MESSAGE_TYPE_DANGER, $code, $error, $response);
     }
 
     /**
      * set alert view
-     * 
+     *
      * @param string $message
      * @param string $type 'warning','info','warning','danger'
      */
-    protected function setAlert($message, $type = 'info')
+    protected function setAlert($message, $type = self::MESSAGE_TYPE_INFO)
     {
         $this->setWarning($message, $type, '200');
     }
 
     /**
      * generate/get default parameter di resource listing, yang akan dipassing juga ke output
-     * 
+     *
      * @param bool $mergeParam true jika parameter input lainnya langsung dimasukan ke query dan filter
      *                         false jika dipisah di key terpisah saja (all)
      * @param array $mergeExcept list parameter yg tidak di merge kan ke query & filter
@@ -160,7 +199,7 @@ class BaseController extends LaravelBaseController
      *          *has --> optional jika menyertakan parameter has
      *          *view_import,
      *          *import_id,
-     * 
+     *
      *          ... paramater2 input lainnya jika ada dan $mergeParam == true
      *      ],
      *      filter => [
@@ -175,8 +214,10 @@ class BaseController extends LaravelBaseController
      *      orderBy => []
      *  ]
      */
-    final protected function getListParam(bool $mergeParam = true, array $mergeExcept = [])
-    {
+    final protected function getListParam(
+        bool $mergeParam = true,
+        array $mergeExcept = []
+    ) {
         $params = [
             'all' => request()->except([
                 'limit',
@@ -188,21 +229,24 @@ class BaseController extends LaravelBaseController
                 'with',
                 'has',
                 'view_import',
-                'import_id'
+                'import_id',
             ]),
             'query' => [ //parameter yang dipassing di URL, termasuk juga parameter filter, untuk di passing ke pagination juga
                 'limit' => request()->input('limit', 10),
-                'offset' => request()->input('offset', 0)
+                'offset' => request()->input('offset', 0),
             ],
             'filter' => [], //parameter filter ke method repo listing nya
-            'orderBy' => []
+            'orderBy' => [],
         ];
 
         //jika menyertakan orderBy
         if (request()->input('orderBy', null) || request()->input('orderType', null)) {
             $params['query']['orderBy'] = request()->input('orderBy', 'id');
             $params['query']['orderType'] = request()->input('orderType', 'ASC');
-            $params['orderBy'] = [$params['query']['orderBy'], $params['query']['orderType']];
+            $params['orderBy'] = [
+                $params['query']['orderBy'],
+                $params['query']['orderType']
+            ];
         }
 
         //jika menyertakan query string
@@ -212,12 +256,12 @@ class BaseController extends LaravelBaseController
 
         //jika menyertakan with
         if (request()->input('with', null)) {
-            $params['filter']['with'] = $params['query']['with'] = request()->input('with',[]);
+            $params['filter']['with'] = $params['query']['with'] = request()->input('with', []);
         }
 
         //jika menyertakan with
         if (request()->input('has', null)) {
-            $params['filter']['has'] = $params['query']['has'] = request()->input('has',[]);
+            $params['filter']['has'] = $params['query']['has'] = request()->input('has', []);
         }
 
         //jika menyertakan append
@@ -230,7 +274,10 @@ class BaseController extends LaravelBaseController
             foreach ($params['all'] as $key => $param) {
                 if (!in_array($key, $mergeExcept)) {
                     $params['query'][$key] = $param;
-                    if (isset($param[0]) && in_array(strtoupper($param[0]), ['LIKE', '!=', '<', '<=', '>', '>='])) {
+                    if (
+                        isset($param[0])
+                        && in_array(strtoupper($param[0]), ['LIKE', '!=', '<', '<=', '>', '>='])
+                    ) {
                         $params['filter'][] = [$key, $param[0], $param[1]];
                     } else {
                         $params['filter'][] = [$key, $param];
@@ -238,13 +285,13 @@ class BaseController extends LaravelBaseController
                 }
             }
         }
-        
+
         //detek import
-        if(request()->input('view_import',0) != 0){
+        if (request()->input('view_import', 0) != 0) {
             $params['filter']['view_import'] = request()->input('view_import');
             $params['query']['view_import'] = request()->input('view_import');
-            $params['filter']['import_id'] = request()->input('import_id',0);
-            $params['query']['import_id'] = request()->input('import_id',0);
+            $params['filter']['import_id'] = request()->input('import_id', 0);
+            $params['query']['import_id'] = request()->input('import_id', 0);
         }
 
         return $params;
@@ -253,6 +300,13 @@ class BaseController extends LaravelBaseController
     /**
      * Otomatisasi `$this->output['params'] = $this->getListParam();`
      */
+    /**
+     * Undocumented function
+     *
+     * @param boolean $mergeParam
+     * @param array $mergeExcept
+     * @return void
+     */
     public function buildParams(bool $mergeParam = true, array $mergeExcept = [])
     {
         $this->setParams($this->getListParam($mergeParam, $mergeExcept));
@@ -260,9 +314,10 @@ class BaseController extends LaravelBaseController
 
     /**
      * cek apakah request dari ifframe atau bukan
+     *
      * @return boolean
-     * @SuppressWarnings(PHPMD.Superglobals)
      */
+    // @SuppressWarnings(PHPMD.Superglobals)
     protected function hasReferer()
     {
         return isset($_SERVER['HTTP_REFERER']) ? true : false;
@@ -270,6 +325,7 @@ class BaseController extends LaravelBaseController
 
     /**
      * cek apakah request API
+     *
      * @return boolean
      */
     protected function isApiCall()
@@ -279,6 +335,7 @@ class BaseController extends LaravelBaseController
 
     /**
      * cek apakah request Ajax
+     *
      * @return boolean
      */
     protected function isAjaxCall()
@@ -288,6 +345,7 @@ class BaseController extends LaravelBaseController
 
     /**
      * cek apakah request WEB
+     *
      * @return boolean
      */
     protected function isWebCall()
@@ -312,14 +370,19 @@ class BaseController extends LaravelBaseController
     }
 
     /**
-     * 
-     * @param type $response
+     * Return Output/Response
+     *
+     * @param mixed $response
+     *
      * @return \App\Base\responsableName
-     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
+    // @SuppressWarnings(PHPMD.BooleanArgumentFlag)
     protected function done($response = false)
     {
-        if ($response) $this->response = $response;
+        if ($response) {
+            $this->response = $response;
+        }
+
         return new $this->responsableName(
             $this->output,
             $this->response,

@@ -33,21 +33,24 @@ class GenerateTenant extends Command
      */
     public function handle()
     {
-        $tenants = \Illuminate\Support\Facades\DB::table('tenants')->select('id')->get();
+        $tenants = DB::table('tenants')->select(['id', 'db', 's3storage', 'status'])->get();
         $tenatIdList = [];
         foreach ($tenants as $tenant) {
             $tenatIdList[$tenant->id] = [
-                'id'=>$tenant->id,
-                'db'=>$tenant->db,
-                's3storage'=>$tenant->s3storage,
-                'status'=>$tenant->status,
+                'id' => $tenant->id,
+                'db' => $tenant->db,
+                's3storage' => $tenant->s3storage,
+                'status' => $tenant->status,
             ];
         }
-        
-        if (file_put_contents(app_path('MainApp' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . '_tenant.json') , str_replace('\/','/',json_encode($tenatIdList,JSON_PRETTY_PRINT)) )) {
+
+        if (file_put_contents(
+            app_path('MainApp' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . '_tenant.json'),
+            str_replace('\/', '/', json_encode($tenatIdList, JSON_PRETTY_PRINT))
+        )) {
             $this->info('Regenerate _tenant.json !');
             $this->info('SUCCESS!');
-        }else{
+        } else {
             $this->error('Regenerate _tenant.json FAILED!');
         }
     }

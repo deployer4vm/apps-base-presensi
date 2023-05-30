@@ -24,12 +24,11 @@ class MigrationEnded
 
     /**
      * @param  object  $event
-     * 
+     *
      * @return void
      */
     public function handle($event)
-    { 
-        $this->resetCache('MigrationEnded',$event);
+    {
+        $this->resetCache('MigrationEnded', $event);
     }
-
 }

@@ -1,120 +1,120 @@
 export default {
-  get _layoutHelpers () {
-    return window.layoutHelpers
-  },
+    get _layoutHelpers() {
+        return window.layoutHelpers
+    },
 
-  _exec (fn) {
-    return this._layoutHelpers && fn()
-  },
+    _exec(fn) {
+        return this._layoutHelpers && fn()
+    },
 
-  getLayoutSidenav () {
-    return this._exec(() => this._layoutHelpers.getLayoutSidenav()) || null
-  },
+    getLayoutSidenav() {
+        return this._exec(() => this._layoutHelpers.getLayoutSidenav()) || null
+    },
 
-  getSidenav () {
-    return this._exec(() => this._layoutHelpers.getSidenav()) || null
-  },
+    getSidenav() {
+        return this._exec(() => this._layoutHelpers.getSidenav()) || null
+    },
 
-  _bindSidenavMouseEvents () {
-    return this._exec(() => this._layoutHelpers._bindSidenavMouseEvents()) || null
-  },
+    _bindSidenavMouseEvents() {
+        return this._exec(() => this._layoutHelpers._bindSidenavMouseEvents()) || null
+    },
 
-  getLayoutNavbar () {
-    return this._exec(() => this._layoutHelpers.getLayoutNavbar()) || null
-  },
+    getLayoutNavbar() {
+        return this._exec(() => this._layoutHelpers.getLayoutNavbar()) || null
+    },
 
-  getLayoutFooter () {
-    return this._exec(() => this._layoutHelpers.getLayoutFooter()) || null
-  },
+    getLayoutFooter() {
+        return this._exec(() => this._layoutHelpers.getLayoutFooter()) || null
+    },
 
-  getLayoutContainer () {
-    return this._exec(() => this._layoutHelpers.getLayoutContainer()) || null
-  },
+    getLayoutContainer() {
+        return this._exec(() => this._layoutHelpers.getLayoutContainer()) || null
+    },
 
-  isSmallScreen () {
-    return this._exec(() => this._layoutHelpers.isSmallScreen())
-  },
+    isSmallScreen() {
+        return this._exec(() => this._layoutHelpers.isSmallScreen())
+    },
 
-  isLayout1 () {
-    return this._exec(() => this._layoutHelpers.isLayout1())
-  },
+    isLayout1() {
+        return this._exec(() => this._layoutHelpers.isLayout1())
+    },
 
-  isCollapsed () {
-    return this._exec(() => this._layoutHelpers.isCollapsed())
-  },
+    isCollapsed() {
+        return this._exec(() => this._layoutHelpers.isCollapsed())
+    },
 
-  isFixed () {
-    return this._exec(() => this._layoutHelpers.isFixed())
-  },
+    isFixed() {
+        return this._exec(() => this._layoutHelpers.isFixed())
+    },
 
-  isOffcanvas () {
-    return this._exec(() => this._layoutHelpers.isOffcanvas())
-  },
+    isOffcanvas() {
+        return this._exec(() => this._layoutHelpers.isOffcanvas())
+    },
 
-  isNavbarFixed () {
-    return this._exec(() => this._layoutHelpers.isNavbarFixed())
-  },
+    isNavbarFixed() {
+        return this._exec(() => this._layoutHelpers.isNavbarFixed())
+    },
 
-  isFooterFixed () {
-    return this._exec(() => this._layoutHelpers.isFooterFixed())
-  },
+    isFooterFixed() {
+        return this._exec(() => this._layoutHelpers.isFooterFixed())
+    },
 
-  isReversed () {
-    return this._exec(() => this._layoutHelpers.isReversed())
-  },
+    isReversed() {
+        return this._exec(() => this._layoutHelpers.isReversed())
+    },
 
-  setCollapsed (collapsed, animate = true) {
-    this._exec(() => this._layoutHelpers.setCollapsed(collapsed, animate))
-  },
+    setCollapsed(collapsed, animate = true) {
+        this._exec(() => this._layoutHelpers.setCollapsed(collapsed, animate))
+    },
 
-  toggleCollapsed (animate = true) {
-    this._exec(() => this._layoutHelpers.toggleCollapsed(animate))
-  },
+    toggleCollapsed(animate = true) {
+        this._exec(() => this._layoutHelpers.toggleCollapsed(animate))
+    },
 
-  setPosition (fixed, offcanvas) {
-    this._exec(() => this._layoutHelpers.setPosition(fixed, offcanvas))
-  },
+    setPosition(fixed, offcanvas) {
+        this._exec(() => this._layoutHelpers.setPosition(fixed, offcanvas))
+    },
 
-  setNavbarFixed (fixed) {
-    this._exec(() => this._layoutHelpers.setNavbarFixed(fixed))
-  },
+    setNavbarFixed(fixed) {
+        this._exec(() => this._layoutHelpers.setNavbarFixed(fixed))
+    },
 
-  setFooterFixed (fixed) {
-    this._exec(() => this._layoutHelpers.setFooterFixed(fixed))
-  },
+    setFooterFixed(fixed) {
+        this._exec(() => this._layoutHelpers.setFooterFixed(fixed))
+    },
 
-  setReversed (reversed) {
-    this._exec(() => this._layoutHelpers.setReversed(reversed))
-  },
+    setReversed(reversed) {
+        this._exec(() => this._layoutHelpers.setReversed(reversed))
+    },
 
-  update () {
-    this._exec(() => this._layoutHelpers.update())
-  },
+    update() {
+        this._exec(() => this._layoutHelpers.update())
+    },
 
-  setAutoUpdate (enable) {
-    this._exec(() => this._layoutHelpers.setAutoUpdate(enable))
-  },
+    setAutoUpdate(enable) {
+        this._exec(() => this._layoutHelpers.setAutoUpdate(enable))
+    },
 
-  on (event, callback) {
-    this._exec(() => this._layoutHelpers.on(event, callback))
-  },
+    on(event, callback) {
+        this._exec(() => this._layoutHelpers.on(event, callback))
+    },
 
-  off (event) {
-    this._exec(() => this._layoutHelpers.off(event))
-  },
+    off(event) {
+        this._exec(() => this._layoutHelpers.off(event))
+    },
 
-  init () {
-    this._exec(() => this._layoutHelpers.init())
-  },
+    init() {
+        this._exec(() => this._layoutHelpers.init())
+    },
 
-  destroy () {
-    this._exec(() => this._layoutHelpers.destroy())
-  },
+    destroy() {
+        this._exec(() => this._layoutHelpers.destroy())
+    },
 
-  // Internal
-  //
+    // Internal
+    //
 
-  _removeClass (cls) {
-    this._exec(() => this._layoutHelpers._removeClass(cls))
-  }
+    _removeClass(cls) {
+        this._exec(() => this._layoutHelpers._removeClass(cls))
+    }
 }

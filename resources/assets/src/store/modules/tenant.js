@@ -41,7 +41,7 @@ const getters = {
     },
 };
 
-const mutations = {   
+const mutations = {
     setTenant(state, data) {
         // state.tenantList = data.tenant_list?data.tenant_list:null;
         state.activeTenant = data.active_tenant?data.active_tenant:{id: 0,name: '',group_app: '',is_main: 0};
@@ -58,9 +58,9 @@ const mutations = {
 
 const actions = {
     reloadTenant({commit},groupApp){
-        var apiPath = 
-            globals().Web.getEndpoint(globals().AppConfig.endpoint.api.app) + 
-            globals().AppConfig.system.multitenant.api_endpoint.tenant + 
+        var apiPath =
+            globals().Web.getEndpoint(globals().AppConfig.endpoint.api.app) +
+            globals().AppConfig.system.multitenant.api_endpoint.tenant +
             globals().AppConfig.system.multitenant.api_endpoint.tenant_active;
         return axios.get(apiPath,{
             params: {
@@ -79,9 +79,9 @@ const actions = {
         });
     },
     listTenantGroup({commit},params={}) {
-        var apiPath = 
-            globals().Web.getEndpoint(globals().AppConfig.endpoint.api.app) + 
-            globals().AppConfig.system.multitenant.api_endpoint.tenant + 
+        var apiPath =
+            globals().Web.getEndpoint(globals().AppConfig.endpoint.api.app) +
+            globals().AppConfig.system.multitenant.api_endpoint.tenant +
             globals().AppConfig.system.multitenant.api_endpoint.tenant_group;
         return axios.get(apiPath,{
             params: params

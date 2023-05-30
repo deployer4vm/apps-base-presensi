@@ -53,7 +53,7 @@ class GenerateBackup implements ShouldQueue
         exec('cd "'.$newBackupPath.'" && tar -C "'.$uploadPath.'" -zcvf upload.tar.gz .');
         //compress semua hasil backup
         exec('cd "'.$backupPath.'" && tar -C "'.$newBackupPath.'" -zcvf '.$now.'.tar.gz .');
-        //delete semua file 
+        //delete semua file
         exec('rm -rf "'.$newBackupPath.'"');
         Backup::create([
             'backup_date'=>$now,

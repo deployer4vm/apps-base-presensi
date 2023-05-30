@@ -15,23 +15,22 @@ class KindeditorController extends BaseController
      */
     public function __construct()
     {
-        
     }
 
     /**
      * initiate language resource for vue apps
-     * 
-     * @param Request $request *semua optional
+     *
+     * @param \Illuminate\Http\Request $request *semua optional
      *      lang : lang id nya
      *      item : item nya jika diperlukan
-     *
+     * @return \Illuminate\Http\Response JSON Response
      */
     public function upload(Request $request)
     {
         //File save directory path
         $save_path = storage_path('app/upload/editor/');
         //File save directory URL
-        $save_url = url('upload/editor').'/';
+        $save_url = url('upload/editor') . '/';
         //Define file extensions that are allowed to upload
         $ext_arr = [
             'image' => ['gif', 'jpg', 'jpeg', 'png', 'bmp'],
@@ -41,70 +40,70 @@ class KindeditorController extends BaseController
         ];
         //Maximum file size
         $max_size = 1000000;
-        
+
         $save_path = realpath($save_path) . '/';
-        
+
         //PHP upload failed
-        if (! empty ($_FILES ['imgFile'] ['error'])) {
-            switch ($_FILES ['imgFile'] ['error']) {
-            case '1':
-                $error = 'Exceeded the size allowed by php.ini. ';
-                break;
-            case '2':
-                $error = 'Exceeded the size allowed by the form. ';
-                break;
-            case '3':
-                $error = 'Only part of the image was uploaded. ';
-                break;
-            case '4':
-                $error = 'Please select an image. ';
-                break;
-            case '6':
-                $error = 'Temporary directory not found. ';
-                break;
-            case '7':
-                $error = 'Error writing file to hard disk. ';
-                break;
-            case '8':
-                $error = 'File upload stopped by extension. ';
-                break;
-            case '999':
-            default:
-                $error = 'Unknown error. ';
+        if (!empty($_FILES['imgFile']['error'])) {
+            switch ($_FILES['imgFile']['error']) {
+                case '1':
+                    $error = 'Exceeded the size allowed by php.ini. ';
+                    break;
+                case '2':
+                    $error = 'Exceeded the size allowed by the form. ';
+                    break;
+                case '3':
+                    $error = 'Only part of the image was uploaded. ';
+                    break;
+                case '4':
+                    $error = 'Please select an image. ';
+                    break;
+                case '6':
+                    $error = 'Temporary directory not found. ';
+                    break;
+                case '7':
+                    $error = 'Error writing file to hard disk. ';
+                    break;
+                case '8':
+                    $error = 'File upload stopped by extension. ';
+                    break;
+                case '999':
+                default:
+                    $error = 'Unknown error. ';
             }
-            return $this->uploadAlert ($error);
+            return $this->uploadAlert($error);
         }
-        
+
         // When uploading files
-        if (empty ($_FILES) === false) {
+        if (empty($_FILES) === false) {
             // Original file name
-            $file_name = $_FILES ['imgFile'] ['name'];
+            $file_name = $_FILES['imgFile']['name'];
             // Temporary file name on the server
-            $tmp_name = $_FILES ['imgFile'] ['tmp_name'];
+            $tmp_name = $_FILES['imgFile']['tmp_name'];
             //File size
-            $file_size = $_FILES ['imgFile'] ['size'];
+            $file_size = $_FILES['imgFile']['size'];
             // Check the file name
-            if (! $file_name) {
-                return $this->uploadAlert ("Please select a file.");
+            if (!$file_name) {
+                return $this->uploadAlert("Please select a file.");
             }
             // Check the directory
-            if (@is_dir ($save_path) === false) {
-                return $this->uploadAlert ("The upload directory does not exist.");
+            if (@is_dir($save_path) === false) {
+                return $this->uploadAlert("The upload directory does not exist.");
             }
             // Check the directory write permission
-            if (@is_writable ($save_path) === false) {
-                return $this->uploadAlert ("The upload directory does not have write permission.");
+            if (@is_writable($save_path) === false) {
+                return $this->uploadAlert("The upload directory does not have write permission.");
             }
             // Check if it has been uploaded
-            if (@is_uploaded_file ($tmp_name) === false) {
-                return $this->uploadAlert ("Upload failed.");
+            if (@is_uploaded_file($tmp_name) === false) {
+                return $this->uploadAlert("Upload failed.");
             }
             //Check file size
             if ($file_size > $max_size) {
                 return $this->uploadAlert("The upload file size exceeds the limit.");
             }
             //Check directory name
-            $dir_name = empty($_GET['dir']) ? 'image' : trim($_GET['dir']);
+            $dir_name = $request->input('dir', 'image');
             if (empty($ext_arr[$dir_name])) {
                 return $this->uploadAlert("The directory name is incorrect.");
             }
@@ -115,21 +114,23 @@ class KindeditorController extends BaseController
             $file_ext = strtolower($file_ext);
             //Check extension
             if (in_array($file_ext, $ext_arr[$dir_name]) === false) {
-                return $this->uploadAlert("Upload file extension is not allowed. \n Only allowed" . implode(",", $ext_arr[$dir_name]) . "format.");
+                return $this->uploadAlert("Upload file extension is not allowed. \n Only allowed"
+                    . implode(",", $ext_arr[$dir_name])
+                    . "format.");
             }
             //Create Folder
             if ($dir_name !== '') {
                 $save_path .= $dir_name . "/";
                 $save_url .= $dir_name . "/";
                 if (!file_exists($save_path)) {
-                    mkdir($save_path,0766,true);
+                    mkdir($save_path, 0766, true);
                 }
             }
             $ymd = date("Ymd");
             $save_path .= $ymd . "/";
             $save_url .= $ymd . "/";
             if (!file_exists($save_path)) {
-                mkdir($save_path,0766,true);
+                mkdir($save_path, 0766, true);
             }
             //New file name
             $new_file_name = date("YmdHis") . '_' . rand(10000, 99999) . '.' . $file_ext;
@@ -140,17 +141,21 @@ class KindeditorController extends BaseController
             }
             @chmod($file_path, 0644);
             $file_url = $save_url . $new_file_name;
-        
+
             return response()->json(array('error' => 0, 'url' => $file_url));
         }
         return $this->uploadAlert("File upload failed.");
-                
     }
 
+    /**
+     * Return JSON Response
+     *
+     * @param string $msg
+     * @return \Illuminate\Http\Response
+     */
     private function uploadAlert($msg)
     {
         return response()->json(array('error' => 1, 'message' => $msg));
-
     }
 
     /**
@@ -158,18 +163,18 @@ class KindeditorController extends BaseController
      */
     public function filemanager(Request $request)
     {
-        
+
         // Root directory path, you can specify an absolute path, such as / var / www / attached /
-        $root_path = storage_path('app/upload/editor').DIRECTORY_SEPARATOR;
+        $root_path = storage_path('app/upload/editor') . DIRECTORY_SEPARATOR;
 
         // Root directory URL, you can specify an absolute path, such as http://www.yoursite.com/attached/
-        $root_url = url('upload/editor').'/';
+        $root_url = url('upload/editor') . '/';
 
         //Picture extension
         $ext_arr = array('gif', 'jpg', 'jpeg', 'png', 'bmp');
 
         //Directory name
-        $dir_name = empty($_GET['dir']) ? '' : trim($_GET['dir']);
+        $dir_name = $request->input('dir');
         if (!in_array($dir_name, array('', 'image', 'flash', 'media', 'file'))) {
             echo "Invalid Directory name.";
             exit;
@@ -178,25 +183,25 @@ class KindeditorController extends BaseController
             $root_path .= $dir_name . "/";
             $root_url .= $dir_name . "/";
             if (!file_exists($root_path)) {
-                mkdir($root_path,0766,true);
+                mkdir($root_path, 0766, true);
             }
         }
-        
+
         //According to the path parameter, set each path and URL
-        if (empty($_GET['path'])) {
+        if (!$request->input('path')) {
             $current_path = realpath($root_path) . '/';
             $current_url = $root_url;
             $current_dir_path = '';
             $moveup_dir_path = '';
         } else {
-            $current_path = realpath($root_path) . '/' . $_GET['path'];
-            $current_url = $root_url . $_GET['path'];
-            $current_dir_path = $_GET['path'];
+            $current_path = realpath($root_path) . '/' . $request->input('path');
+            $current_url = $root_url . $request->input('path');
+            $current_dir_path = $request->input('path');
             $moveup_dir_path = preg_replace('/(.*?)[^\/]+\/$/', '$1', $current_dir_path);
         }
         //echo realpath($root_path);
         //Sorting form, name or size or type
-        $order = empty($_GET['order']) ? 'name' : strtolower($_GET['order']);
+        $order = $request->input('order', 'name');
 
         //Not allowed to use: move to the previous directory
         if (preg_match('/\.\./', $current_path)) {
@@ -244,9 +249,9 @@ class KindeditorController extends BaseController
         }
 
         //Sort
-        
 
-        usort($file_list, function ($a, $b) use($order) {
+
+        usort($file_list, function ($a, $b) use ($order) {
             if ($a['is_dir'] && !$b['is_dir']) {
                 return -1;
             } else if (!$a['is_dir'] && $b['is_dir']) {
@@ -281,7 +286,5 @@ class KindeditorController extends BaseController
         $result['file_list'] = $file_list;
 
         return response()->json($result);
-
     }
-
 }

@@ -31,8 +31,6 @@ class Handler extends ExceptionHandler
      *
      * @param  \Throwable  $exception
      * @return void
-     *
-     * @throws \Exception
      */
     public function report(Throwable $exception)
     {
@@ -44,39 +42,74 @@ class Handler extends ExceptionHandler
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Throwable  $exception
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
-     * @throws \Throwable
+     * @return \Illuminate\Http\Response
      */
     public function render($request, Throwable $exception)
     {
         $isApi = $request->wantsJson() || $request->ajax();
-                   
+
         if ($exception instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException) {
-            if($isApi){ 
-                return response()->json(['status'=>404,'message'=>__('alert.resource_not_found'),'data'=>null,'errors'=>[true]],404);
-            }else{
-                return response()->view('error.generic',['message'=>__('alert.resource_not_found'),'code'=>404]);
+            if ($isApi) {
+                return response()->json([
+                    'status' => 404,
+                    'message' => __('alert.resource_not_found'),
+                    'data' => null,
+                    'errors' => [true]
+                ], 404);
+            } else {
+                return response()->view(
+                    'error.generic',
+                    [
+                        'message' => __('alert.resource_not_found'),
+                        'code' => 404
+                    ]
+                );
             }
-        }else if($exception instanceof \Illuminate\Auth\AuthenticationException){
-            if($isApi){ 
-                return response()->json(['status'=>401,'message'=>__('alert.invalid_token'),'data'=>null,'errors'=>[true]],401);//khusus token/auth failed
-            }else{
-                // return redirect()->route('auth.login')->with('alert', ['type' => 'danger', 'message'=>__('alert.auth_required'),'code'=>401]);
-                if($exception->redirectTo()){
-                    return response()->redirectTo($exception->redirectTo())->with('alert', ['type' => 'danger', 'message'=>__('alert.auth_required'),'code'=>401]);
-                }else{
-                    return response()->view('error.generic',['message'=>__('alert.invalid_token'),'code'=>401]);
+        } else if ($exception instanceof \Illuminate\Auth\AuthenticationException) {
+            if ($isApi) {
+                return response()->json([
+                    'status' => 401,
+                    'message' => __('alert.invalid_token'),
+                    'data' => null,
+                    'errors' => [true]
+                ], 401); //khusus token/auth failed
+            } else {
+                if ($exception->redirectTo()) {
+                    return response()
+                        ->redirectTo($exception->redirectTo())
+                        ->with('alert', [
+                            'type' => 'danger',
+                            'message' => __('alert.auth_required'),
+                            'code' => 401
+                        ]);
+                } else {
+                    return response()->view('error.generic', [
+                        'message' => __('alert.auth_required'),
+                        'code' => 401
+                    ]);
                 }
             }
-        }else if($exception instanceof \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException){
-            if($isApi){ 
-                return response()->json(['status'=>405,'message'=>__('alert.resource_not_found'),'data'=>null,'errors'=>[true]],405);
-            }else{
-                return response()->view('error.generic',['message'=>__('alert.resource_not_found'),'code'=>405]);
+        } else if ($exception instanceof \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException) {
+            if ($isApi) {
+                return response()->json([
+                    'status' => 405,
+                    'message' => __('alert.resource_not_found'),
+                    'data' => null,
+                    'errors' => [true]
+                ], 405);
+            } else {
+                return response()->view('error.generic', [
+                    'message' => __('alert.resource_not_found'),
+                    'code' => 405
+                ]);
+            }
+        } else if ($exception instanceof \Error) {
+            $pattern = '/Class \'([^\s]+)\' not found/m';
+            if (preg_match($pattern, $exception->getMessage(), $matches)) {
+                // return $matches[1];//
             }
         }
-        
+
         return parent::render($request, $exception);
     }
 }

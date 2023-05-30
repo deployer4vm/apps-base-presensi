@@ -11,7 +11,7 @@ use App\Jobs\GenerateBackup;
 
 class RunBackup extends Command
 {
-    
+
     /**
      * The name and signature of the console command.
      *
@@ -36,6 +36,5 @@ class RunBackup extends Command
         GenerateBackup::dispatch();
 
         $this->info('SUCCESS!');
-
     }
 }

@@ -21,6 +21,9 @@ class CreateConfigTable extends Migration
             $table->string('key')->comment('id / key config nya');
             $table->text('value')->comment('isi / value config nya');
             $table->timestamps();
+            
+            $table->index('group');
+            $table->index('key');
         });
         DB::statement("ALTER TABLE config COMMENT = 'config umum'");
     }

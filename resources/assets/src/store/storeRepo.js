@@ -25,6 +25,8 @@ _.forEach(storeConfig,(v,k)=>{
     state.data[k].listData = JSON.parse(JSON.stringify(state.defData.listData));
     state.data[k].listDataParams = {};//JSON.parse(JSON.stringify(state.defData.listDataParams))
     state.data[k].oneData = {};//JSON.parse(JSON.stringify(state.defData.oneData))
+    if(v.pathPrefix)
+        state.data[k].pathSuffix = v.pathPrefix;
 });
 
 const getters = {
@@ -43,12 +45,12 @@ const mutations = {
 
 const actions = { 
     readList({ commit, state }, params={}) {
-        let prefix = '';
-        if(state.data[params.module].pathPrefix)
-            prefix = globals().Helper.replaceAttribute(state.data[params.module].pathPrefix,params);
+        let suffix = '';
+        if(state.data[params.module].pathSuffix)
+            suffix = globals().Helper.replaceAttribute(state.data[params.module].pathSuffix,params);
         
         return globals()
-            .LocalApi.get(state.data[params.module].apiEndpoint + prefix, {
+            .LocalApi.get(state.data[params.module].apiEndpoint + suffix, {
                 params: params.params?params.params:{}
             })
             .then(res => {
@@ -62,13 +64,13 @@ const actions = {
             });
     },
     readOne({ commit, state }, params) {
-        let prefix = '';
-        if(state.data[params.module].pathPrefix)
-            prefix = globals().Helper.replaceAttribute(state.data[params.module].pathPrefix,params) + '/';
+        let suffix = '';
+        if(state.data[params.module].pathSuffix)
+        suffix = '/' + globals().Helper.replaceAttribute(state.data[params.module].pathSuffix,params);
 
         return globals()
             .LocalApi.get(
-                state.data[params.module].apiEndpoint + prefix + params.id,
+                state.data[params.module].apiEndpoint + params.id + suffix,
                 {
                     params: params.params?params.params:{}
                 }
@@ -83,13 +85,13 @@ const actions = {
             });
     },
     create({ dispatch, state }, params) {
-        let prefix = '';
-        if(state.data[params.module].pathPrefix)
-            prefix = globals().Helper.replaceAttribute(state.data[params.module].pathPrefix,params);
+        let suffix = '';
+        if(state.data[params.module].pathSuffix)
+            suffix = globals().Helper.replaceAttribute(state.data[params.module].pathSuffix,params);
             
         return globals()
             .LocalApi.post(
-                state.data[params.module].apiEndpoint + prefix, 
+                state.data[params.module].apiEndpoint + suffix, 
                 params.data
             )
             .then(res => {
@@ -97,13 +99,13 @@ const actions = {
             });
     },
     update({ dispatch, state }, params) {        
-        let prefix = '';
-        if(state.data[params.module].pathPrefix)
-            prefix = globals().Helper.replaceAttribute(state.data[params.module].pathPrefix,params) + '/';
+        let suffix = '';
+        if(state.data[params.module].pathSuffix)
+            suffix = '/' + globals().Helper.replaceAttribute(state.data[params.module].pathSuffix,params);
 
         return globals()
             .LocalApi.put(
-                state.data[params.module].apiEndpoint + prefix + params.id, 
+                state.data[params.module].apiEndpoint + params.id + suffix, 
                 params.data
             )
             .then(res => {
@@ -111,12 +113,12 @@ const actions = {
             });
     },
     delete({ dispatch, state }, params) {
-        let prefix = '';
-        if(state.data[params.module].pathPrefix)
-            prefix = globals().Helper.replaceAttribute(state.data[params.module].pathPrefix,params) + '/';
+        let suffix = '';
+        if(state.data[params.module].pathSuffix)
+            suffix = '/' + globals().Helper.replaceAttribute(state.data[params.module].pathSuffix,params);
 
         return globals()
-            .LocalApi.delete(state.data[params.module].apiEndpoint + prefix + params.id)
+            .LocalApi.delete(state.data[params.module].apiEndpoint + params.id + suffix)
             .then(res => {
                 return params.reload==undefined||!params.reload?res.data.data:dispatch("readList",{module: params.module});
             });

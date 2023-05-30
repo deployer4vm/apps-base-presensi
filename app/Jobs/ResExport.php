@@ -60,6 +60,9 @@ class ResExport implements ShouldQueue
     public function handle()
     {
         try{
+            if(config('AppConfig.system.multitenant.active'))
+                \App\Facades\Tenant::setActiveTenantById($this->tenantId);
+
             $repo = new $this->repo;
             $repo->setExportTenantId($this->tenantId);
             $repo->initExportOnJob($this->addsJobsParam);
