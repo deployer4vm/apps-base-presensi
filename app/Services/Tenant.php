@@ -176,7 +176,6 @@ class Tenant extends BaseRepository
             $this->_tmpTenantListByDomain[$domain]['domain'] = $domainData->toArray();
 
             if ($this->_tmpTenantListByDomain[$domain]) {
-                $this->_tmpTenantListByDomain[$domain] = $this->_tmpTenantListByDomain[$domain]->toArray();
                 $this->_tmpTenantListByDomain[$domain]['domain'] = $domainData->toArray();
             } else {
                 return false;

@@ -8,39 +8,39 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.0.2",
+        "php": "^8.1",
         "beberlei/doctrineextensions": "^1.3",
-        "beyondcode/laravel-websockets": "^1.13",
-        "box/spout": "^3.3",
+        "beyondcode/laravel-websockets": "^1.14",
+        "box/spout": "dev-main",
+        "doctrine/dbal": "^3.2",
         "dompdf/dompdf": "^2.0",
-        "endroid/qr-code": "^4.7",
-        "fruitcake/laravel-cors": "^3.0",
-        "guzzlehttp/guzzle": "^7.2",
+        "endroid/qr-code": "^4.8",
+        "guzzlehttp/guzzle": "^7.7",
         "hp-synapse/mod-user": "dev-master",
         "hp-synapse/apps-manager": "dev-master",
-        "laravel/framework": "^9.0",
-        "laravel/telescope": "^4.0",
-        "laravel/sanctum": "^3.0",
+        "laravel/framework": "^10.0",
+        "laravel/telescope": "^4.14",
+        "laravel/sanctum": "^3.2",
         "laravel/tinker": "^2.7",
-        "laravel/ui": "^3.0",
+        "laravel/ui": "^4.0",
         "league/flysystem-aws-s3-v3": "^3.0",
         "league/flysystem-sftp-v3": "^3.0",
-        "madnest/madzipper": "^1.3",
-        "phpoffice/phpspreadsheet": "^1.26",
-        "pusher/pusher-php-server": "~5.0",
+        "madnest/madzipper": "^1.4",
+        "phpoffice/phpspreadsheet": "^1.28",
+        "pusher/pusher-php-server": "^7.2",
         "ramsey/uuid": "^4.7"
     },
     "require-dev": {
-        "spatie/laravel-ignition": "^1.0",
-        "fakerphp/faker": "^1.9.1",
-        "laravel/pint": "^1.0",
-        "laravel/sail": "^1.0",
+        "spatie/laravel-ignition": "^2.0",
+        "fakerphp/faker": "^1.22",
+        "laravel/pint": "^1.10",
+        "laravel/sail": "^1.22",
         "hp-synapse/apps-generator": "dev-master",
-        "mockery/mockery": "^1.4",
-        "nunomaduro/collision": "^6.1",
+        "mockery/mockery": "^1.5",
+        "nunomaduro/collision": "^7.0",
         "orangehill/iseed": "^3.0",
-        "phpunit/phpunit": "^9.5",
-        "reliese/laravel": "^1.1"
+        "phpunit/phpunit": "^10.0",
+        "reliese/laravel": "^1.2"
     },
     "config": {
         "optimize-autoloader": true,
@@ -66,7 +66,7 @@
             "Tests\\": "tests/"
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true,
     "scripts": {
         "post-autoload-dump": [
@@ -82,9 +82,17 @@
     },
     "repositories": [
         {
+            "name": "box/spout",
+            "type": "path",
+            "url": "../box-spout",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
             "name": "hp-synapse/apps-generator",
             "type": "path",
-            "url": "../../apps-generator",
+            "url": "../apps-generator",
             "options": {
                 "symlink": true
             }
@@ -92,7 +100,7 @@
         {
             "name": "hp-synapse/apps-manager",
             "type": "path",
-            "url": "../../apps-manager",
+            "url": "../apps-manager",
             "options": {
                 "symlink": true
             }
@@ -100,7 +108,7 @@
         {
             "name": "hp-synapse/mod-accounting",
             "type": "path",
-            "url": "../../mod-accounting",
+            "url": "../mod-accounting",
             "options": {
                 "symlink": true
             }
@@ -108,7 +116,7 @@
         {
             "name": "hp-synapse/mod-coop",
             "type": "path",
-            "url": "../../mod-coop",
+            "url": "../mod-coop",
             "options": {
                 "symlink": true
             }
@@ -116,7 +124,7 @@
         {
             "name": "hp-synapse/mod-coop-sp",
             "type": "path",
-            "url": "../../mod-coop-sp",
+            "url": "../mod-coop-sp",
             "options": {
                 "symlink": true
             }
@@ -124,7 +132,7 @@
         {
             "name": "hp-synapse/mod-cp",
             "type": "path",
-            "url": "../../mod-cp",
+            "url": "../mod-cp",
             "options": {
                 "symlink": true
             }
@@ -132,7 +140,7 @@
         {
             "name": "hp-synapse/mod-digitalpayment",
             "type": "path",
-            "url": "../../mod-digitalpayment",
+            "url": "../mod-digitalpayment",
             "options": {
                 "symlink": true
             }
@@ -140,7 +148,7 @@
         {
             "name": "hp-synapse/mod-ppob",
             "type": "path",
-            "url": "../../mod-ppob",
+            "url": "../mod-ppob",
             "options": {
                 "symlink": true
             }
@@ -148,7 +156,7 @@
         {
             "name": "hp-synapse/mod-sewa",
             "type": "path",
-            "url": "../../mod-sewa",
+            "url": "../mod-sewa",
             "options": {
                 "symlink": true
             }

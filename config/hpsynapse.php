@@ -7,6 +7,89 @@ defined('DS') or define('DS', DIRECTORY_SEPARATOR);
 if (!function_exists('initHPsynapseConfig')) {
     function initHPsynapseConfig()
     {
+        // Return blank config jika file belum tergenerate
+        if (
+            !file_exists(__DIR__ . '/../app/MainApp/config/_system.json')
+            || !file_exists(__DIR__ . '/../app/MainApp/config/_client.json')
+        ) {
+            return [
+                'bindings' => [
+                    'controller' => [],
+                    'interface' => [
+                        // 'App\\Contracts\\UserLog' => 'App\\Services\\UserLog',
+                        // 'App\\Contracts\\HybridAuth' => 'App\\Services\\HybridAuth',
+                        'App\\Contracts\\Tenant' => 'App\\Services\\Tenant',
+                        'App\\Contracts\\Excel' => 'App\\Services\\Excel',
+                        'App\\Contracts\\Backup' => 'App\\Services\\Backup',
+                        'App\\Contracts\\CacheConfig' => 'App\\Services\\CacheConfig',
+                        'App\\Contracts\\DbConfig' => 'App\\Services\\DbConfig',
+                        'App\\Contracts\\Helper' => 'App\\Services\\Helper',
+                        'App\\Contracts\\Web' => 'App\\Services\\Web',
+                        'App\\Contracts\\Trans' => 'App\\Services\\Trans',
+                        'App\\Contracts\\Export' => 'App\\Services\\Export',
+                        'App\\Contracts\\Import' => 'App\\Services\\Import',
+                        'App\\Contracts\\PostReference' => 'App\\Services\\PostReference'
+                    ],
+                    'route' => []
+                ],
+                'lang_path' => [], //language path
+                'controller_path' => [], //controller path
+                'view_path' => [], //blade view path
+                'migration_path' => [], //migrations path
+                'seed_path' => [], //seeds path
+                /*
+                * namespace ke path lokasi daftar module module
+                *  NAMESPACE => [path_to_module_group, FILTER PREFIX
+                */
+                'namespaces' => [],
+                'lib_namespace' => ['hpsynapse' => [base_path('vendor' . DS . 'hp-synapse'), 'lib-']],
+
+                'resource_namespace' => '',
+
+                'language_folder_name' => '',
+
+                'view_folder_name' => '',
+
+                /*
+                * dev_package_path : path ke package disimpan secara fisik saat development
+                * relative ke base_path()
+                */
+                'dev_package_path' => '../',
+                'protection_middleware' => [],
+                /*
+                * struktur table default yang akan digenerate jika tidak mencantumkan
+                * nama tabel saat generate
+                */
+                'generate_table_default' => [
+                    'name' => 'varchar',
+                    'description' => 'text'
+                ],
+                /*
+                * field yang akan di hilangkan form dan list serta akan dimasukan
+                * ke model guarded attribut
+                */
+                'generate_table_field_exclude' => [
+                    'id', 'created_at', 'updated_at'
+                ],
+                /*
+                * template layout utama yg akan di extend saat generate module
+                */
+                'generate_default_layout' => 'layouts.app',
+                /*
+                * view dari sidebar menu yang akan ditambahkan menu baru oleh system
+                */
+                'generate_sidebar_layouts' => 'layouts.adminsidebar',
+                /*
+                * tag html container menu sidebar yg akan ditambah
+                */
+                'generate_sidebar_menu_tag' => 'ul',
+                /*
+                * zappid dari tag container menu sidebar yg akan ditambah
+                */
+                'generate_sidebar_menu_id' => 'menusidebar'
+            ];
+        }
+
         $system = json_decode(
             file_get_contents(__DIR__ . '/../app/MainApp/config/_system.json'),
             true
@@ -312,8 +395,8 @@ if (!function_exists('initHPsynapseConfig')) {
             'bindings' => [
                 'controller' => [],
                 'interface' => [
-                    'App\\Contracts\\UserLog' => 'App\\Services\\UserLog',
-                    'App\\Contracts\\HybridAuth' => 'App\\Services\\HybridAuth',
+                    // 'App\\Contracts\\UserLog' => 'App\\Services\\UserLog',
+                    // 'App\\Contracts\\HybridAuth' => 'App\\Services\\HybridAuth',
                     'App\\Contracts\\Tenant' => 'App\\Services\\Tenant',
                     'App\\Contracts\\Excel' => 'App\\Services\\Excel',
                     'App\\Contracts\\Backup' => 'App\\Services\\Backup',
