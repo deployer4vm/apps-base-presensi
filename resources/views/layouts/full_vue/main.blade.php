@@ -13,7 +13,7 @@
     <title>{{ config('AppConfig.system.template.admin.title') }}</title>
 
     <link rel="shortcut icon" href="{{asset(config('AppConfig.system.template.favicon','assets/images/favicon.ico'))}}"/>
-    
+
     <!-- Main font -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i,900"
         rel="stylesheet">
@@ -54,15 +54,15 @@
             var isOnTenantManager = {{ config('tenant.isOnTenantManager', false) ? 'true' : 'false' }};
             var tenantData = <?php echo json_encode(config('tenant', []), JSON_PRETTY_PRINT); ?>;
         @endif
-        var onIframe = {{  config('AppConfig.system.coop_var.force_on_iframe', 1) || isset($_GET['onIframeConfig']) ? 'true' : 'false' }};
+        var onIframe = {{  config('AppConfig.system.coop_var.force_on_iframe', 1) || request('onIframeConfig') ? 'true' : 'false' }};
         @if (config('AppConfig.system.coop_var.force_on_iframe', 1) || isset($_GET['onIframeConfig']))
             var byPassViewConfig = {
-                showNavbar: {{ config('AppConfig.system.coop_var.force_on_iframe', 1) || (isset($_GET['onIframeConfig']['showNavbar']) && $_GET['byPassViewConfig']['showNavbar'] == 0) ? '0' : '1' }},
-                showSidenav: {{ config('AppConfig.system.coop_var.force_on_iframe', 1) || (isset($_GET['onIframeConfig']['showSidenav']) && $_GET['byPassViewConfig']['showSidenav'] == 0) ? '0' : '1' }},
-                showFooter: {{ config('AppConfig.system.coop_var.force_on_iframe', 1) || (isset($_GET['onIframeConfig']['showFooter']) && $_GET['byPassViewConfig']['showFooter'] == 0) ? '0' : '1' }}
+                showNavbar: {{ config('AppConfig.system.coop_var.force_on_iframe', 1) || request('onIframeConfig.showNavbar', 1) == 0 ? '0' : '1' }},
+                showSidenav: {{ config('AppConfig.system.coop_var.force_on_iframe', 1) || request('onIframeConfig.showSidenav', 1) == 0 ? '0' : '1' }},
+                showFooter: {{ config('AppConfig.system.coop_var.force_on_iframe', 1) || request('onIframeConfig.showFooter', 1) == 0 ? '0' : '1' }}
             };
         @endif
-        var first_login = {{$_GET['first_login'] ? 'true' : 'false'}};
+        var first_login = {{ request('first_login') ? 'true' : 'false' }};
         // {{ config('AppConfig.system.coop_var.force_on_iframe', true) }}
     </script>
 

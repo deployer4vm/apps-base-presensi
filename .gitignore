@@ -1,7 +1,7 @@
 /.vscode
 /node_modules
-/public/hot
 /public/dist/*
+/public/hot
 /public/images
 /public/images/*
 /public/assets

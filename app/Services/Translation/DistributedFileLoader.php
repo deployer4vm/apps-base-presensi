@@ -42,7 +42,7 @@ class DistributedFileLoader extends FileLoader
 
     protected function loadJsonPaths($locale)
     {
-        return collect(array_merge($this->jsonPaths, [$this->path]))
+        return collect(array_merge($this->jsonPaths, $this->paths))
             ->reduce(function ($output, $path) use ($locale) {
                 if ($path && $this->files->exists($full = "{$path}/{$locale}.json")) {
                     $decoded = json_decode($this->files->get($full), true);
