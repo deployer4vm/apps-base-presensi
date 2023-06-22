@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
 use App\Facades\Tenant;
+use Illuminate\Support\Facades\Log;
 
 /**
  * use trait ini di migration yang datanya ada pemisahan antar tenantnya
@@ -179,6 +180,8 @@ trait MigrateDataTenant
                         Tenant::dbExists($tenant['id'])
                         && Schema::connection(config('database.perTenant') . $tenant['id'])
                             ->hasTable($oldTable)
+                        && !Schema::connection(config('database.perTenant') . $tenant['id'])
+                            ->hasTable($newTable)
                     ) {
                         Schema::connection(config('database.perTenant') . $tenant['id'])
                             ->rename($oldTable, $newTable);
@@ -187,14 +190,14 @@ trait MigrateDataTenant
                     // jika per table
                     $tmpOldTable = Tenant::getTableName($oldTable, $tenant['id']);
                     $tmpNewTable = Tenant::getTableName($newTable, $tenant['id']);
-                    if (Schema::hasTable($tmpOldTable))
+                    if (Schema::hasTable($tmpOldTable) && !Schema::hasTable($tmpNewTable))
                         Schema::rename($tmpOldTable, $tmpNewTable);
                 }
             }
 
             // jika di 1 table
         } else {
-            if (Schema::hasTable($oldTable))
+            if (Schema::hasTable($oldTable) && !Schema::hasTable($newTable))
                 Schema::rename($oldTable, $newTable);
         }
     }

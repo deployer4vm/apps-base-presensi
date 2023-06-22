@@ -175,14 +175,14 @@ class Tenant extends BaseRepository
                 = $tenant->toArray();
             $this->_tmpTenantListByDomain[$domain]['domain'] = $domainData->toArray();
 
-            if ($this->_tmpTenantListByDomain[$domain]) {
-                $this->_tmpTenantListByDomain[$domain]['domain'] = $domainData->toArray();
-            } else {
-                return false;
-            }
+            // if ($this->_tmpTenantListByDomain[$domain]) {
+            //     $this->_tmpTenantListByDomain[$domain]['domain'] = $domainData->toArray();
+            // } else {
+            //     return false;
+            // }
 
-            $this->_tmpTenantListByGroupApp[$this->_tmpTenantListByDomain[$domain]['group_app']] = $this->_tmpTenantListByDomain[$domain];
-            $this->_tmpTenantList[$this->_tmpTenantListByDomain[$domain]['id']] = $this->_tmpTenantListByDomain[$domain];
+            // $this->_tmpTenantListByGroupApp[$this->_tmpTenantListByDomain[$domain]['group_app']] = $this->_tmpTenantListByDomain[$domain];
+            // $this->_tmpTenantList[$this->_tmpTenantListByDomain[$domain]['id']] = $this->_tmpTenantListByDomain[$domain];
         }
 
         return $this->_tmpTenantListByDomain[$domain];
@@ -313,7 +313,7 @@ class Tenant extends BaseRepository
      */
     public function setOnTenantManager()
     {
-        $config->setTenantConfig(['isOnTenantManager' => true]);
+        $this->setTenantConfig(['isOnTenantManager' => true]);
     }
 
 
@@ -324,7 +324,7 @@ class Tenant extends BaseRepository
      */
     public function setOnStorageAlltenant()
     {
-        $config->setTenantConfig(['isOnStorageAlltenant' => true]);
+        $this->setTenantConfig(['isOnStorageAlltenant' => true]);
     }
 
     /**
@@ -334,7 +334,7 @@ class Tenant extends BaseRepository
      */
     public function setOnGeneralApi()
     {
-        $config->setTenantConfig(['isOnGeneralApi' => true]);
+        $this->setTenantConfig(['isOnGeneralApi' => true]);
     }
 
     /**
@@ -571,7 +571,7 @@ class Tenant extends BaseRepository
     public function setDb($tenantId)
     {
         if (config('AppConfig.system.multitenant.data_mode', 1) != 3)
-            return true;
+            return;
 
         $dbConfigName = $this->getDbConnectionName($tenantId);
         config(['tenant.connection', $dbConfigName]);
@@ -581,7 +581,6 @@ class Tenant extends BaseRepository
             $dbConfig = $this->getDbConnection($tenantId);
             config(['database.connections.' . $dbConfigName => $dbConfig]);
         }
-        return true;
     }
 
     /**
@@ -902,7 +901,7 @@ class Tenant extends BaseRepository
      */
     public function verifyTenantIdOrDefault($tenantId = false)
     {
-        return $tenantId ?: config('tenant.id', false) ?: $that->getActiveTenant('id');
+        return $tenantId ?: config('tenant.id', false) ?: $this->getActiveTenant('id');
     }
 
     /**
@@ -913,7 +912,7 @@ class Tenant extends BaseRepository
      */
     public function getTenantConnection($tenantId = false)
     {
-        $tenantId = $that->verifyTenantIdOrDefault($tenantId);
+        $tenantId = $this->verifyTenantIdOrDefault($tenantId);
         $this->getDbConnection($tenantId);
         return DB::connection($this->getDbConnectionName($tenantId));
     }
