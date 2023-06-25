@@ -43,6 +43,7 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\TenantDomainRedirectCheck::class,
             \App\Http\Middleware\TokenExpireCheck::class,
             \App\Http\Middleware\AcceesConfigCheck::class,
+            \hpsynapse\moduser\Middleware\InitAuthWeb::class
         ],
 
         'api' => [
@@ -51,6 +52,8 @@ class Kernel extends HttpKernel
             // \App\Http\Middleware\AppGroupCheck::class,//dipindah ke routeserviceprovider
             \App\Http\Middleware\TokenExpireCheck::class,
             \App\Http\Middleware\AcceesConfigCheck::class,
+            \hpsynapse\moduser\Middleware\ValidateClientKey::class,
+            \hpsynapse\moduser\Middleware\InitAuthAPI::class
         ],
     ];
 
@@ -73,6 +76,8 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'TenantOnly' => \App\Http\Middleware\TenantOnly::class,
+        'auth.useronly' => \hpsynapse\moduser\Middleware\APIUserOnly::class,
+        'auth.h2honly' => \hpsynapse\moduser\Middleware\APIH2HOnly::class
     ];
 
 }
