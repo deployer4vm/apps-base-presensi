@@ -148,5 +148,8 @@
         "plugins": [
             "@babel/plugin-syntax-dynamic-import"
         ]
+    },
+    "dependencies": {
+        "node-laravel-encryptor": "^3.0.2"
     }
 }
