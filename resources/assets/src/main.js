@@ -154,9 +154,6 @@ var VM = new Vue({
             this.UserAuth.store = this.$store;
             this.UserAuth.router = this.$router;
 
-            // Add Client Key Header
-            this.LocalApi.defaults.headers.common['X-Client-Key'] = this.AppConfig.client.api_key;
-
             //set token LocalApi jika sudah login
             if (this.UserAuth.isLogin()) {
                 this.LocalApi.defaults.headers.common['Authorization'] = 'Bearer ' + this.UserAuth.getToken();

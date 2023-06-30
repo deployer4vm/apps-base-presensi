@@ -59,6 +59,16 @@ localapi.showAllert = true;
 localapi.defaults.baseURL = "/";//AppConfig.client.endpoint[AppConfig.system.mode]["domain"];
 localapi.defaults.headers.get["Accept"] = "application/json";
 localapi.defaults.headers.common['Content-Type'] = 'multipart/form-data';
+if (
+    AppConfig.packageLocal.moduser != undefined
+    && AppConfig.packageLocal.moduser.enable
+    && AppConfig.system.has_auth
+) {
+    // Add Client Key Header
+    window.axios.defaults.headers.common['X-Client-Key'] = AppConfig.client.api_key;
+    localapi.defaults.headers.common['X-Client-Key'] = AppConfig.client.api_key;
+    console.log(AppConfig.client.api_key);
+}
 localapi.interceptors.response.use((response) => response, (error) => {
     if (
         error.response &&
