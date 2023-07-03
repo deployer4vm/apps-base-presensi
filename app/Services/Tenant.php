@@ -409,7 +409,8 @@ class Tenant extends BaseRepository
      */
     public function getDbConnectionName($tenantId)
     {
-        if (config('AppConfig.system.multitenant.data_mode', 1) != 3)
+        // jika tenant id 0 atau mode data bukan beda database (!=3) berarti koneksi ke database utama
+        if (empty($tenantId) || config('AppConfig.system.multitenant.data_mode', 1) != 3)
             return config('database.default');
 
         return config('database.perTenant') . $tenantId;
@@ -423,7 +424,8 @@ class Tenant extends BaseRepository
      */
     public function getDbConnection($tenantId)
     {
-        if (config('AppConfig.system.multitenant.data_mode', 1) != 3)
+        // jika tenant id 0 atau mode data bukan beda database (!=3) berarti koneksi ke database utama
+        if (empty($tenantId) || config('AppConfig.system.multitenant.data_mode', 1) != 3)
             return config('database.connections.' . config('database.default'));
 
         $dbConfigName = $this->getDbConnectionName($tenantId);
