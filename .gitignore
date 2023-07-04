@@ -27,3 +27,5 @@ composer.lock
 package.json
 package-lock.json
 composer.lock.bak
+error_log
+*.ini
