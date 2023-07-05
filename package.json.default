@@ -30,6 +30,7 @@
         "core-js": "^2.6.11",
         "cropper": "~4.0.0-beta",
         "cross-env": "^7.0",
+        "crypto-js": "^4.1.1",
         "datatables.net-bs4": "~1.10.16",
         "dragula": "~3.7.2",
         "echarts": "^4.6.0",
