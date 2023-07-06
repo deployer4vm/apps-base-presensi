@@ -116,13 +116,11 @@ trait MigrateDataTenant
                     ) {
                         if (
                             $column == false
-                            || (
-                                !$ifColumnExist
+                            || (!$ifColumnExist
                                 && !Schema::connection(config('database.perTenant') . $tenant['id'])
                                     ->hasColumn($table, $column)
                             )
-                            || (
-                                $ifColumnExist
+                            || ($ifColumnExist
                                 && Schema::connection(config('database.perTenant') . $tenant['id'])
                                 ->hasColumn($table, $column)
                             )
@@ -158,6 +156,124 @@ trait MigrateDataTenant
         }
     }
 
+    public function tableIndexPerTenant($table, $bluePrint, $column, $ifIndexExist = false, $unique = false)
+    {
+        //jika mode nya tidak share dalam 1 table
+        if (
+            config('AppConfig.system.multitenant.active', false)
+            && config('AppConfig.system.multitenant.data_mode', 1) != 1
+        ) {
+            $filter = isset($this->tenantId) ? [['id', $this->tenantId]] : [];
+            $columnName = is_array($column) ? implode('_', $column) : $column;
+            $indexName = $table . '_' . $columnName . '_' . ($unique ? 'unique' : 'index');
+            $tenantList = Tenant::listTenant($filter);
+            foreach ($tenantList['data'] as $tenant) {
+                //jika per database
+                if (config('AppConfig.system.multitenant.data_mode', 1) == 3) {
+                    Tenant::setDb($tenant['id']);
+                    if (
+                        Tenant::dbExists($tenant['id'])
+                        && Schema::connection(config('database.perTenant') . $tenant['id'])
+                        ->hasTable($table)
+                    ) {
+                        $schemaManager = Schema::connection(config('database.perTenant') . $tenant['id'])->getConnection()
+                            ->getDoctrineSchemaManager();
+                        $indexesFound  = $schemaManager->listTableIndexes($table);
+                        if (
+                            ($ifIndexExist === false
+                                && array_key_exists($indexName, $indexesFound) === false
+                            )
+                            || ($ifIndexExist
+                                && array_key_exists($indexName, $indexesFound)
+                            )
+                        ) {
+                            Schema::connection(config('database.perTenant') . $tenant['id'])
+                                ->table($table, $bluePrint);
+                        }
+                    }
+                    // jika per table
+                } else {
+                    $tmpTable = Tenant::getTableName($table, $tenant['id']);
+                    $schemaManager = Schema::getConnection()->getDoctrineSchemaManager();
+                    $indexesFound  = $schemaManager->listTableIndexes($tmpTable);
+                    if (Schema::hasTable($tmpTable)) {
+                        if (
+                            (!$ifIndexExist && !array_key_exists($indexName, $indexesFound))
+                            || ($ifIndexExist && array_key_exists($indexName, $indexesFound))
+                        ) {
+                            Schema::table($tmpTable, $bluePrint);
+                        }
+                    }
+                }
+            }
+            // jika di 1 table
+        } else {
+            if (Schema::hasTable($table)) {
+                $schemaManager = Schema::getConnection()->getDoctrineSchemaManager();
+                $indexesFound  = $schemaManager->listTableIndexes($table);
+                if (
+                    $column == false ||
+                    (!$ifIndexExist && !array_key_exists($indexName, $indexesFound)) ||
+                    ($ifIndexExist && array_key_exists($indexName, $indexesFound))
+                )
+                    Schema::table($table, $bluePrint);
+            }
+        }
+    }
+
+    public function tableRenameColumnPerTenant($table, $bluePrint, $oldColumn, $newColumn)
+    {
+        //jika mode nya tidak share dalam 1 table
+        if (
+            config('AppConfig.system.multitenant.active', false)
+            && config('AppConfig.system.multitenant.data_mode', 1) != 1
+        ) {
+            $filter = isset($this->tenantId) ? [['id', $this->tenantId]] : [];
+            $tenantList = Tenant::listTenant($filter);
+            foreach ($tenantList['data'] as $tenant) {
+                //jika per database
+                if (config('AppConfig.system.multitenant.data_mode', 1) == 3) {
+                    Tenant::setDb($tenant['id']);
+                    if (
+                        Tenant::dbExists($tenant['id'])
+                        && Schema::connection(config('database.perTenant') . $tenant['id'])
+                        ->hasTable($table)
+                    ) {
+                        if (
+                            Schema::connection(config('database.perTenant') . $tenant['id'])
+                            ->hasColumn($table, $oldColumn)
+                            && !Schema::connection(config('database.perTenant') . $tenant['id'])
+                                ->hasColumn($table, $newColumn)
+                        ) {
+                            Schema::connection(config('database.perTenant') . $tenant['id'])
+                                ->table($table, $bluePrint);
+                        }
+                    }
+                    // jika per table
+                } else {
+                    $tmpTable = Tenant::getTableName($table, $tenant['id']);
+                    if (Schema::hasTable($tmpTable)) {
+                        if (
+                            !Schema::hasColumn($tmpTable, $newColumn)
+                            && Schema::hasColumn($tmpTable, $oldColumn)
+                        ) {
+                            Schema::table($tmpTable, $bluePrint);
+                        }
+                    }
+                }
+            }
+            // jika di 1 table
+        } else {
+            if (Schema::hasTable($table)) {
+                if (
+                    !Schema::hasColumn($table, $newColumn)
+                    && Schema::hasColumn($table, $oldColumn)
+                )
+                    Schema::table($table, $bluePrint);
+            }
+        }
+    }
+
     /**
      * rename nama table di mode multi tenanat
      */
@@ -179,7 +295,7 @@ trait MigrateDataTenant
                     if (
                         Tenant::dbExists($tenant['id'])
                         && Schema::connection(config('database.perTenant') . $tenant['id'])
-                            ->hasTable($oldTable)
+                        ->hasTable($oldTable)
                         && !Schema::connection(config('database.perTenant') . $tenant['id'])
                             ->hasTable($newTable)
                     ) {
@@ -225,10 +341,9 @@ trait MigrateDataTenant
                     Tenant::setDb($tenant['id']);
                     if (
                         Tenant::dbExists($tenant['id'])
-                        && (
-                            $table == false
+                        && ($table == false
                             || Schema::connection(config('database.perTenant') . $tenant['id'])
-                                ->hasTable($table) == $ifTableExist
+                            ->hasTable($table) == $ifTableExist
                         )
                     ) {
                         DB::connection(config('database.perTenant') . $tenant['id'])

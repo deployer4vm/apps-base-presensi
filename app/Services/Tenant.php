@@ -616,9 +616,9 @@ class Tenant extends BaseRepository
                         $tmpClass->setTenantMigrateMode(true);
                         $tmpClass->setTenantId($tenantId);
                         $tmpClass->up();
-                        echo 'migrated -> ' . $migration . '<br>';
+                        echo 'migrated -> ' . $migration . "\r\n";
                     } else {
-                        echo 'not migrated -> ' . $migration . '<br>';
+                        echo 'not migrated -> ' . $migration . "\r\n";
                     }
                 }
             }
