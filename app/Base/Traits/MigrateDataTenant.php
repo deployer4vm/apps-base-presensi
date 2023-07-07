@@ -167,6 +167,7 @@ trait MigrateDataTenant
             $columnName = is_array($column) ? implode('_', $column) : $column;
             $indexName = $table . '_' . $columnName . '_' . ($unique ? 'unique' : 'index');
             $tenantList = Tenant::listTenant($filter);
+            // if ($unique) Log::debug($indexName);
             foreach ($tenantList['data'] as $tenant) {
                 //jika per database
                 if (config('AppConfig.system.multitenant.data_mode', 1) == 3) {
@@ -179,6 +180,10 @@ trait MigrateDataTenant
                         $schemaManager = Schema::connection(config('database.perTenant') . $tenant['id'])->getConnection()
                             ->getDoctrineSchemaManager();
                         $indexesFound  = $schemaManager->listTableIndexes($table);
+                        // if ($unique) {
+                        //     Log::debug($indexesFound);
+                        //     Log::debug((int) array_key_exists($indexName, $indexesFound));
+                        // }
                         if (
                             ($ifIndexExist === false
                                 && array_key_exists($indexName, $indexesFound) === false
