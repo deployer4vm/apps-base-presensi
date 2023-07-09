@@ -27,6 +27,11 @@ class TokenExpireCheck
                 $isWebReq = false;
                 $updatedAt = Auth::user()->updated_at;
                 $token = Auth::user()->api_token;
+                // jika token permanent maka tidak perlu dicek
+                if(Auth::user()->is_permanent){
+                    ApiToken::where('api_token', $token)->update(['updated_at' => now()]);
+                    return $next($request);
+                }
             } else {
                 $updatedAt = UserAuth::getSessionLastUpdate();
                 $token = UserAuth::getToken();
