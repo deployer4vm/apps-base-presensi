@@ -8,7 +8,7 @@
             <span class="app-brand-logo demo dinavbar">
                 <img style="max-height: 30px; max-widht: 60px;" :src="logoPath" />
             </span>
-            
+
             <span class="app-brand-text demo font-weight-normal ml-2">{{ brandTitle }}</span>
         </b-navbar-brand>
 
@@ -34,7 +34,7 @@
                         <notif-navbar />
                         <div class="nav-item d-none d-lg-block text-big font-weight-light line-height-1 opacity-25 mr-3 ml-1">|</div>
                     </template>
-                    
+
                     <template v-if="AppConfig.system.multilang==1">
                         <b-nav-item-dropdown :right="!isRTL">
                             <template slot="button-content">
@@ -71,7 +71,7 @@
                             <i class="ion ion-ios-person text-lightest"></i>
                             &nbsp; {{ Trans.get('user.my_profile') }}
                         </b-dd-item>
-                        
+
                         <template v-if="AppConfig.isModuleEnable('moduser') && AppConfig.packageLocal.moduser.user_role.multi_role==1 && UserAuth.getAuthRoleCount()>1">
                             <b-dd-divider />
                             <b-dd-item v-for="role in UserAuth.getAuthRoleList()" @click="changeRole(role.role_code)" :key="'header-chose-role-' + role.id">
@@ -79,12 +79,12 @@
                             </b-dd-item>
                             <b-dd-divider />
                         </template>
-                        
+
                         <b-dd-item v-if="AppConfig.isModuleEnable('moduser') && showNotif" :to="{name: 'notification'}">
                             <i class="ion ion-md-notifications-outline text-info"></i>
                             &nbsp; {{ Trans.get('notif.notification_title') }}
                         </b-dd-item>
-                        
+
                         <b-dd-divider />
 
                         <b-dd-item v-if="AppConfig.isModuleEnable('moduser')" @click="UserAuth.logout()">

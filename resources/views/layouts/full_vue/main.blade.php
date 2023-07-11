@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="default-style layout-fixed layout-navbar-fixed">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="default-style">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="IE=edge,chrome=1">

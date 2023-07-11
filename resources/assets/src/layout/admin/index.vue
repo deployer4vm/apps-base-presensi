@@ -11,13 +11,21 @@
                     <app-layout-sidenav orientation="horizontal" v-if="showSidenav && isSidenavHorizontal" />
 
                     <div :class="{
+                            // 'router-transitions': true,
+                            // 'container-fluid': true,
+                            // 'flex-grow-1': true,
+                            // 'container-p-y': bodyWithPadding,
+                            // 'p-0': !bodyWithPadding,
+                            // 'pt-0': !bodyWithPadding,
+                            // 'pb-0': !bodyWithPadding
+
                             'router-transitions': true,
                             'container-fluid': true,
                             'flex-grow-1': true,
-                            'container-p-y': bodyWithPadding,
-                            'p-0': !bodyWithPadding,
-                            'pt-0': !bodyWithPadding,
-                            'pb-0': !bodyWithPadding
+                            'container-p-y': true,
+                            'p-0': true,
+                            // 'pt-0': bodyWithPadding,
+                            // 'pb-0': bodyWithPadding
                         }"
                     >
                         <router-view />
@@ -82,7 +90,7 @@
     }
 
     .layout-container.no-navbar {
-        padding-top:0 !important;    
+        padding-top:0 !important;
     }
 
     /* *****************************************************************************
@@ -133,7 +141,7 @@ export default {
         this.layoutHelpers.init();
         this.layoutHelpers.update();
         // this.layoutHelpers._bindSidenavMouseEvents();
-        this.layoutHelpers.setAutoUpdate(true);        
+        this.layoutHelpers.setAutoUpdate(true);
     },
     beforeDestroy() {
         this.layoutHelpers.destroy();
