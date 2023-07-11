@@ -67,7 +67,7 @@ if (
     // Add Client Key Header
     window.axios.defaults.headers.common['X-Client-Key'] = AppConfig.client.api_key;
     localapi.defaults.headers.common['X-Client-Key'] = AppConfig.client.api_key;
-    console.log(AppConfig.client.api_key);
+    // console.log(AppConfig.client.api_key);
 }
 localapi.interceptors.response.use((response) => response, (error) => {
     if (

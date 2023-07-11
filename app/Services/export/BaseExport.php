@@ -361,7 +361,7 @@ class BaseExport extends BaseRepository
         $exportData = $this->getExport($cacheKey);
         if ($exportData == false) return false;
 
-        $exportData['filename'] = $config['filename'] ?: '';
+        $exportData['filename'] = array_key_exists('filename', $config) ? $config['filename'] : '';
         $exportData['directory'] = empty($config['directory'])
             ? ''
             : trim(trim($config['directory'], '/'), '\\') . '/';
