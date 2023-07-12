@@ -182,9 +182,12 @@ class BaseController extends LaravelBaseController
     /**
      * generate/get default parameter di resource listing, yang akan dipassing juga ke output
      *
-     * @param bool $mergeParam true jika parameter input lainnya langsung dimasukan ke query dan filter
-     *                         false jika dipisah di key terpisah saja (all)
-     * @param array $mergeExcept list parameter yg tidak di merge kan ke query & filter
+     * @param bool $mergeToParam    true jika parameter input lainnya langsung dimasukan ke query dan filter
+     *                          false jika dipisah di key terpisah saja (all)
+     * @param array $mergeParam     list parameter yg di HANYA / TIDAK (tergantung parameter $mergeType) merge kan ke query & filter
+     * @param bool $mergeType       true jika $mergeParam adalah list parameter yang tidak di merge
+     *                              false jika $mergeParam adalah list parameter yang HANYA/ONLY di merge
+     * 
      * @return array format :
      *  [
      *      all => seluruh parameter input
@@ -200,7 +203,7 @@ class BaseController extends LaravelBaseController
      *          *view_import,
      *          *import_id,
      *
-     *          ... paramater2 input lainnya jika ada dan $mergeParam == true
+     *          ... paramater2 input lainnya jika ada dan $mergeToParam == true
      *      ],
      *      filter => [
      *          *q,
@@ -209,14 +212,15 @@ class BaseController extends LaravelBaseController
      *          *has,
      *          *view_import,
      *          *import_id,
-     *          [..] ... paramater2 input lainnya jika ada dan $mergeParam == true
+     *          [..] ... paramater2 input lainnya jika ada dan $mergeToParam == true
      *      ],
      *      orderBy => []
      *  ]
      */
     final protected function getListParam(
-        bool $mergeParam = true,
-        array $mergeExcept = []
+        bool $mergeToParam = true,
+        array $mergeParam = [],
+        bool $mergeType = true
     ) {
         $params = [
             'all' => request()->except([
@@ -270,9 +274,12 @@ class BaseController extends LaravelBaseController
         }
 
         //jika parameter dimerge langsung dengan query dan filter
-        if ($mergeParam && !empty($params['all'])) {
+        if ($mergeToParam && !empty($params['all'])) {
             foreach ($params['all'] as $key => $param) {
-                if (!in_array($key, $mergeExcept)) {
+                if (
+                    ($mergeType && !in_array($key, $mergeParam)) ||
+                    ($mergeType && in_array($key, $mergeParam))
+                ) {
                     $params['query'][$key] = $param;
                     if (
                         isset($param[0])
