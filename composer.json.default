@@ -25,6 +25,7 @@
         "laravel/ui": "^4.0",
         "league/flysystem-aws-s3-v3": "^3.0",
         "league/flysystem-sftp-v3": "^3.0",
+        "maatwebsite/excel": "^3.1",
         "madnest/madzipper": "^1.4",
         "phpoffice/phpspreadsheet": "^1.28",
         "pusher/pusher-php-server": "^7.2",
@@ -157,6 +158,14 @@
             "name": "hp-synapse/mod-sewa",
             "type": "path",
             "url": "../mod-sewa",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "name": "hp-synapse/mod-approval",
+            "type": "path",
+            "url": "../mod-approval",
             "options": {
                 "symlink": true
             }
