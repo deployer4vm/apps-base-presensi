@@ -159,7 +159,53 @@ $mysqlBaseConnection = [
     ]) : [],
 ];
 
-return [
+$connections = [
+
+    'sqlite' => [
+        'driver' => 'sqlite',
+        'url' => env('DATABASE_URL'),
+        'database' => env('DB_DATABASE', database_path('database.sqlite')),
+        'prefix' => '',
+        'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
+    ],
+
+    'mysql' => $mysqlBaseConnection,
+    'mysql0' => $mysqlBaseConnection,
+
+    //config data per tenant
+    'mysqlPerTenant' => $mysqlPerTenant,
+
+    'pgsql' => [
+        'driver' => 'pgsql',
+        'url' => env('DATABASE_URL'),
+        'host' => env('DB_HOST', '127.0.0.1'),
+        'port' => env('DB_PORT', '5432'),
+        'database' => env('DB_DATABASE', 'forge'),
+        'username' => env('DB_USERNAME', 'forge'),
+        'password' => env('DB_PASSWORD', ''),
+        'charset' => 'utf8',
+        'prefix' => '',
+        'prefix_indexes' => true,
+        'schema' => 'public',
+        'sslmode' => 'prefer',
+    ],
+
+    'sqlsrv' => [
+        'driver' => 'sqlsrv',
+        'url' => env('DATABASE_URL'),
+        'host' => env('DB_HOST', 'localhost'),
+        'port' => env('DB_PORT', '1433'),
+        'database' => env('DB_DATABASE', 'forge'),
+        'username' => env('DB_USERNAME', 'forge'),
+        'password' => env('DB_PASSWORD', ''),
+        'charset' => 'utf8',
+        'prefix' => '',
+        'prefix_indexes' => true,
+    ],
+
+];
+
+$config = [
 
     /*
     | Config tambahan untuk multi tenant dan multi database server
@@ -196,51 +242,7 @@ return [
     |
     */
 
-    'connections' => [
-
-        'sqlite' => [
-            'driver' => 'sqlite',
-            'url' => env('DATABASE_URL'),
-            'database' => env('DB_DATABASE', database_path('database.sqlite')),
-            'prefix' => '',
-            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
-        ],
-
-        'mysql' => $mysqlBaseConnection,
-        'mysql0' => $mysqlBaseConnection,
-
-        //config data per tenant
-        'mysqlPerTenant' => $mysqlPerTenant,
-
-        'pgsql' => [
-            'driver' => 'pgsql',
-            'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', '5432'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
-            'password' => env('DB_PASSWORD', ''),
-            'charset' => 'utf8',
-            'prefix' => '',
-            'prefix_indexes' => true,
-            'schema' => 'public',
-            'sslmode' => 'prefer',
-        ],
-
-        'sqlsrv' => [
-            'driver' => 'sqlsrv',
-            'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', 'localhost'),
-            'port' => env('DB_PORT', '1433'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
-            'password' => env('DB_PASSWORD', ''),
-            'charset' => 'utf8',
-            'prefix' => '',
-            'prefix_indexes' => true,
-        ],
-
-    ],
+    'connections' => $connections,
 
     /*
     |--------------------------------------------------------------------------
@@ -292,3 +294,49 @@ return [
     ],
 
 ];
+
+// set tambahan connection jika ada, diset via env dengan key
+// DB_ADDS_[NOMOR URUT]_*
+$i = 1;
+while (env('DB_ADDS_' . $i . '_CONNECTION', false)) {
+    if(
+        !isset($config[env('DB_ADDS_' . $i . '_CONNECTION')]) && 
+        !isset($connections[env('DB_ADDS_' . $i . '_CONNECTION')])
+    ){
+        $config[env('DB_ADDS_' . $i . '_CONNECTION')] = env('DB_ADDS_' . $i . '_CONNECTION');
+        $connections[env('DB_ADDS_' . $i . '_CONNECTION')] = [
+            'driver' => env('DB_ADDS_' . $i . '_DRIVER', 'mysql'),
+            'url' => env('DATABASE_URL'),
+            'host' => env('DB_ADDS_' . $i . '_HOST', '127.0.0.1'),
+            'port' => env('DB_ADDS_' . $i . '_PORT', '3306'),
+            'database' => env('DB_ADDS_' . $i . '_DATABASE', 'forge'),
+            'username' => env('DB_ADDS_' . $i . '_USERNAME', 'forge'),
+            'password' => env('DB_ADDS_' . $i . '_PASSWORD', ''),
+            'unix_socket' => env('DB_ADDS_' . $i . 'SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            // 'strict' => true,
+            'modes' => [
+                // 'ONLY_FULL_GROUP_BY',
+                // 'STRICT_TRANS_TABLES',
+                // 'NO_ZERO_IN_DATE',
+                // 'NO_ZERO_DATE',
+                'ERROR_FOR_DIVISION_BY_ZERO',
+                'NO_AUTO_CREATE_USER',
+                // 'NO_ENGINE_SUBSTITUTION',
+            ],
+            'engine' => 'InnoDB',
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+
+        ];
+    }
+    $i++;
+}
+
+$config['connections'] = $connections;
+
+return $config;
