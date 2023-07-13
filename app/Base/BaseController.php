@@ -278,7 +278,7 @@ class BaseController extends LaravelBaseController
             foreach ($params['all'] as $key => $param) {
                 if (
                     ($mergeType && !in_array($key, $mergeParam)) ||
-                    ($mergeType && in_array($key, $mergeParam))
+                    (!$mergeType && in_array($key, $mergeParam))
                 ) {
                     $params['query'][$key] = $param;
                     if (
