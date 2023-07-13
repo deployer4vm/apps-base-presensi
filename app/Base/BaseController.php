@@ -17,6 +17,7 @@ class BaseController extends LaravelBaseController
     use ValidatesRequests;
     use ResCacheTrait;
 
+    const MESSAGE_TYPE_SUCCESS = "success";
     const MESSAGE_TYPE_INFO = "info";
     const MESSAGE_TYPE_WARNING = "warning";
     const MESSAGE_TYPE_DANGER = "danger";
@@ -27,9 +28,10 @@ class BaseController extends LaravelBaseController
      * @var array
      */
     protected $output = [
+        'http_code' => 200,//khusus response api, tapi tidak akan disertakan di return
         'status' => 200,
         'message' => '',
-        'message_type' => 'info', //khusus warning view (bukan api)
+        'message_type' => 'info', //khusus warning view (bukan api), web request
         'data' => null,
         'params' => null,
         'viewdata' => null, //data yang hanya disertakan di web request
@@ -116,21 +118,26 @@ class BaseController extends LaravelBaseController
      * Set Warning Status Output
      *
      * @param string $message
-     * @param string $type 'warning','info','warning','danger'
-     * @param integer $code http response code
+     * @param string $type 'success','warning','info','warning','danger'
+     * @param integer $httpCode http response code
+     * @param integer $status status code
      * @param mixed $error
      * @param mixed $response
      */
     protected function setWarning(
         $message,
         $type = self::MESSAGE_TYPE_WARNING,
-        $code = 400,
+        $httpCode = 400,
+        $status = false,
         $error = false,
         $response = null
     ) {
-        $this->output['status'] = $code;
+        if($status===false)$status=$httpCode;
+
+        $this->output['http_code'] = $httpCode;
+        $this->output['status'] = $status;
         $this->output['message'] = $message;
-        $this->output['message_type'] = $type;
+        $this->output['message_type'] = empty($type)?self::MESSAGE_TYPE_WARNING:$type;
         $this->output['errors'] =
             $error === true || $error === 1 || $error === false
                 ? [true]
@@ -156,16 +163,20 @@ class BaseController extends LaravelBaseController
      *
      * @param string $message
      * @param mixed $error
-     * @param integer $code
+     * @param integer $httpCode
+     * @param boolean|integer $status
      * @param mixed $response
      */
     protected function setError(
         $message,
         $error = false,
-        $code = 400,
+        $httpCode = 400,
+        $status = false,
         $response = null
     ) {
-        $this->setWarning($message, self::MESSAGE_TYPE_DANGER, $code, $error, $response);
+        if($status===false)$status=$httpCode;
+        
+        $this->setWarning($message, self::MESSAGE_TYPE_DANGER, $httpCode, $status, $error, $response);
     }
 
     /**

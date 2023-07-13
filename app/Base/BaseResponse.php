@@ -97,6 +97,7 @@ abstract class BaseResponse implements Responsable
     public function prepareApi()
     {
         $outputParam = [
+            'http_code' => 200,
             'status' => 200,
             'data' => [],
             'params' => [],
@@ -132,7 +133,9 @@ abstract class BaseResponse implements Responsable
     {
         $this->prepareApi();
         $this->prepare();
-        return response()->json($this->output, $this->output['status']);
+        $tmpHttpCode = $this->output['http_code'];
+        unset($this->output['http_code']);
+        return response()->json($this->output, $tmpHttpCode);
     }
 
     /**
