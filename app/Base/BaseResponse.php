@@ -25,7 +25,7 @@ abstract class BaseResponse implements Responsable
      * @param string $viewWrapVarName Nama variable yang digunakan untuk passing data
      */
     public function __construct(
-        $output = false,
+        &$output = false,
         $response = 'list',
         $forceOutput = 0,
         $isViewVarWraped = false,
@@ -41,7 +41,10 @@ abstract class BaseResponse implements Responsable
     /**
      * prepare all data
      */
-    abstract protected function prepare();
+    public function prepare(&$request)
+    {
+
+    }
 
     /**
      * Override from parent
@@ -52,7 +55,7 @@ abstract class BaseResponse implements Responsable
      */
     public function toResponse($request)
     {
-        return $this->isApiCall($request) ? $this->apiResponse() : $this->viewResponse();
+        return $this->isApiCall($request) ? $this->apiResponse($request) : $this->viewResponse($request);
     }
 
     /**
@@ -61,7 +64,7 @@ abstract class BaseResponse implements Responsable
      * @param \Illuminate\Http\Request $request
      * @return bool
      */
-    protected function isApiCall($request)
+    protected function isApiCall(&$request)
     {
         if ($this->forceOutput) {
             return $this->forceOutput == 2 ? true : false;
@@ -80,7 +83,7 @@ abstract class BaseResponse implements Responsable
      * @param \Illuminate\Http\Request $request
      * @return boolean
      */
-    protected function isAjaxCall($request)
+    protected function isAjaxCall(&$request)
     {
         return $request->ajax() ? true : false;
     }
@@ -94,7 +97,7 @@ abstract class BaseResponse implements Responsable
      *
      * @return void
      */
-    public function prepareApi()
+    public function prepareApi(&$request)
     {
         $outputParam = [
             'http_code' => 200,
@@ -104,6 +107,7 @@ abstract class BaseResponse implements Responsable
             'message' => '',
             'errors' => null
         ];
+
         //delete semua data selain data khusus api
         foreach ($outputParam as $key => $value) {
             if (isset($this->output[$key])) {
@@ -129,10 +133,10 @@ abstract class BaseResponse implements Responsable
      *
      * @return void
      */
-    private function apiResponse()
+    private function apiResponse(&$request)
     {
-        $this->prepareApi();
-        $this->prepare();
+        $this->prepareApi($request);
+        $this->prepare($request);
         $tmpHttpCode = $this->output['http_code'];
         unset($this->output['http_code']);
         return response()->json($this->output, $tmpHttpCode);
@@ -147,7 +151,7 @@ abstract class BaseResponse implements Responsable
      *
      * @return void
      */
-    public function prepareView()
+    public function prepareView(&$request)
     {
         $this->alert = false;
         $this->errors = false;
@@ -192,10 +196,10 @@ abstract class BaseResponse implements Responsable
      *
      * @return mixed View or Redirect response
      */
-    private function viewResponse()
+    private function viewResponse(&$request)
     {
-        $this->prepareView();
-        $this->prepare();
+        $this->prepareView($request);
+        $this->prepare($request);
 
         //jika string berarti view
         if (is_string($this->response)) {
