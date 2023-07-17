@@ -21,6 +21,8 @@ class BaseController extends LaravelBaseController
     const MESSAGE_TYPE_INFO = "info";
     const MESSAGE_TYPE_WARNING = "warning";
     const MESSAGE_TYPE_DANGER = "danger";
+    
+    private $requestPrepareClass = [['\App\Base\DefaultRequestPrepare','prepare']];
 
     /**
      * default data parameter untuk Responseable
@@ -46,8 +48,8 @@ class BaseController extends LaravelBaseController
      *
      * @var boolean
      */
-
     protected $isViewVarWraped = false;
+
     /**
      * nama variable wrap/grouping,
      * untuk data berbentuk list array,
@@ -58,10 +60,10 @@ class BaseController extends LaravelBaseController
     protected $viewWrapVarName = 'data'; //
 
     //default response paramter untuk
-    protected $response = '';
+    protected $response = '';    
 
-    //nama class responseable nya
-    protected $responsableName = '\App\Base\DefaultResponse';
+    //nama class responsable nya
+    private $responsableClass = '\App\Base\DefaultResponse';
 
     //force output menjadi api atau web
     private $forceOutput = 0; //0 auto, 1 WEB, 2 API
@@ -72,7 +74,7 @@ class BaseController extends LaravelBaseController
      * @param mixed Output Data
      * @return $this
      */
-    protected function setData($data)
+    public function setData($data)
     {
         $this->output['data'] = $data;
         return $this;
@@ -84,7 +86,7 @@ class BaseController extends LaravelBaseController
      * @param array Output Parameters
      * @return $this
      */
-    protected function setParams($params)
+    public function setParams($params)
     {
         $this->output['params'] = $params;
         return $this;
@@ -95,7 +97,7 @@ class BaseController extends LaravelBaseController
      *
      * @return array $this->output['params']
      */
-    protected function getParams()
+    public function getParams()
     {
         return $this->output['params'];
     }
@@ -107,7 +109,7 @@ class BaseController extends LaravelBaseController
      * @param string type: info, warning, danger
      * @return $this
      */
-    protected function setMessage($message, $type = self::MESSAGE_TYPE_INFO)
+    public function setMessage($message, $type = self::MESSAGE_TYPE_INFO)
     {
         $this->output['message'] = $message;
         $this->output['message_type'] = $type;
@@ -124,7 +126,7 @@ class BaseController extends LaravelBaseController
      * @param mixed $error
      * @param mixed $response
      */
-    protected function setWarning(
+    public function setWarning(
         $message,
         $type = self::MESSAGE_TYPE_WARNING,
         $httpCode = 400,
@@ -167,7 +169,7 @@ class BaseController extends LaravelBaseController
      * @param boolean|integer $status
      * @param mixed $response
      */
-    protected function setError(
+    public function setError(
         $message,
         $error = false,
         $httpCode = 400,
@@ -185,7 +187,7 @@ class BaseController extends LaravelBaseController
      * @param string $message
      * @param string $type 'warning','info','warning','danger'
      */
-    protected function setAlert($message, $type = self::MESSAGE_TYPE_INFO)
+    public function setAlert($message, $type = self::MESSAGE_TYPE_INFO)
     {
         $this->setWarning($message, $type, '200');
     }
@@ -195,7 +197,7 @@ class BaseController extends LaravelBaseController
      *
      * @param bool $mergeToParam    true jika parameter input lainnya langsung dimasukan ke query dan filter
      *                          false jika dipisah di key terpisah saja (all)
-     * @param array $mergeParam     list parameter yg di HANYA / TIDAK (tergantung parameter $mergeType) merge kan ke query & filter
+     * @param array $mergeParam     list parameter yg HANYA / TIDAK (tergantung parameter $mergeType) dimerge kan ke query & filter
      * @param bool $mergeType       true jika $mergeParam adalah list parameter yang tidak di merge
      *                              false jika $mergeParam adalah list parameter yang HANYA/ONLY di merge
      * 
@@ -317,17 +319,17 @@ class BaseController extends LaravelBaseController
 
     /**
      * Otomatisasi `$this->output['params'] = $this->getListParam();`
-     */
-    /**
-     * Undocumented function
      *
      * @param boolean $mergeParam
      * @param array $mergeExcept
      * @return void
      */
-    public function buildParams(bool $mergeParam = true, array $mergeExcept = [])
-    {
-        $this->setParams($this->getListParam($mergeParam, $mergeExcept));
+    public function buildParams(
+        bool $mergeToParam = true,
+        array $mergeParam = [],
+        bool $mergeType = true
+    ){
+        $this->setParams($this->getListParam($mergeToParam, $mergeParam, $mergeType));
     }
 
     /**
@@ -388,11 +390,64 @@ class BaseController extends LaravelBaseController
     }
 
     /**
+     * Set $this->requestPrepareClass
+     *
+     * @param string $requestPrepareClass RequestPrepare Class
+     * @param string $methodeName methodeName Class
+     * @return $this
+     */
+    protected function setRequestClass($requestPrepareClass,$methodeName='prepare')
+    {
+        $this->requestPrepareClass[] = [
+            $requestPrepareClass,
+            $methodeName
+        ];
+        return $this;
+    }
+
+    /**
+     * Initialize auto request preparation
+     * 
+     * @param Controller $controller        isi dengan $this dari controller
+     * @param Request $request              isi dengan $request dari controller
+     * @param Boolead $isListRequest        true jika request list, false input general
+     * @param False|Array $requestClass     jika ingin setRequestClass langsung
+     */
+    protected function prepare(&$request,$isListRequest=false,$requestClass=false)
+    {
+        if($requestClass)
+            $this->setRequestClass($requestClass[0],$requestClass[1]);
+
+        $idx = count($this->requestPrepareClass)==1?0:1;
+        $isOnController = $this->requestPrepareClass[$idx][0]==get_class($this);
+        if(($isOnController?$this:(new $this->requestPrepareClass[$idx][0]))->{$this->requestPrepareClass[$idx][1]}(
+            $this,
+            $request,
+            $isListRequest
+        ))
+            return true;
+
+        return false;
+    }
+
+    /**
+     * Set $this->responsableClass
+     *
+     * @param string Responsable Class
+     * @return $this
+     */
+    protected function setResponsableClass($responsableClass)
+    {
+        $this->responsableClass = $responsableClass;
+        return $this;
+    }
+
+    /**
      * Return Output/Response
      *
      * @param mixed $response
      *
-     * @return \App\Base\responsableName
+     * @return \App\Base\responsableClass
      */
     // @SuppressWarnings(PHPMD.BooleanArgumentFlag)
     protected function done($response = false)
@@ -401,7 +456,7 @@ class BaseController extends LaravelBaseController
             $this->response = $response;
         }
 
-        return new $this->responsableName(
+        return new $this->responsableClass(
             $this->output,
             $this->response,
             $this->forceOutput,
@@ -409,9 +464,4 @@ class BaseController extends LaravelBaseController
             $this->viewWrapVarName
         );
     }
-
-    /*
-     * controller level cache
-     * -------------------------------------------------------------------------
-     */
 }
