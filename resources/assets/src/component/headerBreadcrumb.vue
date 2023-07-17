@@ -8,11 +8,11 @@
             >
                 <span class="ion ion-ios-arrow-back"></span>&nbsp; {{ Trans.get("lang.back") }}
             </b-btn>
-            <h5 class="p-2 pl-4 m-0 d-inline-block text-nowrap font-weight-normal">
+            <h5 class="py-2 pr-4 m-0 d-inline-block text-nowrap font-weight-normal">
                 {{ pageTitle }}
             </h5>
         </div>
-        <div class="py-2 px-4">
+        <div class="py-2 pl-4">
             <b-breadcrumb @click="breadcrumbLink" class="m-0" :items="Web.getBreadcrumb()" />
         </div>
     </div>

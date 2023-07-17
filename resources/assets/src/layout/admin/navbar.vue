@@ -2,30 +2,27 @@
     <b-navbar toggleable="lg" :variant="getLayoutNavbarBg()" class="layout-navbar align-items-lg-center container-p-x" >
         <!-- Brand saat mode mobile (tidak ada sidebar) -->
         <b-navbar-brand :to="{name : 'home'}" class="app-brand demo d-lg-none py-0 mr-4">
-            <!-- <span class="app-brand-logo demo bg-primary">
-                <svg viewBox="0 0 148 80" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><linearGradient id="a" x1="46.49" x2="62.46" y1="53.39" y2="48.2" gradientUnits="userSpaceOnUse"><stop stop-opacity=".25" offset="0"></stop><stop stop-opacity=".1" offset=".3"></stop><stop stop-opacity="0" offset=".9"></stop></linearGradient><linearGradient id="e" x1="76.9" x2="92.64" y1="26.38" y2="31.49" xlink:href="#a"></linearGradient><linearGradient id="d" x1="107.12" x2="122.74" y1="53.41" y2="48.33" xlink:href="#a"></linearGradient></defs><path style="fill: #fff;" transform="translate(-.1)" d="M121.36,0,104.42,45.08,88.71,3.28A5.09,5.09,0,0,0,83.93,0H64.27A5.09,5.09,0,0,0,59.5,3.28L43.79,45.08,26.85,0H.1L29.43,76.74A5.09,5.09,0,0,0,34.19,80H53.39a5.09,5.09,0,0,0,4.77-3.26L74.1,35l16,41.74A5.09,5.09,0,0,0,94.82,80h18.95a5.09,5.09,0,0,0,4.76-3.24L148.1,0Z"></path><path transform="translate(-.1)" d="M52.19,22.73l-8.4,22.35L56.51,78.94a5,5,0,0,0,1.64-2.19l7.34-19.2Z" fill="url(#a)"></path><path transform="translate(-.1)" d="M95.73,22l-7-18.69a5,5,0,0,0-1.64-2.21L74.1,35l8.33,21.79Z" fill="url(#e)"></path><path transform="translate(-.1)" d="M112.73,23l-8.31,22.12,12.66,33.7a5,5,0,0,0,1.45-2l7.3-18.93Z" fill="url(#d)"></path></svg>
-            </span>-->
-            <span class="app-brand-logo demo dinavbar">
-                <img style="max-height: 30px; max-widht: 60px;" :src="logoPath" />
-            </span>
+            <!-- Sidenav toggle -->
+            <b-navbar-nav class="layout-sidenav-toggle d-lg-none align-items-lg-center mr-auto" v-if="sidenavToggle">
+                <a class="nav-item nav-link px-0 mr-lg-4" href="javascript:void(0)" @click="toggleSidenav">
+                    <i class="ion ion-md-menu text-large align-middle" />
+                </a>
+            </b-navbar-nav>
+            <router-link :to="{name : 'home'}">
+                <span class="app-brand-logo demo dinavbar d-none">
+                    <img :src="logoPath" />
+                </span>
+            </router-link>
 
             <span class="app-brand-text demo font-weight-normal ml-2">{{ brandTitle }}</span>
         </b-navbar-brand>
-
-        <!-- Sidenav toggle -->
-        <b-navbar-nav class="layout-sidenav-toggle d-lg-none align-items-lg-center mr-auto" v-if="sidenavToggle">
-            <a class="nav-item nav-link px-0 mr-lg-4" href="javascript:void(0)" @click="toggleSidenav">
-                <i class="ion ion-md-menu text-large align-middle" />
-            </a>
-        </b-navbar-nav>
-
         <!-- Navbar toggle -->
         <b-navbar-toggle target="app-layout-navbar"></b-navbar-toggle>
 
         <b-collapse is-nav id="app-layout-navbar">
 
             <b-navbar-nav class="align-items-lg-center">
-                <li class="nav-item navbar-text font-weight-bold active"><h5 class="m-0" v-html="navbarTitle"></h5></li>
+                <li class="nav-item font-weight-bold active"><h5 class="m-0" v-html="navbarTitle"></h5></li>
             </b-navbar-nav>
 
             <b-navbar-nav class="align-items-lg-center ml-auto" style="min-height: 42px;">
@@ -59,16 +56,27 @@
 
                     <b-nav-item-dropdown :right="!isRTL">
                         <template slot="button-content">
-                            <span class="d-inline-flex flex-lg-row-reverse align-items-center align-middle">
+                            <!-- <span class="d-inline-flex flex-lg-row-reverse align-items-center align-middle">
                                 <div class="avatar-header-block d-block rounded-circle text-center">
                                     <i class="ion ion-ios-person"></i>
                                 </div>
                                 <span class="px-1 mr-lg-2 ml-2 ml-lg-0">{{ UserAuth.getUser('name') }}</span>
+                            </span> -->
+                            <span class="d-inline-flex flex-lg-row-reverse align-items-center align-middle">
+                                <div class="d-block ui-w-30 rounded-circle overflow-hidden box-avatar">
+                                    <div class="thumb-img">
+                                        <img :src="`${publicUrl}assets/images/avatar.png`">
+                                    </div>
+                                </div>
+                                <div class="px-1 mr-lg-2 ml-2 ml-lg-0 d-none d-lg-block text-right line-height-1">
+                                    <small class="text-muted mb-0">{{ UserAuth.getUser('name') }}</small>
+                                    <span class="font-weight-bold d-block">{{ UserAuth.getUser('name') }}</span>
+                                </div>
                             </span>
                         </template>
 
                         <b-dd-item v-if="AppConfig.isModuleEnable('moduser')" :to="{name: 'myprofile'}">
-                            <i class="ion ion-ios-person text-lightest"></i>
+                            <i class="fi fi-rr-man-head"></i>
                             &nbsp; {{ Trans.get('user.my_profile') }}
                         </b-dd-item>
 
@@ -81,14 +89,14 @@
                         </template>
 
                         <b-dd-item v-if="AppConfig.isModuleEnable('moduser') && showNotif" :to="{name: 'notification'}">
-                            <i class="ion ion-md-notifications-outline text-info"></i>
+                            <i class="fi fi-rr-bell"></i>
                             &nbsp; {{ Trans.get('notif.notification_title') }}
                         </b-dd-item>
 
                         <b-dd-divider />
 
                         <b-dd-item v-if="AppConfig.isModuleEnable('moduser')" @click="UserAuth.logout()">
-                            <i class="ion ion-ios-log-out text-danger"></i>
+                            <i class="fi fi-rr-sign-out-alt text-danger"></i>
                             &nbsp; {{ Trans.get('auth.logout') }}
                         </b-dd-item>
 
