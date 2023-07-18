@@ -28,7 +28,8 @@ if (!function_exists('initHPsynapseConfig')) {
                         'App\\Contracts\\Trans' => 'App\\Services\\Trans',
                         'App\\Contracts\\Export' => 'App\\Services\\Export',
                         'App\\Contracts\\Import' => 'App\\Services\\Import',
-                        'App\\Contracts\\PostReference' => 'App\\Services\\PostReference'
+                        'App\\Contracts\\PostReference' => 'App\\Services\\PostReference',
+                        'App\\Contracts\\SystemCallback'=>'App\\Services\\SystemCallback'
                     ],
                     'route' => []
                 ],
