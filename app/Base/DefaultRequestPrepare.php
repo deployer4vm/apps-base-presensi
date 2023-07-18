@@ -10,12 +10,12 @@ class DefaultRequestPrepare
     public function prepare(&$controller,&$request,$isListRequest=false) 
     {
         if($isListRequest){
+            $controller->buildParams();
+        }else{
             $controller->setParams([
                 'input'=>$request->all(),
                 'route'=>$request->route()->parameters
             ]);
-        }else{
-            $controller->buildParams();
         }
         
         return true;
