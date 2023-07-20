@@ -14,6 +14,7 @@ class DefaultRequestPrepare
         }else{
             $controller->setParams([
                 'input'=>$request->all(),
+                'query'=>$request->query(),
                 'route'=>$request->route()->parameters
             ]);
         }

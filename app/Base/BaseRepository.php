@@ -1222,10 +1222,13 @@ abstract class BaseRepository
 
             $model = $this->_where($model, $where);
 
-            if ($model) {
+            if ($model && $model->exists()) {
                 $return = $model->update($data);
                 return $return == null ? true : $return;
+            } else {
+                $this->error = __('lang.data_not_found');
             }
+            
         } catch (\Illuminate\Database\QueryException $ex) {
             $this->error = $ex->getMessage();
         }
@@ -1280,8 +1283,8 @@ abstract class BaseRepository
             return false;
 
         $model = $this->_where($model, $where);
-
-        if ($model != false) {
+        
+        if ($model && $model->exists()) {
             if ($model->count() <= 0)
                 return true;
             if ($model->delete())
