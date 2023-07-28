@@ -3,7 +3,7 @@
         <div class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center">
             <b-btn
                 v-if="showBack"
-                class="btn btn btn-xs w-icon btn-outline-secondary mr-23"
+                class="btn btn btn-xs w-icon btn-outline-secondary mr-2"
                 @click="goBack"
             >
                 <i class="fi fi-rr-arrow-left"></i><span>{{ Trans.get("lang.back") }}</span>
