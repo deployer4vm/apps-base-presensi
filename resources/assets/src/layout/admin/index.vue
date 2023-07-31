@@ -22,7 +22,7 @@
                             'router-transitions': true,
                             'container-fluid': true,
                             'flex-grow-1': true,
-                            'container-p-y': true,
+                            // 'container-p-y': true,
                             'p-0': true,
                             'pt-0': true,
                             // 'pb-0': bodyWithPadding
