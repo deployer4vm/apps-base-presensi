@@ -1,6 +1,6 @@
-<template>    
+<template>
     <span>
-        <b-modal size="sm" scrollable centered id="alert-modals" 
+        <b-modal size="sm" centered id="alert-modals"
             @show="showModal"
             @hidden="closeModal"
             @ok="handleOk"
@@ -10,13 +10,15 @@
             </div>
 
             <div v-html="text"></div>
-            
+
             <template slot="modal-footer" slot-scope="{ ok, cancel }">
-                <b-button size="sm" variant="primary" @click="ok()">
-                    {{ modalButtonOk }}
+                <b-button size="sm" variant="secondary" class="w-icon" @click="cancel()">
+                    <i class="fi fi-rs-circle-xmark"></i>
+                    <span>{{ modalButtonCancel }}</span>
                 </b-button>
-                <b-button size="sm" variant="secondary" @click="cancel()">
-                    {{ modalButtonCancel }}
+                <b-button size="sm" variant="primary" class="w-icon" @click="ok()">
+                    <i class="fi fi-rs-check-circle"></i>
+                    <span>{{ modalButtonOk }}</span>
                 </b-button>
             </template>
         </b-modal>
