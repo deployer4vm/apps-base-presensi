@@ -12,6 +12,8 @@ let AppConfig = {
     endpoint: require("../../../app/MainApp/config/_endpoint.json"),
     sidenav: require("../../../app/MainApp/config/_sidenav.json"),
     sidenavOri: require("../../../app/MainApp/config/_sidenav.json"),
+    customSidenav: require("../../../app/MainApp/config/sidenav.json"),
+    customSidenavOri: require("../../../app/MainApp/config/sidenav.json"),
     acl: require("../../../app/MainApp/config/_acl.json")
 };
 

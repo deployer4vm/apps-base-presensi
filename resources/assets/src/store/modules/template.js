@@ -55,7 +55,8 @@ const state = {
         sidenav: {
             show: true,
             isHorizontal: globals().AppConfig.system.web_admin.sidenav_horizontal == 1 ? true : false,//jika null berarti ikut setingan template di system.json nya
-            menu: {}
+            menu: {},
+            customMenu: {}
         },
         body: {
             withPadding: true,
@@ -98,6 +99,9 @@ const getters = {
     //---------------sidenav-------------------
     getSidenavMenu(state) {
         return state.admin.sidenav.menu;
+    },
+    getCustomSidenavMenu(state) {
+        return state.admin.sidenav.customMenu;
     },
     isSidenavShowed(state) {
         return state.admin.sidenav.show;
@@ -177,6 +181,7 @@ const mutations = {
      */
     setSidenavMenu(state) {
         state.admin.sidenav.menu = globals().AppConfig.sidenav;
+        state.admin.sidenav.customMenu = globals().AppConfig.customSidenav;
         // _.forEach(globals().AppConfig.packageLocal, (value, index) => {
         //     if(value.access.has_acl == 0 ||(value.access &&  value.enable &&  value.access.has_access)){
         //         state.admin.sidenav[index] =value.access;

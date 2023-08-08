@@ -319,6 +319,9 @@ export default {
     getSidenavMenu() {
         return this.store.getters.getSidenavMenu;
     },
+    getCustomSidenavMenu() {
+        return this.store.getters.getCustomSidenavMenu;
+    },
     setShowSidenav(showSidenav) {
         this.store.commit("setShowSidenav", showSidenav);
         return this;

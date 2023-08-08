@@ -43,14 +43,15 @@
                 <template v-if="menus.has_acl == 0 || (menus.has_access==1 && isInGroup(menus.tenant_group_id))">
 
                     <sidenav-router-link
-                        v-if="menus.route"
+                        v-if="menus.children == undefined"
                         v-bind:key="menus.id"
                         :icon="menus.icon"
                         :class="menus.class?menus.class:''"
                         :to="menus.route"
                         :exact="true"
-                        :active="isMenuActive(Web.getModuleEndpoint(packageNamespace))"
+                        :active="isMenuActive(menus.route ? menus.route : Web.getModuleEndpoint(packageNamespace))"
                     >
+                    <!-- Old Active :active="isMenuActive(Web.getModuleEndpoint(packageNamespace))" -->
                         {{ Trans.chose(menus.caption) }}
                     </sidenav-router-link>
                     <sidenav-menu
@@ -58,10 +59,14 @@
                         :icon="menus.icon"
                         :class="menus.class?menus.class:''"
                         v-bind:key="menus.id"
-                        :active="isMenuActive(Web.getModuleEndpoint(packageNamespace))"
-                        :open="isMenuOpen(Web.getModuleEndpoint(packageNamespace))"
+                        :active="isMenuActive(menus.route ? menus.route : Web.getModuleEndpoint(packageNamespace))"
+                        :open="isMenuOpen(menus.route ? menus.route : Web.getModuleEndpoint(packageNamespace))"
                     >
-
+                        <!--
+                            Old Active and Open
+                            :active="isMenuActive(Web.getModuleEndpoint(packageNamespace))"
+                            :open="isMenuOpen(Web.getModuleEndpoint(packageNamespace))"
+                        -->
                         <template slot="link-text">{{ Trans.chose(menus.caption) }}</template>
 
                         <!-- looping level 2 -->
@@ -217,7 +222,7 @@ export default {
             return this.$store.getters.getAdminTitle;
         },
         sidebarMenu() {
-            return this.$store.getters.getSidenavMenu;
+            return this.AppConfig.system.web_admin.custom_sidenav ? this.$store.getters.getCustomSidenavMenu : this.$store.getters.getSidenavMenu;
         },
         curClasses() {
             let bg = this.layoutSidenavBg;
