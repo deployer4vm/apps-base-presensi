@@ -53,6 +53,8 @@ class Tenant extends BaseRepository
     private $_tmpTenantListByGroupApp = [];
     private $_tmpTenantListByDomain = [];
 
+    private $connectionCache = [];
+
     // public function listTenant(array $filter = [], int $offset = 0, int $limit = 0, array $orderBy = [])
     // {
     //     return $this->_autoResourceList('listTenant',[$filter,$offset,$limit,$orderBy]);
@@ -914,9 +916,12 @@ class Tenant extends BaseRepository
      */
     public function getTenantConnection($tenantId = false)
     {
-        $tenantId = $this->verifyTenantIdOrDefault($tenantId);
-        $this->getDbConnection($tenantId);
-        return DB::connection($this->getDbConnectionName($tenantId));
+        if (!isset($this->connectionCache[$tenantId])) {
+            $tenantId = $this->verifyTenantIdOrDefault($tenantId);
+            $this->getDbConnection($tenantId);
+            $this->connectionCache[$tenantId] = DB::connection($this->getDbConnectionName($tenantId));
+        }
+        return $this->connectionCache[$tenantId];
     }
 
     /**
