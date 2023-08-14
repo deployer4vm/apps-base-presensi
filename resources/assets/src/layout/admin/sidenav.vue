@@ -49,7 +49,7 @@
                         :class="menus.class?menus.class:''"
                         :to="menus.route"
                         :exact="true"
-                        :active="isMenuActive(menus.route ? menus.route : Web.getModuleEndpoint(packageNamespace))"
+                        :active="isMenuActive(menus.route ? menus.route : Web.getModuleEndpoint(packageNamespace), menus.id)"
                     >
                     <!-- Old Active :active="isMenuActive(Web.getModuleEndpoint(packageNamespace))" -->
                         {{ Trans.chose(menus.caption) }}
@@ -59,8 +59,8 @@
                         :icon="menus.icon"
                         :class="menus.class?menus.class:''"
                         v-bind:key="menus.id"
-                        :active="isMenuActive(menus.route ? menus.route : Web.getModuleEndpoint(packageNamespace))"
-                        :open="isMenuOpen(menus.route ? menus.route : Web.getModuleEndpoint(packageNamespace))"
+                        :active="isMenuActive(menus.route ? menus.route : Web.getModuleEndpoint(packageNamespace), menus.id)"
+                        :open="isMenuOpen(menus.route ? menus.route : Web.getModuleEndpoint(packageNamespace), menus.id)"
                     >
                         <!--
                             Old Active and Open
@@ -79,8 +79,8 @@
                                 <sidenav-router-link
                                     :to="menu.route"
                                     :class="menu.class?menu.class:''"
-                                    :active="isMenuActive(menu.route)"
-                                    v-bind:key="aclIdLv1"
+                                    :active="isMenuActive(menu.route, menu.id)"
+                                    v-bind:key="menu.id ?? aclIdLv1"
                                     :exact="true"
                                 >
                                     <i :class="'sidenav-icon ' + menu.icon" v-if="menu.icon"></i>
@@ -92,10 +92,10 @@
 
                             <!-- looping level 3 -->
                             <sidenav-menu
-                                v-bind:key="aclIdLv1"
+                                v-bind:key="menu.id ?? aclIdLv1"
                                 :class="menu.class?menu.class:''"
-                                :active="isMenuActive(menu.route)"
-                                :open="isMenuOpen(menu.route)"
+                                :active="isMenuActive(menu.route, menu.id)"
+                                :open="isMenuOpen(menu.route, menu.id)"
                             >
                                 <template slot="link-text">
                                     <i :class="'sidenav-icon ' + menu.icon" v-if="menu.icon"></i>
@@ -111,8 +111,8 @@
                                     <sidenav-router-link
                                         :to="submenu.route"
                                         :class="submenu.class?submenu.class:''"
-                                        v-bind:key="aclIdLv2"
-                                        :active="isMenuActive(submenu.route)"
+                                        v-bind:key="submenu.id ?? aclIdLv2"
+                                        :active="isMenuActive(submenu.route, submenu.id)"
                                         :exact="true"
                                     ><i :class="'sidenav-icon ' + submenu.icon" v-if="submenu.icon"></i> {{ Trans.chose(submenu.caption) }}</sidenav-router-link>
 
@@ -121,10 +121,10 @@
 
                                     <!-- looping level 4 -->
                                     <sidenav-menu
-                                        v-bind:key="submenu.aclIdLv2"
+                                        v-bind:key="submenu.id ?? aclIdLv2"
                                         :class="submenu.class?submenu.class:''"
-                                        :active="isMenuActive(submenu.route)"
-                                        :open="isMenuOpen(submenu.route)"
+                                        :active="isMenuActive(submenu.route, submenu.id)"
+                                        :open="isMenuOpen(submenu.route, submenu.id)"
                                     >
 
                                         <template slot="link-text"><i :class="'sidenav-icon ' + submenu.icon" v-if="submenu.icon"></i> {{ Trans.chose(submenu.caption) }}</template>
@@ -136,7 +136,8 @@
                                             <sidenav-router-link
                                             :to="subsubmenu.route"
                                             :class="subsubmenu.class?subsubmenu.class:''"
-                                            v-bind:key="aclIdLv3"
+                                            :active="isMenuActive(subsubmenu.route, subsubmenu.id)"
+                                            v-bind:key="subsubmenu.id ?? aclIdLv3"
                                             :exact="true"
                                             ><i :class="'sidenav-icon ' + subsubmenu.icon" v-if="subsubmenu.icon"></i> {{ Trans.chose(subsubmenu.caption) }}</sidenav-router-link>
 
@@ -183,6 +184,8 @@ import {
     SidenavDivider
 } from "@/vendor/libs/sidenav";
 
+import $ from "jquery";
+
 export default {
     name: "app-layout-sidenav",
     components: {
@@ -207,11 +210,17 @@ export default {
         this.isCollapsed = this.layoutHelpers.isCollapsed();
     },
     mounted() {
-
+        setTimeout(function () {
+            $('.sidenav-item.active').parents('.sidenav-item').addClass('active');
+            if (this.orientation !== "horizontal") {
+                $('.sidenav-item.active').parents('.sidenav-item').addClass('open')
+            }
+        }, 500);
     },
     data() {
         return {
-            isCollapsed: false
+            isCollapsed: false,
+            activeId: ""
         };
     },
     computed: {
@@ -275,7 +284,7 @@ export default {
                 return curTenantGroup == 0 || curTenantGroup == 1;
             }
         },
-        isMenuActive(route,viewLog=false) {
+        isMenuActive(route, menuId, viewLog=false) {
             let routePath = "";
             if (typeof route == "string") {
                 routePath = route;
@@ -286,13 +295,24 @@ export default {
             if(viewLog)
                 console.log(routePath,this.Web.curEndpoint,this.$router.currentRoute.path,this.Web.isOnEndpoint(routePath));
 
-            return routePath == "/" && this.Web.curEndpoint != "/"
+            var isActive = routePath == "/" && this.Web.curEndpoint != "/"
                 ? false
                 : routePath==this.Web.curEndpoint || this.Web.isOnEndpoint(routePath);
+
+            if (isActive) {
+                this.activeId = menuId;
+                return true;
+            }
+
+            if (this.activeId && menuId.startsWith(this.activeId)) {
+                return true;
+            }
+
+            return false;
         },
-        isMenuOpen(route,viewLog=false) {
+        isMenuOpen(route, menuId, viewLog=false) {
             return (
-                this.isMenuActive(route,viewLog) && this.orientation !== "horizontal"
+                this.isMenuActive(route, menuId, viewLog) && this.orientation !== "horizontal"
             );
         },
         toggleSidenav() {
