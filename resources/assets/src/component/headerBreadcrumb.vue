@@ -1,18 +1,19 @@
 <template>
     <div class="d-flex justify-content-between align-items-center w-100 mb-0 flex-wrap border-bottom">
-        <div class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center">
+        <div class="d-flex align-items-center py-2">
             <b-btn
                 v-if="showBack"
-                class="btn btn btn-xs w-icon btn-outline-secondary mr-2"
+                class="btn btn-xs w-icon btn-outline-dark mr-2"
                 @click="goBack"
             >
-                <i class="fi fi-rr-arrow-left"></i><span>{{ Trans.get("lang.back") }}</span>
+            <i class="fi fi-rs-caret-left"></i>
+                <span>{{ Trans.get("lang.back") }}</span>
             </b-btn>
             <h5 class="my-2 pr-1 m-0 d-inline-block text-nowrap title-breadcrumb">
                 {{ pageTitle }}
             </h5>
         </div>
-        <b-breadcrumb @click="breadcrumbLink" class="m-0" :items="Web.getBreadcrumb()" />
+        <b-breadcrumb @click="breadcrumbLink" class="m-0 d-none d-md-flex" :items="Web.getBreadcrumb()" />
     </div>
 </template>
 <script>
