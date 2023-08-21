@@ -287,9 +287,10 @@ class BaseController extends LaravelBaseController
         }
 
         //jika parameter dimerge langsung dengan query dan filter
-        if ($mergeToParam && !empty($params['all'])) {
+        if (!empty($params['all'])) {
             foreach ($params['all'] as $key => $param) {
                 if (
+                    empty($mergeParam) || 
                     ($mergeType && !in_array($key, $mergeParam)) ||
                     (!$mergeType && in_array($key, $mergeParam))
                 ) {

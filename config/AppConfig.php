@@ -807,6 +807,11 @@ if (file_exists($tenantConfigPath)) {
     $tenantList = [];
 }
 
+//jika file sidenav custom belum ada maka create default kosong
+$sidenavConfigPath = $mainAppPath . '/config/sidenav.json';
+if (!file_exists($sidenavConfigPath)) {
+    file_put_contents($sidenavConfigPath, '{}');
+}
 
 $moduleMultitenant = [
     "// DO NOT EDIT MANUALY UNLESS YOU KNOW WHAT YOU ARE DOING \n",
