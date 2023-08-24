@@ -1,9 +1,9 @@
 <template>
     <nav class="layout-footer footer" :class="getLayoutFooterBg()">
         <div
-            class="container-fluid d-flex flex-wrap justify-content-between text-center container-p-x"
+            class="container-fluid d-flex flex-wrap justify-content-between text-center p-0"
         >
-            <div class="pt-3">
+            <div>
                 <span class="footer-text font-weight-bolder">{{
                     footerText
                 }}</span>
