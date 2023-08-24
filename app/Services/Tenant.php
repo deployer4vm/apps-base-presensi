@@ -191,7 +191,7 @@ class Tenant extends BaseRepository
     }
 
     /**
-     * START - GROUP MANAGE ACTIAVE TENANT
+     * START - GROUP MANAGE ACTIAVE TENANT 
      */
 
     /**

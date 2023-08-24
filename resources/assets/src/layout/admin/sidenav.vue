@@ -19,7 +19,7 @@
                 :to="{name : 'home'}"
                 class="app-brand-text demo sidenav-text font-weight-normal ml-2"
             >
-                {{ title }} test3
+                {{ title }}
             </router-link>
 
             <!-- burger menu saat sidebar membuka -->

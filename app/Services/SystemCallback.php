@@ -62,14 +62,15 @@ class SystemCallback
                     'status'=>0
                 ]);
             }
-            return $return;
+            
+            return MSystemCallback::with(['log'])->where('id',$callbackData->id)->first()->toArray();
         }
 
         return false;
     }
 
     private function sendCallBack($data,$user,$callbackData)
-    {        
+    {   
         $client = new \GuzzleHttp\Client();
         
         $header = [
