@@ -139,6 +139,10 @@ abstract class BaseResponse implements Responsable
         $this->prepare($request);
         $tmpHttpCode = $this->output['http_code'];
         unset($this->output['http_code']);
+        
+        // on api response
+        event(new \App\Events\OnApiResponse($this->output,$tmpHttpCode));
+        
         return response()->json($this->output, $tmpHttpCode);
     }
 
