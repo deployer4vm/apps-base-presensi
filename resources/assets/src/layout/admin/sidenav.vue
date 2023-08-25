@@ -210,9 +210,10 @@ export default {
         this.isCollapsed = this.layoutHelpers.isCollapsed();
     },
     mounted() {
+        let sideType = this.orientation;
         setTimeout(function () {
             $('.sidenav-item.active').parents('.sidenav-item').addClass('active');
-            if (this.orientation !== "horizontal") {
+            if (sideType !== "horizontal") {
                 $('.sidenav-item.active').parents('.sidenav-item').addClass('open')
             }
         }, 500);
