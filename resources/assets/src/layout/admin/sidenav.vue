@@ -71,8 +71,8 @@
 
                         <!-- looping level 2 -->
                         <template v-for="(menu, aclIdLv1) in menus.children">
-
-                        <template v-if="menu.enable && (menus.has_acl == 0 || (menu.is_navbar && menu.active_acl.has_access==1 && isInGroup(menu.tenant_group_id)))">
+                        <!-- OLD if menus.has_acl == 0 ||  -->
+                        <template v-if="menu.enable && ((menu.is_navbar && menu.active_acl.has_access==1 && isInGroup(menu.tenant_group_id)))">
 
                             <template v-if="menu.children == undefined">
 
@@ -103,8 +103,8 @@
                                 </template>
 
                                 <template v-for="(submenu,aclIdLv2) in menu.children">
-
-                                <template v-if="submenu.enable && (menus.has_acl == 0 || (submenu.is_navbar && submenu.active_acl.has_access==1 && isInGroup(submenu.tenant_group_id)))">
+                                <!-- Old if menus.has_acl == 0 ||  -->
+                                <template v-if="submenu.enable && ((submenu.is_navbar && submenu.active_acl.has_access==1 && isInGroup(submenu.tenant_group_id)))">
 
                                     <template v-if="submenu.children == undefined">
 
@@ -130,9 +130,9 @@
                                         <template slot="link-text"><i :class="'sidenav-icon ' + submenu.icon" v-if="submenu.icon"></i> {{ Trans.chose(submenu.caption) }}</template>
 
                                         <template v-for="(subsubmenu,aclIdLv3) in submenu.children">
-
-                                        <template v-if="subsubmenu.enable && (menus.has_acl == 0 || (subsubmenu.is_navbar && subsubmenu.active_acl.has_access==1 && isInGroup(subsubmenu.tenant_group_id)))">
-
+                                        <!-- Old If menus.has_acl == 0 ||  -->
+                                        <template v-if="subsubmenu.enable && ((subsubmenu.is_navbar && subsubmenu.active_acl.has_access==1 && isInGroup(subsubmenu.tenant_group_id)))">
+                                            
                                             <sidenav-router-link
                                             :to="subsubmenu.route"
                                             :class="subsubmenu.class?subsubmenu.class:''"
