@@ -41,17 +41,33 @@ class SystemCallback
             ->whereNotNull('secret_key')->first();
         
         if($user){      
-            $callbackData = MSystemCallback::create([
+            $callbackData = [
                 'tenant_id'=>isset($data['tenant_id'])?$data['tenant_id']:0,
                 'system_user_id'=>$data['system_user_id'],
                 'callback_id'=>$data['callback_id'],
-                'callback_url'=>$data['callback_url'],
-                'data'=>$data['data'],
                 'last_hit_at' => now()->format('Y-m-d H:i:s'),
-                'status'=>1
-            ]);     
+            ];
 
-            $data['data'] = json_encode($data['data']);
+            // jika tidak menyertakan id maka ini callback baru, 
+            // jika menyertakan maka callback ulang
+            if(empty($data['id'])){
+                // jika callback baru maka isi lengkap datanya
+                $callbackData['callback_url'] = $data['callback_url'];
+                $callbackData['data'] = $data['data'];
+                $callbackData['status'] = 1;
+
+                $callbackData = MSystemCallback::create($callbackData);     
+            }else{
+                $callbackData['status'] = 1;
+
+                MSystemCallback::where('id',$data['id'])->update($callbackData);     
+                $callbackData = MSystemCallback::where('id',$data['id'])->first();
+            }
+
+            $tmpData = $data['data'];
+            $data['data'] = json_encode($data['data'],JSON_PRESERVE_ZERO_FRACTION);
+            dd($tmpData,$data['data']);
+
             if(empty($data['data']))
                 return false;
 
@@ -78,15 +94,12 @@ class SystemCallback
             'Accept' => 'application/json',
         ];
 
-        $formParams = [
-            'client_id' => $this->getConsumerKey(),
-            'client_secret' => $this->getConsumerSecret()
-        ];
-
         $log = [
             'tenant_id' => $data['callback_id'],
             'system_callback_id' => $callbackData->id,
             'callback_id' => $data['callback_id'],
+            'callback_url' => $data['callback_url'],
+            'callback_data' => $data['data'],
         ];
 
         try {
@@ -98,6 +111,7 @@ class SystemCallback
                     'body' => UserAuth::encryptCredential($data['data'],$user['secret_key'])
                 ]
             );
+            $responseCode = $res->getStatusCode();
         } catch (Exception $e) {
             Log::error('System Callback Return Error');
             Log::error($e);
@@ -114,7 +128,6 @@ class SystemCallback
         // Create Log
         if($responseCode==200){
             $responseBody = $res->getBody()->getContents();
-            $responseCode = $res->getStatusCode();
             $responseHeader = $res->getHeaders();
             $log['status'] = 1;
             $return = json_decode($responseBody, true);
