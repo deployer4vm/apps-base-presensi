@@ -50,34 +50,37 @@ class SystemCallback
 
             // jika tidak menyertakan id maka ini callback baru, 
             // jika menyertakan maka callback ulang
-            if(empty($data['id'])){
+            if(empty($data['id'])){                
+                $createData = true;   
+            }else{
+                MSystemCallback::where('id',$data['id'])->update($callbackData);     
+                // jika data callback tidak ada kemungkinan update gagal, maka create ulang
+                if(($callbackData = MSystemCallback::where('id',$data['id'])->first())==false){
+                    $createData = true;
+                    unset($data['id']);
+                }
+            }
+
+            // jika perlu create data baru
+            if($createData){
                 // jika callback baru maka isi lengkap datanya
                 $callbackData['callback_url'] = $data['callback_url'];
                 $callbackData['data'] = $data['data'];
                 $callbackData['status'] = 1;
 
-                $callbackData = MSystemCallback::create($callbackData);     
-            }else{
-                $callbackData['status'] = 1;
-
-                MSystemCallback::where('id',$data['id'])->update($callbackData);     
-                $callbackData = MSystemCallback::where('id',$data['id'])->first();
+                $callbackData = MSystemCallback::create($callbackData); 
             }
 
             $tmpData = $data['data'];
             $data['data'] = json_encode($data['data'],JSON_PRESERVE_ZERO_FRACTION);
-            dd($tmpData,$data['data']);
-
+            
             if(empty($data['data']))
                 return false;
 
             $return = $this->sendCallBack($data,$user->toArray(),$callbackData);
-            // jika gagal maka update status sebagai gagal
-            if($return==false){
-                MSystemCallback::where('id',$callbackData->id)->update([
-                    'status'=>0
-                ]);
-            }
+            MSystemCallback::where('id',$callbackData->id)->update([
+                'status'=>$return?1:0//update status gagal tidak nya
+            ]);
             
             return MSystemCallback::with(['log'])->where('id',$callbackData->id)->first()->toArray();
         }

@@ -25,13 +25,13 @@
                                     {{ dropFilesCaption }}
                                     <div class="text-muted small my-2">or</div>
                                 </h5>
-                                <button
+                                <label
                                     @click="$refs[refID].$el.querySelector('input').click()"
                                     class="btn btn-outline-primary w-icon btn-xs"
                                     >
                                     <i class="fi fi-rs-upload"></i>
                                     <span>Select File</span>
-                                </button>
+                                </label>
                             </div>
                         </div>
                         <div v-else>No Files</div>
