@@ -26,6 +26,7 @@
         "package_dir",
         "is_package",
         "is_lib",
-        "git"
+        "git",
+        "load_priority"
     ]
 }
