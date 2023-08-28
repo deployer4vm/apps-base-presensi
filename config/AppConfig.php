@@ -157,8 +157,15 @@ $moduleList = array_merge(
 $package = [];
 foreach ($moduleList as $path) {
     $tmpPackage = json_decode(file_get_contents($path), true);
+    if (!isset($tmpPackage['load_priority'])) {
+        $tmpPackage['load_priority'] = 99;
+    }
     $package[$tmpPackage['package_namespace']] = $tmpPackage;
 }
+
+$packageCollection = collect($package);
+$sortedPackage = $packageCollection->sortBy('load_priority');
+$package = $sortedPackage->toArray();
 
 $packageOld = '';
 if (file_exists($mainAppPath . '/config/package.json')) {
