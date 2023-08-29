@@ -143,7 +143,7 @@ class BaseController extends LaravelBaseController
         $this->output['errors'] =
             $error === true || $error === 1 || $error === false
                 ? [true]
-                : $error;
+                : (empty($error)?[true]:$error);
 
         if (!is_null($response)) {
             $this->response =

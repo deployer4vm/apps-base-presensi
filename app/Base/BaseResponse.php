@@ -143,7 +143,7 @@ abstract class BaseResponse implements Responsable
         // on api response
         event(new \App\Events\OnApiResponse($this->output,$tmpHttpCode));
         
-        return response()->json($this->output, $tmpHttpCode);
+        return response()->json($this->output, $tmpHttpCode,[] ,JSON_PRESERVE_ZERO_FRACTION);
     }
 
     /**
