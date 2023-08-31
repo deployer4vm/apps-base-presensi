@@ -14,16 +14,16 @@
                                     <span class="text-big" v-html="data.title"></span><br>
                                     <small class="text-muted" v-if="data.description" v-html="data.description"></small>
                                 </span>
-                                <router-link 
+                                <router-link
                                     :to="{name: data.route.name}" v-if="data.route.name"
                                     class="btn btn-sm btn-info"
                                 >
                                     Go <span class="ion ion-ios-arrow-forward" />
                                 </router-link>
-                                <b-btn 
+                                <b-btn
                                     v-else
-                                    @click="topWindowHref(data.url)" 
-                                    size="sm" 
+                                    @click="topWindowHref(data.url)"
+                                    size="sm"
                                     variant="info"
                                 >
                                     Go <span class="ion ion-ios-arrow-forward" />
@@ -33,38 +33,55 @@
                     </div>
                 </div>
             </div> -->
-            
-            <div :key="i" class="my-4">
 
-                <h4 v-if="item.title">{{ item.title }}</h4>
-
-                <div class="row my-4">
-                    <div class="col-md-3" v-for="(data, j) in item.list" :key="j">
-                        <router-link
-                            :to="{name: data.route.name}" v-if="data.route"
-                            class="card card-hover text-body my-2">
-                            <b-card-body class="text-center py-5">
-                                <span :class="data.icon + ' display-3 text-primary'" />
-                                <b-badge class="ml-3" variant="danger indicator" v-if="data.indicator">{{ data.indicator }}</b-badge>
-                                <h5 class="m-0 mt-3">{{ data.title }}</h5>
-                                <small>{{ data.description }}</small>
-                            </b-card-body>
-                        </router-link>
-                        <div
-                            v-else
-                            @click="topWindowHref(data.url)"
-                            style="cursor: pointer;"
-                            class="card card-hover text-body my-2">
-                            <b-card-body class="text-center py-5">
-                                <span :class="data.icon + ' display-3 text-primary'" />
-                                <b-badge class="ml-3" variant="danger indicator" v-if="data.indicator">{{ data.indicator }}</b-badge>
-                                <h5 class="m-0 mt-3">{{ data.title }}</h5>
-                                <small>{{ data.description }}</small>
-                            </b-card-body>
-                        </div>
+            <b-card no-body :key="i" class="my-4">
+                <b-card-header>
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <h5 class="my-2" v-if="item.title">{{ item.title }}</h5>
                     </div>
-                </div>
-            </div>
+                </b-card-header>
+
+                <b-card-body class="px-4 pt-4 pb-0">
+                    <b-container fluid>
+                        <div class="row">
+                            <div class="col-md-3" v-for="(data, j) in item.list" :key="j">
+                                <router-link
+                                    :to="{name: data.route.name}" v-if="data.route"
+                                    class="card card-bordered shadow-none mb-4 h-100">
+                                    <b-card-body class="p-4">
+                                        <div class="d-flex flex-column align-items-start">
+                                            <div class="position-relative">
+                                                <i :class="data.icon + ' text-gd-purple'" style="font-size: 2.25rem;" /></i>
+                                                <b-badge variant="danger indicator" v-if="data.indicator">{{ data.indicator }}</b-badge>
+                                            </div>
+                                            <div class="text-right card-title w-100">
+                                                <h5 class="m-0 mt-3">{{ data.title }}</h5>
+                                                <small>{{ data.description }}</small>
+                                            </div>
+                                        </div>
+                                    </b-card-body>
+                                </router-link>
+                                <div
+                                    v-else
+                                    @click="topWindowHref(data.url)"
+                                    style="cursor: pointer;"
+                                    class="card card-bordered shadow-none mb-4 h-100">
+                                    <b-card-body class="p-4">
+                                        <div class="d-flex flex-column align-items-start">
+                                            <i :class="data.icon + ' text-gd-purple d'" style="font-size: 2.25rem;" /></i>
+                                            <b-badge variant="danger indicator" v-if="data.indicator">{{ data.indicator }}</b-badge>
+                                            <div class="text-right card-title w-100">
+                                                <h5 class="m-0 mt-3">{{ data.title }}</h5>
+                                                <small>{{ data.description }}</small>
+                                            </div>
+                                        </div>
+                                    </b-card-body>
+                                </div>
+                            </div>
+                        </div>
+                    </b-container>
+                </b-card-body>
+            </b-card>
         </template>
     </div>
 </template>
