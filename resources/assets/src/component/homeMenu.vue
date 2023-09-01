@@ -47,7 +47,7 @@
                             <div class="col-md-3" v-for="(data, j) in item.list" :key="j">
                                 <router-link
                                     :to="{name: data.route.name}" v-if="data.route"
-                                    class="card card-bordered shadow-none mb-4 h-100">
+                                    class="card bg-hover-gradient gr-purple card-bordered shadow-none mb-4 h-100">
                                     <b-card-body class="p-4">
                                         <div class="d-flex flex-column align-items-start">
                                             <div class="position-relative">
@@ -56,7 +56,7 @@
                                             </div>
                                             <div class="text-right card-title w-100">
                                                 <h5 class="m-0 mt-3">{{ data.title }}</h5>
-                                                <small>{{ data.description }}</small>
+                                                <small class="text-muted">{{ data.description }}</small>
                                             </div>
                                         </div>
                                     </b-card-body>
@@ -65,14 +65,14 @@
                                     v-else
                                     @click="topWindowHref(data.url)"
                                     style="cursor: pointer;"
-                                    class="card card-bordered shadow-none mb-4 h-100">
+                                    class="card bg-hover-gradient gr-purple card-bordered shadow-none mb-4 h-100">
                                     <b-card-body class="p-4">
                                         <div class="d-flex flex-column align-items-start">
-                                            <i :class="data.icon + ' text-gd-purple d'" style="font-size: 2.25rem;" /></i>
+                                            <i :class="data.icon + ' text-gd-purple'" style="font-size: 2.25rem;" /></i>
                                             <b-badge variant="danger indicator" v-if="data.indicator">{{ data.indicator }}</b-badge>
                                             <div class="text-right card-title w-100">
                                                 <h5 class="m-0 mt-3">{{ data.title }}</h5>
-                                                <small>{{ data.description }}</small>
+                                                <small class="text-muted">{{ data.description }}</small>
                                             </div>
                                         </div>
                                     </b-card-body>
