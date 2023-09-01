@@ -158,14 +158,15 @@ trait MigrateDataTenant
 
     public function tableIndexPerTenant($table, $bluePrint, $column, $ifIndexExist = false, $unique = false)
     {
+        $columnName = is_array($column) ? implode('_', $column) : $column;
+        $indexName = $table . '_' . $columnName . '_' . ($unique ? 'unique' : 'index');
+
         //jika mode nya tidak share dalam 1 table
         if (
             config('AppConfig.system.multitenant.active', false)
             && config('AppConfig.system.multitenant.data_mode', 1) != 1
         ) {
             $filter = isset($this->tenantId) ? [['id', $this->tenantId]] : [];
-            $columnName = is_array($column) ? implode('_', $column) : $column;
-            $indexName = $table . '_' . $columnName . '_' . ($unique ? 'unique' : 'index');
             $tenantList = Tenant::listTenant($filter);
             // if ($unique) Log::debug($indexName);
             foreach ($tenantList['data'] as $tenant) {
