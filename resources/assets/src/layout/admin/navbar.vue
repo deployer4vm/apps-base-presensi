@@ -12,8 +12,8 @@
                 <img v-if="koperasi && koperasi.logo.length > 0" :src="`${uploadedUrl}${koperasi.logo[0].   filepath}`" alt="">
                 <img v-else :src="`${publicUrl}assets/images/koperasi_logo.png`" alt="">
             </span>
-            <div class="app-brand-text nav-item text-big font-weight-light line-height-1 opacity-50 mr-2 ml-3">|</div>
-            <h5 class="app-brand-text demo ml-2 mb-0">{{ koperasi.nama }}</h5>
+            <div class="app-brand-text d-none d-lg-block  nav-item text-big font-weight-light line-height-1 opacity-50 mr-2 ml-3">|</div>
+            <h5 class="app-brand-text d-none d-lg-block  demo ml-2 mb-0">{{ koperasi.nama }}</h5>
         </b-navbar-brand>
 
         <!-- Navbar toggle -->
@@ -23,7 +23,7 @@
             <template  v-if="UserAuth.isActive()">
                 <template v-if="showNotif">
                     <notif-navbar />
-                    <div class="nav-item d-none d-lg-block text-big font-weight-light line-height-1 opacity-25 mr-3 ml-1">|</div>
+                    <div class="nav-item d-none d-lg-block text-big font-weight-light line-height-1 opacity-25 mr-2 ml-1">|</div>
                 </template>
 
                 <template v-if="AppConfig.system.multilang==1">

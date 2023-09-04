@@ -57,25 +57,29 @@
                         <div class="preupload-desc">
                             <ul>
                                 <li>
-                                    <span>Nama</span>
+                                    <span>Nama :</span>
                                     <span>
-                                        <a
-                                            v-b-tooltip.hover.top
-                                            :title="'View file'"
-                                            :href="intUploadUrl + file.filepath"
-                                            target="_blank"
-                                            >{{ file.name }}
-                                            </a>
+                                        <b>
+                                            <a
+                                                v-b-tooltip.hover.top
+                                                :title="'View file'"
+                                                :href="intUploadUrl + file.filepath"
+                                                target="_blank"
+                                                >{{ file.name }}
+                                                </a>
+                                        </b>
                                     </span>
                                 </li>
                                 <li>
-                                    <span>Size</span>
+                                    <span>Size :</span>
                                     <span>
-                                        {{ (file.size / 1024 / 1024) | fileSize }} MB
+                                        <b>
+                                            {{ (file.size / 1024 / 1024) | fileSize }} MB
+                                        </b>
                                     </span>
                                 </li>
                                 <li v-if="!disabled">
-                                    <span>Action</span>
+                                    <span>Action :</span>
                                     <span>
                                         <b-btn
                                             @click="imageDelete(index)"

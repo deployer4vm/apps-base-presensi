@@ -34,20 +34,20 @@
                 </div>
             </div> -->
 
-            <b-card no-body :key="i" class="my-4">
+            <b-card no-body :key="i" class="my-3">
                 <b-card-header>
                     <div class="d-flex justify-content-between align-items-center flex-wrap">
                         <h5 class="my-2" v-if="item.title">{{ item.title }}</h5>
                     </div>
                 </b-card-header>
 
-                <b-card-body class="px-4 pt-4 pb-0">
+                <b-card-body class="px-3 pt-3 pb-0">
                     <b-container fluid>
                         <div class="row">
                             <div class="col-md-3" v-for="(data, j) in item.list" :key="j">
                                 <router-link
                                     :to="{name: data.route.name}" v-if="data.route"
-                                    class="card bg-hover-gradient gr-purple card-bordered shadow-none mb-4 h-100">
+                                    class="card bg-hover-gradient card-bordered shadow-none gr-purple mb-3 h-100">
                                     <b-card-body class="p-4">
                                         <div class="d-flex flex-column align-items-start">
                                             <div class="position-relative">
@@ -65,7 +65,7 @@
                                     v-else
                                     @click="topWindowHref(data.url)"
                                     style="cursor: pointer;"
-                                    class="card bg-hover-gradient gr-purple card-bordered shadow-none mb-4 h-100">
+                                    class="card bg-hover-gradient card-bordered shadow-none gr-purple mb-3 h-100">
                                     <b-card-body class="p-4">
                                         <div class="d-flex flex-column align-items-start">
                                             <i :class="data.icon + ' text-gd-purple'" style="font-size: 2.25rem;" /></i>
