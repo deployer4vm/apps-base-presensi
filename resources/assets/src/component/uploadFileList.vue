@@ -19,19 +19,17 @@
             <div class="preview-desc" v-if="!intFiles.length">
                 <b-row>
                     <b-col md="12">
-                        <div class="preupload-img" v-if="!disabled">
-                            <div class="box-img">
-                                <h5>
-                                    {{ dropFilesCaption }}
-                                    <div class="text-muted small my-2">or</div>
-                                </h5>
-                                <div
-                                    @click="$refs[refID].$el.querySelector('input').click()"
-                                    class="btn btn-outline-primary w-icon btn-xs"
-                                    >
-                                    <i class="fi fi-rs-upload"></i>
-                                    <span>Select File</span>
-                                </div>
+                        <div class="preupload" v-if="!disabled">
+                            <h5 class="mb-0">
+                                {{ dropFilesCaption }}
+                                <div class="text-muted small my-2">or</div>
+                            </h5>
+                            <div
+                                @click="$refs[refID].$el.querySelector('input').click()"
+                                class="btn btn-outline-primary w-icon w-auto btn-xs"
+                                >
+                                <i class="fi fi-rs-upload"></i>
+                                <span>Select File</span>
                             </div>
                         </div>
                         <div v-else>No Files</div>
@@ -42,18 +40,20 @@
                 v-for="(file, index) in intFiles"
                 :key="file.id">
                 <b-row>
-                    <b-col md="5">
+                    <b-col sm="5">
                         <div class="preupload-img">
                             <div class="box-img">
-                                <img
-                                    v-if="file.thumb"
-                                    :src="file.thumb"
-                                />
-                                <i v-else>[No Image]</i>
+                                <div class="thumb-img d-flex align-items-center justify-content-center">
+                                    <img
+                                        v-if="file.thumb"
+                                        :src="file.thumb"
+                                    />
+                                    <i v-else>[No Image]</i>
+                                </div>
                             </div>
                         </div>
                     </b-col>
-                    <b-col md="7">
+                    <b-col sm="7">
                         <div class="preupload-desc">
                             <ul>
                                 <li>
@@ -83,7 +83,7 @@
                                     <span>
                                         <b-btn
                                             @click="imageDelete(index)"
-                                            variant="outline-danger w-icon btn-xs"
+                                            variant="outline-danger w-icon btn-xs w-auto"
                                             title="Delete Image"
                                         >
                                             <i
