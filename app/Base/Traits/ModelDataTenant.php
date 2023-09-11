@@ -33,9 +33,16 @@ trait ModelDataTenant
      * @param boolean $isTenantId unused
      * @return void
      */
-    public function setTenantId($tenantId, $isTenantId = true)
+    
+    public function setTenantId($tenantId, $isTenantId=true)
     {
         $this->tenantId = $tenantId;
+        config(['model_tenant_id',$this->tenantId]);
+
+        if($this->getDataMode()==3)
+            $this->setDbPerTenant();
+            
+        return $this;
 
         // $searchField = $isTenantId?'id':'group_app';
         // if($tenantId!=config('tenant.'.$searchField)){
@@ -55,11 +62,8 @@ trait ModelDataTenant
      */
     public function getTenantId()
     {
-        if (empty($this->tenantId)) {
-            $this->tenantId
-                = $GLOBALS['model_tenant_id']
-                = $GLOBALS['model_tenant_id'] ?? config('tenant.id');
-        }
+        if (empty($this->tenantId))
+            $this->tenantId = config('model_tenant_id',config('tenant.id',0));
 
         return $this->tenantId;
     }
@@ -71,9 +75,7 @@ trait ModelDataTenant
      */
     public function setDbPerTenant()
     {
-        $tenantId = $this->getTenantId();
-
-        Tenant::setDb($tenantId);
+        Tenant::setDb($this->getTenantId());
     }
 
     /**
@@ -83,13 +85,8 @@ trait ModelDataTenant
      */
     public function getConnectionName()
     {
-
         if(config('AppConfig.system.multitenant.data_mode',1)==3){
-            //get tenant id yang terset di model ini
-            if (empty($this->tenantId))
-                $this->tenantId = isset($GLOBALS['model_tenant_id'])?$GLOBALS['model_tenant_id']:config('tenant.id');
-
-            $connectionName = Tenant::getDbConnectionName($this->tenantId);
+            $connectionName = Tenant::getDbConnectionName($this->getTenantId());
             if($this->connection != $connectionName){
                 $this->setDbPerTenant();
                 $this->connection = $connectionName;
@@ -128,12 +125,16 @@ trait ModelDataTenant
     {
 
         $table = $this->table;
-        if(config('AppConfig.system.multitenant.data_mode',1)==2){// && !$this->_tableNameSetted){
-            if (empty($this->tenantId))
-                $this->tenantId = isset($GLOBALS['model_tenant_id'])?$GLOBALS['model_tenant_id']:config('tenant.id');
-            $prefix = empty($this->tenantId)?'':(config('AppConfig.system.multitenant.table_prefix','_').$this->tenantId.'_');
-            $table = $prefix.$this->table;
-        }
+        // if(config('AppConfig.system.multitenant.data_mode',1)==2){// && !$this->_tableNameSetted){
+        //     if (empty($this->tenantId))
+        //         $this->tenantId = isset($GLOBALS['model_tenant_id'])?$GLOBALS['model_tenant_id']:config('tenant.id');
+        //     $prefix = empty($this->tenantId)?'':(config('AppConfig.system.multitenant.table_prefix','_').$this->tenantId.'_');
+        //     $table = $prefix.$this->table;
+        // }
+        
+        if($this->getDataMode()==2)
+            $table = config('AppConfig.system.multitenant.table_prefix','_').$this->getTenantId().'_'.$this->table;
+            
 
         return $table;
     }

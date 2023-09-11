@@ -37,8 +37,8 @@ class LangController extends BaseController
         $trans = [];
 
         $langPath = array_merge(
-            config('hpsynapse.lang_path.pertenant.' . config('tenant.id', 0), []),
-            config('hpsynapse.lang_path.general', [])
+            config('hpsynapse.lang_path.general', []),
+            config('hpsynapse.lang_path.pertenant.' . config('tenant.id', 0), [])            
         );
 
         //get all language namespace

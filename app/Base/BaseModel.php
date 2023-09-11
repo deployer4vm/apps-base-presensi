@@ -10,6 +10,15 @@ use App\Facades\CacheConfig;
 
 class BaseModel extends Model
 {
+    public function __construct(array $attributes = [])
+    {
+        // unset kembali model_tenant_id jika di model per tenant
+        if(property_exists($this,'tenantId'))
+            config(['model_tenant_id',null]);
+        
+        parent::__construct($attributes);
+    }
+    
     /**
      * Prepare a date for array / JSON serialization.
      *

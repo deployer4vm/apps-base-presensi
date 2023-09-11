@@ -35,13 +35,17 @@ class RouteServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->bootMigration();
         } else if (config('AppConfig.system.multitenant.active', false)) {
-            //detect app_group mmulti tenant
-            $this->AppGroupCheck();
+            //detect app_group mmulti tenant            
+            // JADINYA DILOAD DI TranslationServiceProvider, karena disiti di load duluan
+            // $this->AppGroupCheck();
         }
 
         parent::boot();
     }
 
+    /**
+     * JADINYA DILOAD DI TranslationServiceProvider, karena disiti di load duluan
+     **/
     private function AppGroupCheck()
     {
         if (config('AppConfig.system.multitenant.detect_mode', 1) == 1) {
