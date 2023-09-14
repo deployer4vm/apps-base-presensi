@@ -25,8 +25,13 @@ _.forEach(storeConfig,(v,k)=>{
     state.data[k].listData = JSON.parse(JSON.stringify(state.defData.listData));
     state.data[k].listDataParams = {};//JSON.parse(JSON.stringify(state.defData.listDataParams))
     state.data[k].oneData = {};//JSON.parse(JSON.stringify(state.defData.oneData))
+    
     if(v.pathPrefix)
         state.data[k].pathSuffix = v.pathPrefix;
+    // if(v.methods)
+        // _.forEach(v.methods,(v2)=>{
+        //     state.data[k].methods = v.pathPrefix;
+        // });
 });
 
 const getters = {
@@ -44,13 +49,44 @@ const mutations = {
 };
 
 const actions = { 
+    method({ commit, state }, params={}){
+        let apiEndpoint = state.data[params.module].methods[params.methodName].apiEndpoint;
+        apiEndpoint = globals().Helper.replaceAttribute(apiEndpoint,params);
+
+        var res;
+
+        switch (state.data[params.module].methods[params.methodName].httpMethod.toLowerCase()) {
+            case 'post':                
+                res = globals().LocalApi.post(apiEndpoint, params.data?params.data:{});
+                break;   
+            case 'put':
+                res = globals().LocalApi.put(apiEndpoint, params.data?params.data:{});                
+                break;   
+            case 'delete':
+                res = globals().LocalApi.delete(apiEndpoint);                
+                break;   
+            case 'get':
+            default:
+                res = globals()
+                    .LocalApi.get(apiEndpoint, {
+                        params: params.params?params.params:{}
+                    });
+                break;
+        }
+
+        return res.then(res => {
+            return res.data.data;
+        });
+    },
     readList({ commit, state }, params={}) {
         let suffix = '';
         if(state.data[params.module].pathSuffix)
             suffix = globals().Helper.replaceAttribute(state.data[params.module].pathSuffix,params);
+
+        let apiEndpoint = globals().Helper.replaceAttribute(state.data[params.module].apiEndpoint,params);
         
         return globals()
-            .LocalApi.get(state.data[params.module].apiEndpoint + suffix, {
+            .LocalApi.get(apiEndpoint + suffix, {
                 params: params.params?params.params:{}
             })
             .then(res => {
@@ -68,9 +104,11 @@ const actions = {
         if(state.data[params.module].pathSuffix)
         suffix = '/' + globals().Helper.replaceAttribute(state.data[params.module].pathSuffix,params);
 
+        let apiEndpoint = globals().Helper.replaceAttribute(state.data[params.module].apiEndpoint,params);
+
         return globals()
             .LocalApi.get(
-                state.data[params.module].apiEndpoint + params.id + suffix,
+                apiEndpoint + params.id + suffix,
                 {
                     params: params.params?params.params:{}
                 }
@@ -89,9 +127,11 @@ const actions = {
         if(state.data[params.module].pathSuffix)
             suffix = globals().Helper.replaceAttribute(state.data[params.module].pathSuffix,params);
             
+        let apiEndpoint = globals().Helper.replaceAttribute(state.data[params.module].apiEndpoint,params);
+
         return globals()
             .LocalApi.post(
-                state.data[params.module].apiEndpoint + suffix, 
+                apiEndpoint + suffix, 
                 params.data
             )
             .then(res => {
@@ -103,9 +143,11 @@ const actions = {
         if(state.data[params.module].pathSuffix)
             suffix = '/' + globals().Helper.replaceAttribute(state.data[params.module].pathSuffix,params);
 
+        let apiEndpoint = globals().Helper.replaceAttribute(state.data[params.module].apiEndpoint,params);
+
         return globals()
             .LocalApi.put(
-                state.data[params.module].apiEndpoint + params.id + suffix, 
+                apiEndpoint + params.id + suffix, 
                 params.data
             )
             .then(res => {
@@ -117,8 +159,10 @@ const actions = {
         if(state.data[params.module].pathSuffix)
             suffix = '/' + globals().Helper.replaceAttribute(state.data[params.module].pathSuffix,params);
 
+        let apiEndpoint = globals().Helper.replaceAttribute(state.data[params.module].apiEndpoint,params);
+
         return globals()
-            .LocalApi.delete(state.data[params.module].apiEndpoint + params.id + suffix)
+            .LocalApi.delete(apiEndpoint + params.id + suffix)
             .then(res => {
                 return params.reload==undefined||!params.reload?res.data.data:dispatch("readList",{module: params.module});
             });

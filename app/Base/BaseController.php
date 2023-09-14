@@ -86,9 +86,21 @@ class BaseController extends LaravelBaseController
      * @param array Output Parameters
      * @return $this
      */
-    public function setParams($params)
+    public function setParams(array $params)
     {
         $this->output['params'] = $params;
+        return $this;
+    }
+    
+    /**
+     * Merge $this->output['params']
+     *
+     * @param array Output Parameters
+     * @return $this
+     */
+    public function mergeParams(array $params)
+    {
+        $this->output['params'] = recuresive_array_merge($this->output['params'],$params);
         return $this;
     }
 
@@ -97,9 +109,9 @@ class BaseController extends LaravelBaseController
      *
      * @return array $this->output['params']
      */
-    public function getParams()
+    public function getParams($paramKey=false)
     {
-        return $this->output['params'];
+        return $paramKey?$this->output['params'][$paramKey]:$this->output['params'];
     }
 
     /**
