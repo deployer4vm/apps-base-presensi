@@ -217,6 +217,13 @@ export default {
                 $('.sidenav-item.active').parents('.sidenav-item').addClass('open')
             }
         }, 500);
+
+        $(".sidenav-item").each(function() {
+            var sidenavMenu = $(this).find(".sidenav-menu");
+            if (sidenavMenu.is(':empty')) {
+                $(this).hide();
+            }
+        });
     },
     data() {
         return {
