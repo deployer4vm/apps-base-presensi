@@ -13,11 +13,7 @@
                 <img v-else :src="`${publicUrl}assets/images/koperasi_logo.png`" alt="">
             </span>
             <div class="app-brand-text d-none d-lg-block  nav-item text-big font-weight-light line-height-1 opacity-50 mr-2 ml-3">|</div>
-<<<<<<< Updated upstream
             <h5 class="app-brand-text d-none d-lg-block  demo ml-2 mb-0">{{ title }}</h5>
-=======
-            <h5 class="app-brand-text d-none d-lg-block  demo ml-2 mb-0">{{ koperasi.nama }}</h5>
->>>>>>> Stashed changes
         </b-navbar-brand>
 
         <!-- Navbar toggle -->
@@ -73,11 +69,7 @@
                         </span>
                     </template>
 
-<<<<<<< Updated upstream
-                    <b-dd-item v-if="AppConfig.isModuleEnable('moduser')" :to="{name: 'myprofile'}">
-=======
                     <b-dd-item v-if="AppConfig.isModuleEnable('moduser')" :to="(typeof AppConfig.packageLocal.moduser.user_profiles.custom_link.name != 'undefined') ? AppConfig.packageLocal.moduser.user_profiles.custom_link : {name: 'myprofile'}">
->>>>>>> Stashed changes
                         <i class="fi fi-rr-man-head"></i>
                         &nbsp; {{ Trans.get('user.my_profile') }}
                     </b-dd-item>
@@ -121,10 +113,7 @@
 export default {
     data(){
         return {
-<<<<<<< Updated upstream
             title: '',
-=======
->>>>>>> Stashed changes
             koperasi: {},
             ActiveRoleCode: ''
         };
@@ -152,10 +141,7 @@ export default {
             this.ActiveRoleCode = this.UserAuth.getAuthRole().role_code;
 
         this.koperasi = this.Web.getTenant.instance_data
-<<<<<<< Updated upstream
         this.title = this.koperasi ? this.koperasi.nama : this.Web.getAdminTitle()
-=======
->>>>>>> Stashed changes
     },
     methods: {
         changeRole(roleCode) {
