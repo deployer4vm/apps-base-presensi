@@ -28,6 +28,8 @@ return [
     'back' => 'Kembali',
     'delete' => 'Hapus',
     'search' => 'Cari',
+    'start' => 'Mulai',
+    'stop' => 'Berhenti',
     'view' => 'Tampilkan',
     'view_all' => 'Tampilkan Semua',
     'view_detail' => 'Tampilkan Detail',
