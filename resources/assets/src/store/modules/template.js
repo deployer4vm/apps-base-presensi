@@ -21,6 +21,7 @@ const state = {
         onOk: null,
         onShow: null,
         onClose: null,
+        onCancel: null,
         modalButtonCancel: 'Close',
         modalButtonOk: 'Ok'
     },
@@ -151,6 +152,7 @@ const mutations = {
         state.alertModal.onShow = v.onShow;
         state.alertModal.onOk = v.onOk;
         state.alertModal.onClose = v.onClose;
+        state.alertModal.onCancel = v.onCancel;
         state.alertModal.modalButtonCancel = v.modalButtonCancel
             ? v.modalButtonCancel
             : globals().Trans.get('alert.modal_cancel_caption');

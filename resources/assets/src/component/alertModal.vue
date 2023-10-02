@@ -3,6 +3,7 @@
         <b-modal size="sm" centered id="alert-modals"
             @show="showModal"
             @hidden="closeModal"
+            @cancel="cancelModal"
             @ok="handleOk"
             >
             <div slot="modal-title">
@@ -56,6 +57,10 @@ export default {
         closeModal() {
             if(typeof this.$store.state.template.alertModal.onClose == 'function')
                 this.$store.state.template.alertModal.onClose();
+        },
+        cancelModal() {
+            if(typeof this.$store.state.template.alertModal.onCancel == 'function')
+                this.$store.state.template.alertModal.onCancel();
         },
         handleOk() {
             if(typeof this.$store.state.template.alertModal.onOk == 'function')

@@ -81,10 +81,18 @@ export default {
     goToTenant(groupApp) {
         this.goTo("home", groupApp);
     },
-    goTo(routeName, groupApp = false) {
+    // goTo(routeName, groupApp = false) {
+    //     // if (groupApp == false) groupApp = this.getTenantGroupApp();
+    //     // console.log('go to : ', this.router.resolve({ name: routeName, params: { group_app: groupApp } }));
+    //     // this.router.push({ name: routeName, params: { group_app: groupApp } });
+    //     this.goTo(routeName,{}, groupApp);
+    // },
+    goTo(routeName, params = {}, groupApp = false) {
         if (groupApp == false) groupApp = this.getTenantGroupApp();
-        console.log('go to : ', this.router.resolve({ name: routeName, params: { group_app: groupApp } }));
-        this.router.push({ name: routeName, params: { group_app: groupApp } });
+        params.groupApp = groupApp;
+
+        console.log('go to : ', this.router.resolve({ name: routeName, params: params }));
+        this.router.push({ name: routeName, params: params });
     },
     /**
      * =======================================================================
@@ -421,6 +429,7 @@ export default {
                 title: params.title,
                 text: params.text,
                 onShow: params.onShow,
+                onCancel: params.onCancel,
                 onClose: params.onClose,
                 onOk: params.onOk,
                 modalButtonCancel: params.modalButtonCancel,
