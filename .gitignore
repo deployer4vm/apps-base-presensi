@@ -13,6 +13,7 @@
 /public/sw.js
 /public/mix-manifest.json
 /storage/*.key
+/storage/*.pem
 /vendor
 /app/MainApp
 /app/MainApp/*
