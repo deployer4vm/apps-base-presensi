@@ -17,6 +17,7 @@ return [
     'delete_failed' => 'Data :attribute gagal dihapus',
     'delete_success' => 'Data :attribute berhasil dihapus',
     'incorect_parameter' => 'Parameter keliru',
+    'no_parameter_detected' => 'Tidak terdeteksi adanya parameter yang dipassing',
     'resource_not_found' => 'Resource not found',
     //default alert modal
     'modal_ok_caption' => 'Ok',
