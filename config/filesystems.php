@@ -18,6 +18,15 @@ $disk = [
         'throw' => true,
     ],
 
+    'keys' => [
+        'driver' => 'local',
+        'root' => storage_path('app/keys'),
+        // 'url' => env('APP_URL').'/storage',
+        // 'url' => '/storage/public',
+        // 'visibility' => 'public',
+        'throw' => true,
+    ],
+
     // disk local khusus multi tenant, untuk file yg general lintas tenant (diakses berbarangan)
     'alltenant' => [
         'driver' => 'local',
