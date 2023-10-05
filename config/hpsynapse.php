@@ -2,6 +2,8 @@
 
 use App\Services\Utilities;
 
+use function PHPUnit\Framework\directoryExists;
+
 defined('DS') or define('DS', DIRECTORY_SEPARATOR);
 
 if (!function_exists('initHPsynapseConfig')) {
@@ -332,14 +334,16 @@ if (!function_exists('initHPsynapseConfig')) {
         if (isset($system['multitenant']['active']) && $system['multitenant']['active'] == 1) {
             foreach ($tenantList as $tenant) {
                 $tenantId = isset($tenant['id']) ? $tenant['id'] : $tenant;
+                $mainAppTenantPath = 'MainApp' . DS . 'Tenants' . DS . 'ID' . $tenantId;
+                $mainAppProjectTenantPath = $mainAppProjectPath . DS  . 'Tenants' . DS . 'ID' . $tenantId;
 
-                if (isset($system['multiproject']['active']) && $system['multiproject']['active'] == 1) {
+                if (isset($system['multiproject']['active']) && $system['multiproject']['active'] == 1) {                    
                     $path = app_path(
                         $mainAppProjectTenantPath
                             . DS . 'database'
                             . DS . 'migrations'
                     );
-                    if (file_exists($path))
+                    if (is_dir($path))
                         $migrationPath[] = $path;
                 } else {
                     $path = app_path(
@@ -347,7 +351,7 @@ if (!function_exists('initHPsynapseConfig')) {
                             . DS . 'database'
                             . DS . 'migrations'
                     );
-                    if (file_exists($path))
+                    if (is_dir($path))
                         $migrationPath[] = $path;
                 }
             }
@@ -369,6 +373,8 @@ if (!function_exists('initHPsynapseConfig')) {
         if (isset($system['multitenant']['active']) && $system['multitenant']['active'] == 1) {
             foreach ($tenantList as $tenant) {
                 $tenantId = isset($tenant['id']) ? $tenant['id'] : $tenant;
+                $mainAppTenantPath = 'MainApp' . DS . 'Tenants' . DS . 'ID' . $tenantId;
+                $mainAppProjectTenantPath = $mainAppProjectPath . DS  . 'Tenants' . DS . 'ID' . $tenantId;
 
                 if (isset($system['multiproject']['active']) && $system['multiproject']['active'] == 1) {
                     $path = app_path(
@@ -376,7 +382,7 @@ if (!function_exists('initHPsynapseConfig')) {
                             . DS . 'database'
                             . DS . 'seeds'
                     );
-                    if (file_exists($path))
+                    if (is_dir($path))
                         $seedPath[] = $path;
                 } else {
                     $path = app_path(
@@ -384,7 +390,7 @@ if (!function_exists('initHPsynapseConfig')) {
                             . DS . 'database'
                             . DS . 'seeds'
                     );
-                    if (file_exists($path))
+                    if (is_dir($path))
                         $seedPath[] = $path;
                 }
             }
