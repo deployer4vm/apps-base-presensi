@@ -1,6 +1,6 @@
 <template>
     <div>
-    <!--     
+    <!--
     Status Import :
 
     0 new process
@@ -19,15 +19,15 @@
             </b-col>
             <b-col md='9'>
                 <b-input-group>
-                    <b-file 
-                        accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" 
-                        v-model="importFile" 
+                    <b-file
+                        accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        v-model="importFile"
                         :disabled="!canUpload"
-                    ></b-file> 
-                    <b-input-group-append v-if="importFile">                              
-                        <b-btn variant="danger btn-md md-btn-flat" @click="importFile=null"> 
-                            <i class="ion ion-md-trash"></i>
-                        </b-btn> 
+                    ></b-file>
+                    <b-input-group-append v-if="importFile">
+                        <b-btn variant="danger btn-md md-btn-flat" @click="importFile=null">
+                            <i class="fi fi-rs-trash"></i>
+                        </b-btn>
                     </b-input-group-append>
                 </b-input-group>
             </b-col>
@@ -38,24 +38,24 @@
             </div>
         </b-form-group> -->
 
-        <div class="text-right">                                    
+        <div class="text-right">
             <b-btn variant="success" @click="uploadImpoart()"
-                :disabled="!canUpload"> 
-                <span class="ion ion-md-cloud-upload"></span> &nbsp; {{ Trans.get('lang.upload') }}
-            </b-btn> 
-        </div>            
-        
+                :disabled="!canUpload">
+                <i class="fi fi-rs-upload"></i> &nbsp; {{ Trans.get('lang.upload') }}
+            </b-btn>
+        </div>
+
         <!-- <div v-if="this.apiUrl.formatFile">
             <hr>
             <b-btn variant="info" @click="download(
                 this.apiUrl.formatFile,
                 apiImportFileFormatFilename?apiImportFileFormatFilename:'Import Format File.xlsx'
-            )"> 
+            )">
                 <span class="ion ion-md-cloud-download"></span> &nbsp; Download Format File Import
-            </b-btn> 
+            </b-btn>
             <i>Silahkan download format file yang telah disediakan, dan jangan mengubah struktur kolom dan urutan baris data.</i>
-        </div> -->        
-        
+        </div> -->
+
         <!-- import jobs status -->
         <div>
 
@@ -66,18 +66,18 @@
                     {{ Trans.get('lang.import.label.data_count') }} : <b v-text="importStatus.processedCount"></b>
                 </div>
                 <!-- download format file -->
-                <div class="col text-right" v-if="isFileFormat && apiUrl.formatFile">                    
+                <div class="col text-right" v-if="isFileFormat && apiUrl.formatFile">
                     <b-btn variant="info" @click="download(
                         apiUrl.formatFile,
                         apiImportFileFormatFilename?apiImportFileFormatFilename:'Import Format File.xlsx'
-                    )"> 
+                    )">
                         <span class="ion ion-md-cloud-download"></span> &nbsp; {{ Trans.get('lang.import.label.download_format') }}
-                    </b-btn> 
-                                    
-                    <b-btn v-if="apiImportFileFormatInfo" variant="success" @click="showInfoUpload"> 
+                    </b-btn>
+
+                    <b-btn v-if="apiImportFileFormatInfo" variant="success" @click="showInfoUpload">
                         <span class="ion ion-md-information-circle-outline"></span> {{ Trans.get('lang.import.label.guide') }}
-                    </b-btn> 
-                    
+                    </b-btn>
+
                     <div><i>{{ Trans.get('lang.import.label.guide_description') }}</i></div>
                 </div>
             </div>
@@ -95,7 +95,7 @@
                     </i>
                     <i v-else-if="importStatus.status==7">
                          {{ Trans.get('lang.import.alert.cancel_progress') }}
-                    </i> - 
+                    </i> -
                     <b>
                          {{ Trans.get('lang.import.label.proccess_count') }} : <span v-text="importStatus.processedCount"></span>
                     </b>
@@ -105,11 +105,11 @@
                 <template v-else-if="importStatus.status==3 || importStatus.status==6 || importStatus.status==8">
                     <i> {{ Trans.get('lang.import.label.last_log') }} :</i>
                     <div v-html="importStatus.log" class="p-1" style="background: rgba(0,0,0,0.1); max-height: 200px; overflow-x: auto;"></div>
-                </template>    
+                </template>
                 <!-- jika belum ada data import sama sekali sebelumnya -->
                 <template v-else>
                     <i><b class="text-danger">-{{ Trans.get('lang.import.label.empty_file') }}-</b></i>
-                </template>                      
+                </template>
             </div>
 
         </div>
@@ -119,7 +119,7 @@
             <hr>
             <b-btn variant="success" class="m-1" @click="approveImport()">
                 <span class="ion ion-ios-checkmark-circle"></span>&nbsp; {{ Trans.get('lang.import.label.approve') }}
-            </b-btn> 
+            </b-btn>
             <b-btn variant="danger" class="m-1" @click="cancelImport()">
                 <span class="ion ion-md-close"></span>&nbsp; {{ Trans.get('lang.import.label.cancel') }}
             </b-btn>
@@ -141,12 +141,12 @@
     export default {
         name: "syncomponent-import",
         props: [
-            //jika menggunakan struktur default, maka cukup 1 url prefix saja yang dilampirkan   
-            //lampirkan tanpa diakhiri /         
+            //jika menggunakan struktur default, maka cukup 1 url prefix saja yang dilampirkan
+            //lampirkan tanpa diakhiri /
             "api-import-mainprefix",
 
             //url parameter jika api-import-mainprefix tidak diisi
-            // lampirkan tanpa diakhiri /   
+            // lampirkan tanpa diakhiri /
             "api-import-file-format",//*optional, url format file excel import nya
             "api-import-upload",
             "api-import-status",
@@ -156,7 +156,7 @@
             // tambahan parameter jika api-import-file-format diisi
             "api-import-file-format-filename",//*optional, nama file yang didownloadnya
             "api-import-file-format-info",//*optional, text html untuk info tambahan
-            
+
             //parameter config tambahan
             "adds-jobs-params", // parameter array tambahan
             "import-approval",// apakah ada fitur approve & cancel (1/0), default 1 (ada process approval)
@@ -176,13 +176,13 @@
             validator: "new"
         },
         data() {
-            return { 
-                isImportOnProcess: false, //flag untuk detek apakah sedang proses upload ? agar tidak bisa klik berkali-kali           
+            return {
+                isImportOnProcess: false, //flag untuk detek apakah sedang proses upload ? agar tidak bisa klik berkali-kali
                 // file
                 importFile:null,
                 importStatus: {
                     status: 0,//status import, 0 sedang tidak ada proses, 1 sudah ada tapi belum start, 2 sedang dalam proses, 3 done, 4 failed
-                    log: '',//text log  
+                    log: '',//text log
                     filename: '',
                     filenamePath: '',
                     count:0,
@@ -202,10 +202,10 @@
         },
         computed:{
             canUpload() {
-                return this.importStatus.status == undefined || 
-                    this.importStatus.status==0 || 
-                    this.importStatus.status==6 || 
-                    this.importStatus.status==8 || 
+                return this.importStatus.status == undefined ||
+                    this.importStatus.status==0 ||
+                    this.importStatus.status==6 ||
+                    this.importStatus.status==8 ||
                     (this.isImportApproval==0 && (this.importStatus.status==3 || this.importStatus.status==4));
             }
         },
@@ -219,7 +219,7 @@
                     approve: this.apiImportMainprefix + this.apiUrl.approve,
                     cancel: this.apiImportMainprefix + this.apiUrl.cancel,
                 };
-            }else{                
+            }else{
                 this.apiUrl = {
                     formatFile: this.apiImportFileFormat,
                     upload: this.apiImportUpload,
@@ -234,7 +234,7 @@
             if(this.fileFormat!=undefined){
                 this.isFileFormat = this.fileFormat==1?1:0;
             }
-            this.getImportStatus(true);    
+            this.getImportStatus(true);
         },
         methods: {
             showInfoUpload(){
@@ -254,7 +254,7 @@
                 this.LocalApi.post(this.apiUrl.upload, formData,
                     {
                         headers: {
-                            'Content-Type': 'multipart/form-data'        
+                            'Content-Type': 'multipart/form-data'
                         }
                     }
                 )
@@ -262,13 +262,13 @@
                     this.isImportOnProcess = false;
                     // var lastStatus = this.importStatus.status;
                     this.importStatus = res.data.data;
-                    
+
                     this.$emit('on-start',this.importStatus);
 
                     this.Web.showAlert({text: this.Trans.get('lang.import.alert.proccess_upload'),type: "success"});
                     setTimeout(function() {
                         that.getImportStatus();
-                    },1000); 
+                    },1000);
                 }).catch((res)=>{
                     this.isImportOnProcess = false;
                     this.Web.showAlert({text: this.Trans.get('lang.import.alert.upload_failed') + ' : ' + res.message,type: "warning"});
@@ -283,17 +283,17 @@
                         this.importStatus = res.data.data;
 
                         this.$emit('on-get-status',this.importStatus);
-                        
+
                         //jika belum selesai atau baru mulai upload, maka request status lagi nanti
                         if(this.importStatus.status==1||this.importStatus.status==2||this.importStatus.status==5||this.importStatus.status==7){
                             setTimeout(function() {
                                 that.getImportStatus();
-                            },1000); 
-                        //jika import selesai dan berhasil                          
+                            },1000);
+                        //jika import selesai dan berhasil
                         }else if(this.importStatus.status==3 && !firstLoad){
-                            
+
                             this.$emit('on-finish',this.importStatus);
-                            
+
                             this.Web.showAlert({text: this.Trans.get('lang.import.alert.import_finish'),type: "success"});
                         //jika import selesai dan gagal
                         }else if(this.importStatus.status==4 && !firstLoad){
@@ -301,16 +301,16 @@
                             this.$emit('on-fail',this.importStatus);
 
                             this.Web.showAlert({text: this.Trans.get('lang.import.alert.import_failed'),type: "danger"});
-                        // //jika approve import selesai dan berhasil                          
+                        // //jika approve import selesai dan berhasil
                         // }else if(this.importStatus.status==0 && oldStatus.status == 6 && !firstLoad){
-                            
+
                         //     this.$emit('on-approve-finish',this.importStatus);
 
                         //     this.importStatus = oldStatus;
                         //     this.Web.showAlert({text: "Proses Approve selesai.",type: "success"});
-                        // //jika pembatalan import selesai dan berhasil                          
+                        // //jika pembatalan import selesai dan berhasil
                         // }else if(this.importStatus.status==0 && oldStatus.status == 8 && !firstLoad){
-                            
+
                         //     this.$emit('on-cancel-finish',this.importStatus);
 
                         //     this.importStatus = oldStatus;
@@ -318,7 +318,7 @@
                         //jika status 0 berarti sudah tidak ada proses
                         }else{
                             this.importFile = null;
-                        }                      
+                        }
                     }).catch((res)=>{
                         this.Web.showAlert({text: this.Trans.get('lang.import.alert.access_failed')+" : " + res.message,type: "warning"});
                     });
