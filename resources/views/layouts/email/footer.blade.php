@@ -4,8 +4,8 @@
 			<tr>
 				<td style="direction:ltr;font-size:0px;padding:20px 0;text-align:center;vertical-align:top;">
 				<!--[if mso | IE]>
-					<table role="presentation" border="0" cellpadding="0" cellspacing="0">                
-			<tr>      
+					<table role="presentation" border="0" cellpadding="0" cellspacing="0">
+			<tr>
 				<td style="vertical-align:bottom;width:600px;">
 				<![endif]-->
 					<div class="mj-column-per-100 outlook-group-fix" style="font-size:13px;text-align:left;direction:ltr;display:inline-block;vertical-align:bottom;width:100%;">
@@ -13,7 +13,7 @@
 							<tbody>
                                 <tr>
 									<td style="vertical-align:bottom;padding:0 0 10px 0; text-align: center; color: #999999; ">
-                                        <small>Jika Anda merasa tidak melakukan registrasi di {{$app_domain}}, silahkan hubungi kami.</small>
+                                        <small>Jika Anda merasa tidak melakukan registrasi di smartcoop, silahkan hubungi kami.</small>
 									</td>
 								</tr>
 								<tr>
@@ -25,8 +25,8 @@
 						</table>
 					</div>
 						<!--[if mso | IE]>
-					</td>          
-				</tr>      
+					</td>
+				</tr>
 						</table>
 					<![endif]-->
 				</td>
