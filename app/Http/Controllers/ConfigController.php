@@ -69,12 +69,18 @@ class ConfigController extends BaseController
      *
      * @param Request $request
      *      data array list data config yang akan di create / update
+     *          name
+     *          value
+     *          group
+     *          key
      *
      * @return array list data config
      */
     public function createUpdate(Request $request)
     {
         $tenantId = $request->input('tenant_id', config('tenant.id', 0));
+        $groupWhere = [];
+        $keyWhere = [];
         if ($data = $request->input('data', false)) {
             foreach ($data as $value) {
                 $updateData = [];
@@ -86,6 +92,8 @@ class ConfigController extends BaseController
                     $model = MConfig::where('group', $value['group'])
                         ->where('key', $value['key'])
                         ->where('tenant_id', $tenantId);
+                    $groupWhere[] = $value['group'];
+                    $keyWhere[] = $value['key'];
                     if ($model->exists()) {
                         $model->update($updateData);
                     } else {
@@ -98,7 +106,10 @@ class ConfigController extends BaseController
             }
         }
 
-        return response()->json(MConfig::get());
+        return response()->json(MConfig::where('tenant_id', $tenantId)
+            ->whereIn('group', $groupWhere)
+            ->whereIn('key', $keyWhere)
+            ->get());
     }
 
     /**

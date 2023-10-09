@@ -35,23 +35,15 @@ class RouteServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->bootMigration();
         } else if (config('AppConfig.system.multitenant.active', false)) {
-            //detect app_group mmulti tenant
-            $this->AppGroupCheck();
+            // set storage config
+            $this->bootStorage();
         }
 
         parent::boot();
     }
 
-    private function AppGroupCheck()
+    private function bootStorage()
     {
-        if (config('AppConfig.system.multitenant.detect_mode', 1) == 1) {
-            // jika detect by subfolder
-            \App\Facades\Tenant::setActiveTenantByGroup();
-        } else {
-            // jika detect by subdomain/domain
-            \App\Facades\Tenant::setActiveTenantByDomain();
-        }
-
         // tambah prefix untuk multi tenant
         $tmpConfig = config('filesystems.disks.local');
         $tmpConfig['root_old'] = $tmpConfig['root'];

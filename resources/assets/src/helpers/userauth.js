@@ -16,6 +16,9 @@ export default {
     isWebdev() {
         return this.store.getters.isLogin && this.store.state.auth.role_code == 'webdev' ? true : false;
     },
+    isWebdevLevel() {
+        return this.store.getters.isLogin && parseInt(this.store.state.auth.user.level) === 0 ? true : false;
+    },
     //implement acl role user yang online ke navside menu
     implementAcl() {
         return this.store.dispatch('implementAcl');

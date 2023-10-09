@@ -26,27 +26,32 @@ export default {
                 return this.store.state.storeRepo.data[this.module].oneData;
             },
             //
-            readList(params) {
+            readList(params={}) {
                 params.module = this.module;
                 return this.store.dispatch("storeRepo/readList", params);
             },
-            readOne(params) {
+            readOne(params={}) {
                 params.module = this.module;
                 return this.store.dispatch("storeRepo/readOne", params);
             },
-            create(params) {
+            create(params={}) {
                 params.module = this.module;
                 return this.store.dispatch("storeRepo/create", params);
             },
-            update(params) {
+            update(params={}) {
                 params.module = this.module;
                 return this.store.dispatch("storeRepo/update", params);
             },
-            delete(params) {
+            delete(params={}) {
                 params.module = this.module;
                 return this.store.dispatch("storeRepo/delete", params);
             },
             //
+            method(methodName,params={}) {
+                params.module = this.module;
+                params.methodName = methodName;
+                return this.store.dispatch("storeRepo/method", params);
+            }
         }
     }
 }

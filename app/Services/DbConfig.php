@@ -103,7 +103,7 @@ class DbConfig extends BaseRepository
                 $default = $data['value'];
             }
         } else {
-            if ($default != null && $saveDefault && $key) {
+            if (!is_null($default) && $saveDefault && $key) {
                 if ($castAsArray) {
                     $this->_setConfig($group, $key, json_encode($default), $tenantId);
                 } else {

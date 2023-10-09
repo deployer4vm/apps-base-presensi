@@ -172,6 +172,8 @@ $connections = [
     'mysql' => $mysqlBaseConnection,
     'mysql0' => $mysqlBaseConnection,
 
+    'mysqlscv1' => $mysqlBaseConnection,
+
     //config data per tenant
     'mysqlPerTenant' => $mysqlPerTenant,
 
@@ -300,7 +302,7 @@ $config = [
 $i = 1;
 while (env('DB_ADDS_' . $i . '_CONNECTION', false)) {
     if(
-        !isset($config[env('DB_ADDS_' . $i . '_CONNECTION')]) && 
+        !isset($config[env('DB_ADDS_' . $i . '_CONNECTION')]) &&
         !isset($connections[env('DB_ADDS_' . $i . '_CONNECTION')])
     ){
         $config[env('DB_ADDS_' . $i . '_CONNECTION')] = env('DB_ADDS_' . $i . '_CONNECTION');

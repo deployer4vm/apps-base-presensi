@@ -1082,7 +1082,7 @@ class Import extends BaseRepository
                 $this->setImportCancelSuccess($cacheKey);
             return true;
         } else {
-            // $this->setImport($cacheKey);
+            $this->setImportCancelFailed($cacheKey);
             $this->error = 'Data import yang bisa dibatalkan tidak ditemukan';
             return false;
         }
@@ -1133,6 +1133,25 @@ class Import extends BaseRepository
         $importData['log'] .= '<span class="text-info">Jobs ended at : <b>'
             . now()->format('Y-m-d H:i:s') . '</b></span>';
         $importData['status'] = self::IMPORT_STATUS_CANCEL_APPROVE_SUCCESS; //8 process cancel approve import berhasil
+        $this->updateImport($cacheKey, $importData);
+        return true;
+    }
+    
+    /**
+     * Set Status for Cancelling Import to failed
+     *
+     * @param string $cacheKey
+     * @return boolean false = Data Import tidak ada
+     */
+    protected function setImportCancelFailed($cacheKey)
+    {
+        $importData = $this->getImport($cacheKey);
+        if ($importData == false) return false;
+
+        $importData['log'] .= '<br><b class="text-danger">Cancel Import Failed !</b><br>';
+        $importData['log'] .= '<span class="text-info">Jobs ended at : <b>'
+            . now()->format('Y-m-d H:i:s') . '</b></span>';
+        $importData['status'] = self::IMPORT_STATUS_FAILED; //4 process cancel approve import berhasil
         $this->updateImport($cacheKey, $importData);
         return true;
     }

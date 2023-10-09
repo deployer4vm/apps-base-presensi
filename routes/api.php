@@ -83,7 +83,7 @@ Route::match(['post','get'],config('AppConfig.system.editor_endpoint.filemanager
 
 $group = [
     'prefix' => config('AppConfig.system.post_ref_endpoint','/sys/postref'),
-    // 'middleware' => 'auth:api'
+    'middleware' => 'auth:api'
 ];
 Route::group($group,function(){  
     // register 1 post ref id

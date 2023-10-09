@@ -1,7 +1,7 @@
 import globals from "@/globals";
 
 const state = {
-    // persistant: true, jika ingin store ini disave di local storage
+    persistant: true, //jika ingin store ini disave di local storage
 
     allConfig: {},
     formatedConfig: {},
@@ -25,7 +25,6 @@ const mutations = {
     setConfig(state, allConfig) {
         state.allConfig = allConfig;
         state.isConfigSet = true; 
-        // console.log(allConfig);
         
         _.forEach(allConfig, (value, index) => {            
             if(state.formatedConfig[value.group]==undefined)
@@ -34,13 +33,6 @@ const mutations = {
             state.formatedConfig[value.group][value.key] = value.value; 
             
         });  
-
-        // _.forEach(state.allConfig, (value, index) => {            
-        //     if(state.formatedConfig[value.group]==undefined)
-        //         state.formatedConfig[value.group] = {};
-
-        //     state.formatedConfig[value.group][value.key] = value.value;          
-        // }); 
             
         // const now = new Date()
         // const expirationDate = new Date(now.getTime() + res.data.expiresIn * 1000)
@@ -52,8 +44,8 @@ const actions = {
     reloadConfig({commit,getters},data={}){
 
         var saveState = data.saveState;
-        if(data.saveState)
-            delete data.saveState;
+        // if(data.saveState)
+        delete data.saveState;
 
         return globals()
             .LocalApi.get(getters.apiEndpoint,{params: data}).then((val)=>{
@@ -61,7 +53,7 @@ const actions = {
                 if(saveState==undefined||saveState)
                     commit('setConfig',val.data);   
                                
-                return true;
+                return val.data;
             }).catch((err)=>{
                 console.log('Config file error.',err);
             });

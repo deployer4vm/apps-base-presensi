@@ -56,8 +56,10 @@ mix.webpackConfig({
  |--------------------------------------------------------------------------
  */
 
+let assetPath = "resources/assets/";
+
 function mixAssetsDir(query, cb) {
-    (glob.sync("resources/assets/" + query) || []).forEach(f => {
+    (glob.sync(query) || []).forEach(f => {
         f = f.replace(/[\\\/]+/g, "/");
         cb(f, path.normalize(f.replace("resources/assets", publicPath + "/dist")));
     });
@@ -70,17 +72,17 @@ const sassOptions = {
 
 // Core javascripts
 if(systemVar.web_admin.web || systemVar.web_admin.full_vue)
-    mixAssetsDir("vendor/js/**/*.js", (src, dest) => mix.scripts(src, dest));//web & full vue
+    mixAssetsDir(assetPath+"vendor/js/**/*.js", (src, dest) => mix.scripts(src, dest));//web & full vue
 if(systemVar.web_admin.web)
-    mixAssetsDir("vendor/webjs/**/*.js", (src, dest) => mix.scripts(src, dest));//web
+    mixAssetsDir(assetPath+"vendor/webjs/**/*.js", (src, dest) => mix.scripts(src, dest));//web
 
 // Web Libs
 if(systemVar.web_admin.web){
-    mixAssetsDir(
+    mixAssetsDir(assetPath+
         'vendor/weblibs/**/*.js', 
         (src, dest) => mix.scripts(src, dest)
     );//web
-    mixAssetsDir(
+    mixAssetsDir(assetPath+
         'vendor/weblibs/**/!(_)*.scss', 
         (src, dest) => mix.sass(src, dest.replace(/\.scss$/, '.css'), sassOptions)
     );//web
@@ -89,8 +91,8 @@ if(systemVar.web_admin.web){
 
 // Fonts
 if(systemVar.web_admin.web || systemVar.web_admin.full_vue) {
-    mixAssetsDir("vendor/fonts/*.css", (src, dest) => mix.copy(src, dest));
-    mixAssetsDir("vendor/fonts/*/*", (src, dest) => mix.copy(src, dest));
+    mixAssetsDir(assetPath+"vendor/fonts/*.css", (src, dest) => mix.copy(src, dest));
+    mixAssetsDir(assetPath+"vendor/fonts/*/*", (src, dest) => mix.copy(src, dest));
 }
 
 /*
@@ -241,6 +243,7 @@ if(systemVar.web_admin.web){
     mix.js("resources/assets/src/web-entry-point.js", "dist/webapp.js").version();//web
     mix.copyDirectory("resources/assets/vendor/webcss", publicPath + "/dist/vendor/webcss")//web
 }
+
 // Core Stylesheets
 
 if(systemVar.web_admin.web || systemVar.web_admin.full_vue) {
@@ -281,6 +284,18 @@ if(systemVar.web_admin.web || systemVar.web_admin.full_vue) {
     .copyDirectory("resources/assets/src/inlinevue", publicPath + "/dist/inlinevue")//web & full vue
     .copyDirectory("resources/assets/vendor/libs", publicPath + "/dist/vendor/libs");//web & full vue
 }
+
+// copy semua assets di module2 di MainApp
+(glob.sync("app/MainApp/Modules/*/resources/assets") || []).forEach(f => {
+    f = f.replace(/[\\\/]+/g, "/");
+    mix.copyDirectory(f, path.normalize(publicPath + "/assets"));
+});
+
+// copy semua assets di module2 di composer package
+(glob.sync("vendor/hp-synapse/*/src/resources/assets") || []).forEach(f => {
+    f = f.replace(/[\\\/]+/g, "/");
+    mix.copyDirectory(f, path.normalize(publicPath + "/assets"));
+});
 
 if(systemVar.web_admin.full_vue){
     mix.sass("resources/assets/src/style.scss", "dist/css/style.css")//full vue
