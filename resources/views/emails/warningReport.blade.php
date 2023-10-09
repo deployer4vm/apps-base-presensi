@@ -7,7 +7,7 @@
         <h2 style="margin: 0;padding: 0 30px;">Smart Coop</h2>
     </div>
     <div style="font-size:14px;line-height:22px;color:#555555;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;text-align:left;">
-        <p style="margin: 0;padding: 0 30px;">ini kode OTP anda <strong>{!! $otp !!}</strong>.</p>
+        <p style="margin: 0;padding: 0 30px;">ini kode OTP anda <strong>{!! $otp !!}</strong></p>
     </div>
 </div>
 @endsection
