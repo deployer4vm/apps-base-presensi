@@ -39,9 +39,10 @@
         </b-form-group> -->
 
         <div class="text-right">
-            <b-btn variant="success" @click="uploadImpoart()"
+            <b-btn variant="success btn-sm w-icon" @click="uploadImpoart()"
                 :disabled="!canUpload">
-                <i class="fi fi-rs-upload"></i> &nbsp; {{ Trans.get('lang.upload') }}
+                <i class="fi fi-rs-cloud-upload"></i>
+                <span>{{ Trans.get('lang.upload') }}</span>
             </b-btn>
         </div>
 
