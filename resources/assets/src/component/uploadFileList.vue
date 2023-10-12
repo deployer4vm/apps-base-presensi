@@ -10,7 +10,7 @@
             </div>
 
             <b-dd v-if="!disabled" size="sm" split :right="isRTL" @click="$refs[refID].$el.querySelector('input').click()">
-                <template slot="button-content"> <i class="ion ion-md-add"></i> Add Files </template>
+                <template slot="button-content"> <i class="fi fi-rs-add"></i> Add Files </template>
                 <b-dd-item v-if="multiple" @click="onAddFolder">Add folder</b-dd-item>
             </b-dd>
         </div> -->
