@@ -75,8 +75,9 @@
                         <span class="ion ion-md-cloud-download"></span> &nbsp; {{ Trans.get('lang.import.label.download_format') }}
                     </b-btn>
 
-                    <b-btn v-if="apiImportFileFormatInfo" variant="success" @click="showInfoUpload">
-                        <span class="ion ion-md-information-circle-outline"></span> {{ Trans.get('lang.import.label.guide') }}
+                    <b-btn v-if="apiImportFileFormatInfo" variant="success btn-sm w-icon" @click="showInfoUpload">
+                        <i class="fi fi-rs-info"></i>
+                        <span> {{ Trans.get('lang.import.label.guide') }}</span>
                     </b-btn>
 
                     <div><i>{{ Trans.get('lang.import.label.guide_description') }}</i></div>
