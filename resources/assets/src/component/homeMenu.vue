@@ -44,7 +44,7 @@
                 <b-card-body class="px-3 pt-3 pb-0">
                     <b-container fluid>
                         <div class="row">
-                            <div class="col-md-3" v-for="(data, j) in item.list" :key="j">
+                            <div class="col-md-6 col-lg-4 col-xl-3" v-for="(data, j) in item.list" :key="j">
                                 <router-link
                                     :to="{name: data.route.name}" v-if="data.route"
                                     class="card bg-hover-gradient card-bordered shadow-none gr-purple mb-3 h-100">
