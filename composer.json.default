@@ -123,6 +123,14 @@
             }
         },
         {
+            "name": "hp-synapse/mod-asset",
+            "type": "path",
+            "url": "../mod-asset",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
             "name": "hp-synapse/mod-coop-sp",
             "type": "path",
             "url": "../mod-coop-sp",
