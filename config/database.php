@@ -172,7 +172,8 @@ $connections = [
     'mysql' => $mysqlBaseConnection,
     'mysql0' => $mysqlBaseConnection,
 
-    'mysqlscv1' => $mysqlBaseConnection,
+    // DO NOT EDIT : TIDAK BOLEH UNCOMMENT 'mysqlscv1' => $mysqlBaseConnection,
+    // 'mysqlscv1' => $mysqlBaseConnection,
 
     //config data per tenant
     'mysqlPerTenant' => $mysqlPerTenant,
