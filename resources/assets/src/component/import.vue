@@ -23,6 +23,7 @@
                         accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                         v-model="importFile"
                         :disabled="!canUpload"
+
                     ></b-file>
                     <b-input-group-append v-if="importFile">
                         <b-btn variant="danger btn-md md-btn-flat" @click="importFile=null">
@@ -68,11 +69,12 @@
                 </div>
                 <!-- download format file -->
                 <div class="col text-right" v-if="isFileFormat && apiUrl.formatFile">
-                    <b-btn variant="info" @click="download(
+                    <b-btn variant="info" class="btn-sm w-icon" @click="download(
                         apiUrl.formatFile,
                         apiImportFileFormatFilename?apiImportFileFormatFilename:'Import Format File.xlsx'
                     )">
-                        <span class="ion ion-md-cloud-download"></span> &nbsp; {{ Trans.get('lang.import.label.download_format') }}
+                        <i class="fi fi-rs-cloud-download"></i>
+                        <span>{{ Trans.get('lang.import.label.download_format') }}</span>
                     </b-btn>
 
                     <b-btn v-if="apiImportFileFormatInfo" variant="success btn-sm w-icon" @click="showInfoUpload">
