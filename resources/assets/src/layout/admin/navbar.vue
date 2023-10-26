@@ -68,31 +68,36 @@
                             </div>
                         </span>
                     </template>
-
-                    <b-dd-item v-if="AppConfig.isModuleEnable('moduser')" :to="(typeof AppConfig.packageLocal.moduser.user_profiles.custom_link.name != 'undefined') ? AppConfig.packageLocal.moduser.user_profiles.custom_link : {name: 'myprofile'}">
-                        <i class="fi fi-rr-man-head"></i>
-                        &nbsp; {{ Trans.get('user.my_profile') }}
-                    </b-dd-item>
-
-                    <template v-if="AppConfig.isModuleEnable('moduser') && AppConfig.packageLocal.moduser.user_role.multi_role==1 && UserAuth.getAuthRoleCount()>1">
-                        <b-dd-divider />
-                        <b-dd-item v-for="role in UserAuth.getAuthRoleList()" @click="changeRole(role.role_code)" :key="'header-chose-role-' + role.id">
-                            <i :class="{ion:true, 'ion-md-radio-button-on': ActiveRoleCode==role.role_code, 'ion-md-radio-button-off': ActiveRoleCode!=role.role_code, 'text-success':true}"></i> &nbsp; {{role.name}}
+                    <template v-if="AppConfig.isModuleEnable('moduser')">
+                        <b-dd-item :to="(typeof AppConfig.packageLocal.moduser.user_profiles.custom_link.name != 'undefined') ? AppConfig.packageLocal.moduser.user_profiles.custom_link : {name: 'myprofile'}">
+                            <i class="fi fi-rr-man-head"></i>
+                            &nbsp; {{ Trans.get('user.my_profile') }}
                         </b-dd-item>
+
+                        <!-- list role -->
+                        <template v-if="AppConfig.packageLocal.moduser.user_role.multi_role==1 && UserAuth.getAuthRoleCount()>1">
+                            <b-dd-divider />
+                            <template v-for="role in UserAuth.getAuthRoleList()">
+                                <b-dd-item v-if="role.role_type!=2" @click="changeRole(role.role_code)" :key="'header-chose-role-' + role.id">
+                                    <!-- hanya tampilkan role tipe login -->
+                                    <i :class="{ion:true, 'ion-md-radio-button-on': ActiveRoleCode==role.role_code, 'ion-md-radio-button-off': ActiveRoleCode!=role.role_code, 'text-success':true}"></i> &nbsp; {{role.name}}
+                                </b-dd-item>
+                            </template>
+                            <b-dd-divider />
+                        </template>
+
+                        <b-dd-item v-if="showNotif" :to="{name: 'notification'}">
+                            <i class="fi fi-rr-bell"></i>
+                            &nbsp; {{ Trans.get('notif.notification_title') }}
+                        </b-dd-item>
+
                         <b-dd-divider />
+
+                        <b-dd-item v-if="AppConfig.isModuleEnable('moduser')" @click="UserAuth.logout()">
+                            <i class="fi fi-rr-sign-out-alt text-danger"></i>
+                            &nbsp; {{ Trans.get('auth.logout') }}
+                        </b-dd-item>
                     </template>
-
-                    <b-dd-item v-if="AppConfig.isModuleEnable('moduser') && showNotif" :to="{name: 'notification'}">
-                        <i class="fi fi-rr-bell"></i>
-                        &nbsp; {{ Trans.get('notif.notification_title') }}
-                    </b-dd-item>
-
-                    <b-dd-divider />
-
-                    <b-dd-item v-if="AppConfig.isModuleEnable('moduser')" @click="UserAuth.logout()">
-                        <i class="fi fi-rr-sign-out-alt text-danger"></i>
-                        &nbsp; {{ Trans.get('auth.logout') }}
-                    </b-dd-item>
 
                     <template v-if="AppConfig.system.mode=='dev'">
                         <b-dd-divider />

@@ -77,7 +77,31 @@ class StorageController extends BaseController
                 break;
         }
 
-        return 'file not found';
+        return $this->serveNotFound($fullFilePath);
+    }
+
+    private function serveNotFound($path)
+    {
+        // jika gambar maka serve default
+        if(strpos(strtolower($path),'image')!==false){
+            $fileName = 'image-not-found.jpg';
+            $fullFilePathTmp = resource_path('assets/images/default/default.jpg');
+
+            $mime = $this->getMime($fileName);
+            $hash = sha1($fullFilePathTmp);
+            $this->filemtime = filemtime($fullFilePathTmp);
+            $gmtMtime = gmdate('D, d M Y H:i:s', $this->filemtime) . ' GMT';
+    
+            $this->setHeader($hash, $gmtMtime);
+    
+            header("Expires: " . gmdate('D, d M Y H:i:s \G\M\T', time() + 31536000));
+            header("Content-disposition: inline; filename=" . $fileName);
+            header("Content-type: " . $mime);
+
+            exit(file_get_contents($fullFilePathTmp));
+        }else{
+            abort(404);
+        }
     }
 
     /**
@@ -98,7 +122,8 @@ class StorageController extends BaseController
                 return $this->serverDownload($fullFilePath, $fileName, $request->input('size', false));
             }
         }
-        return 'file not found';
+
+        return $this->serveNotFound($fullFilePath);
     }
 
     /**
@@ -108,7 +133,6 @@ class StorageController extends BaseController
      * @param string $gmtMtime File Modified Time
      * @return void
      */
-
     private function setHeader($hash, $gmtMtime)
     {
         header("Cache-Control: public, max-age: 2592000");

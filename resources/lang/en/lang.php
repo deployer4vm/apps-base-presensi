@@ -15,6 +15,7 @@ return [
     //-- general button caption
     'save_change' => 'Save Changes',
     'save' => 'Save',
+    'submit' => 'Submit',
     'change' => 'Change',
     'reset' => 'Reset',
     'cancel' => 'Cancel',

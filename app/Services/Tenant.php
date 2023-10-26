@@ -597,6 +597,7 @@ class Tenant extends BaseRepository
     {
         //jika database belum ada maka tolak
         if (!$this->dbExists($tenantId)) {
+            $this->error = 'Database tenant '.$tenantId.' not found';
             return false;
         }
 

@@ -15,6 +15,7 @@ return [
     //-- general button caption
     'save_change' => 'Simpan Perubahan',
     'save' => 'Simpan',
+    'submit' => 'Submit',
     'change' => 'Ubah',
     'reset' => 'Reset',
     'cancel' => 'Batal',

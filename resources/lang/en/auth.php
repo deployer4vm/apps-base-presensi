@@ -16,4 +16,11 @@ return [
     'failed' => 'These credentials do not match our records.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
 
+    'form_otp'=>[
+        // general label
+        'desc' => 'Kode OTP telah dikirim ke :channel Anda. OTP akan hangus dalam <b>:timeout menit</b>.',
+        'otp_hangus_desc' => 'OTP telah hangus, silahkan kirim ulang OTP',
+        'btn_otp_resend_otp' => 'Kirim OTP',
+        'input_otp' => 'Masukan OTP',
+    ]
 ];

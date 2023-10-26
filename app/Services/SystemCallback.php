@@ -14,6 +14,13 @@ use hpsynapse\moduser\Models\User;
 
 class SystemCallback
 {
+    protected $error = '';
+    
+    public function error()
+    {
+        return $this->error;
+    }
+
     /**
      * @param Array $data
      *      callback_id
@@ -30,6 +37,11 @@ class SystemCallback
             !isset($data['callback_url']) ||
             !isset($data['data'])
         ){
+            $this->error = 'Parameter tidak lengkap.';
+            Log::info([
+                'secureCallBack Fail : '.$this->error,
+                $data
+            ]);
             return false;
         }
 
@@ -74,17 +86,31 @@ class SystemCallback
             $tmpData = $data['data'];
             $data['data'] = json_encode($data['data'],JSON_PRESERVE_ZERO_FRACTION);
             
-            if(empty($data['data']))
+            if(empty($data['data'])){
+                $this->error = 'Encode data failed.';
+                Log::info([
+                    'secureCallBack Fail : '.$this->error,
+                    $tmpData,
+                    $data['data']
+                ]);
                 return false;
+            }
 
             $return = $this->sendCallBack($data,$user->toArray(),$callbackData);
             MSystemCallback::where('id',$callbackData->id)->update([
                 'status'=>$return?1:0//update status gagal tidak nya
             ]);
-            
+
+            $this->error = '';
             return MSystemCallback::with(['log'])->where('id',$callbackData->id)->first()->toArray();
         }
 
+        $this->error = 'User System Not Found.';
+        Log::info([
+            'secureCallBack Fail : '.$this->error,
+            $data['system_user_id'],
+            $user
+        ]);
         return false;
     }
 
