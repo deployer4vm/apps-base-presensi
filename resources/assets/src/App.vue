@@ -1,12 +1,14 @@
 <template>
     <div id="app">
-        <transition name="fade">
-            <router-view :key="$route.fullPath"></router-view>
-        </transition>
-        
-        <BlockUI :message="message" :html="html" v-if="loading" />
-        <alert-modal />
+        <router-view :key="$route.fullPath"></router-view>
 
+        <!-- <transition name="fade">
+            <router-view :key="$route.fullPath"></router-view>
+        </transition> -->
+
+        <BlockUI :message="message" :html="html" v-if="loading" />
+
+        <alert-modal />
         <notifications group="notifications-default" />
         <notifications group="notifications-top-left" position="top left" />
         <notifications group="notifications-top-center" position="top center" />
@@ -51,7 +53,7 @@ export default {
         }
     },
     data: () => ({
-        html: `
+        html_old: `
             <div class="sk-cube-grid sk-primary">
                 <div class="sk-cube sk-cube1"></div>
                 <div class="sk-cube sk-cube2"></div>
@@ -64,7 +66,7 @@ export default {
                 <div class="sk-cube sk-cube9"></div>
             </div>
         `,
-        html_old: `
+        html: `
             <div class="sk-circle sk-primary">
                 <div class="sk-circle1 sk-child"></div>
                 <div class="sk-circle2 sk-child"></div>
@@ -97,12 +99,12 @@ export default {
         // this.Web.setAdminTitle(this.$store.state.template.admin.title);
     },
     methods: {
-        appendCSS(){
-            let file = document.createElement('link');
-            file.lang = 'scss';
-            file.href = 'myfile.css';
-            document.head.appendChild(file);
-        }
+        // appendCSS(){
+        //     let file = document.createElement('link');
+        //     file.lang = 'scss';
+        //     file.href = 'myfile.css';
+        //     document.head.appendChild(file);
+        // }
     }
 }
 </script>

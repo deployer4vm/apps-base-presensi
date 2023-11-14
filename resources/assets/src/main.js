@@ -52,7 +52,7 @@ Vue.use(BootstrapVue);
 Vue.use(Toasted);
 
 // Required to enable animations on dropdowns/tooltips/popovers
-Popper.Defaults.modifiers.computeStyle.gpuAcceleration = false;
+Popper.Defaults.modifiers.computeStyle.gpuAcceleration = true;
 
 Vue.config.productionTip = false;
 
