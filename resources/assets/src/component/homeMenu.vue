@@ -51,10 +51,10 @@
                                     <b-card-body class="p-4">
                                         <div class="d-flex flex-column align-items-start">
                                             <div class="position-relative">
-                                                <i :class="data.icon + ' text-gd-purple'" style="font-size: 2.25rem;" /></i>
+                                                <i :class="data.icon + ' text-gd-purple'" style="font-size: 2rem;" /></i>
                                                 <b-badge variant="danger indicator" v-if="data.indicator">{{ data.indicator }}</b-badge>
                                             </div>
-                                            <div class="text-right card-title w-100">
+                                            <div class="text-right card-title w-100 mb-0">
                                                 <h5 class="m-0 mt-3">{{ data.title }}</h5>
                                                 <small class="text-muted">{{ data.description }}</small>
                                             </div>
@@ -68,9 +68,9 @@
                                     class="card bg-hover-gradient card-bordered shadow-none gr-purple mb-3 h-100">
                                     <b-card-body class="p-4">
                                         <div class="d-flex flex-column align-items-start">
-                                            <i :class="data.icon + ' text-gd-purple'" style="font-size: 2.25rem;" /></i>
+                                            <i :class="data.icon + ' text-gd-purple'" style="font-size: 2rem;" /></i>
                                             <b-badge variant="danger indicator" v-if="data.indicator">{{ data.indicator }}</b-badge>
-                                            <div class="text-right card-title w-100">
+                                            <div class="text-right card-title w-100 mb-0">
                                                 <h5 class="m-0 mt-3">{{ data.title }}</h5>
                                                 <small class="text-muted">{{ data.description }}</small>
                                             </div>
