@@ -41,7 +41,7 @@ class DbConfig extends BaseRepository
             $key,
             $default,
             $saveDefault,
-            config('tenant.id', $this->tenantId),
+            $this->tenantId?$this->tenantId:config('tenant.id', 0),
             $castAsArray
         );
     }
@@ -125,7 +125,11 @@ class DbConfig extends BaseRepository
      */
     public function listConfig($group, $returnValue = false)
     {
-        return $this->_listConfig($group, config('tenant.id', $this->tenantId), $returnValue);
+        return $this->_listConfig(
+            $group, 
+            $this->tenantId?$this->tenantId:config('tenant.id', 0), 
+            $returnValue
+        );
     }
 
     /**
@@ -250,7 +254,7 @@ class DbConfig extends BaseRepository
     public function deleteConfig(string $group, string $key)
     {
         return $this->_delete(new Mconfig, [
-            ['tenant_id', config('tenant.id', $this->tenantId)],
+            ['tenant_id', $this->tenantId?$this->tenantId:config('tenant.id', 0)],
             ['group', $group],
             ['key', $key],
         ]);
