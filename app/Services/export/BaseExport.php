@@ -1061,7 +1061,7 @@ class BaseExport extends BaseRepository
      * fungsi chunk hasil query dengan limit, default eloquent laravel tidak bisa
      * menggabungkan fitur chunk dan limit, jadi bibuat work arround nya
      */
-    private function chunkWithLimit($model, $count, $offset = 0, $remaining = null, callable $callback)
+    private function chunkWithLimit($model, $count, $offset, $remaining, callable $callback)
     {
         do {
             if (!is_null($remaining)) {

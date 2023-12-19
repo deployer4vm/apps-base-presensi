@@ -563,8 +563,8 @@ trait ResExportTrait
     private function chunkWithLimit(
         $model,
         $count,
-        $offset = 0,
-        $remaining = null,
+        $offset,
+        $remaining,
         callable $callback
     ) {
         do {
@@ -741,7 +741,7 @@ trait ResExportTrait
      *
      * @return array formatted rows
      */
-    public function formatExportExcelRow(array $row = [], int $rowNumber)
+    public function formatExportExcelRow(array $row, int $rowNumber)
     {
         $insertRow = [];
         $i = 0;
@@ -827,7 +827,7 @@ trait ResExportTrait
      *
      * @return array
      */
-    public function formatExportExcelRowAfter(array $insertRow = [], array $row = [], int $rowNumber)
+    public function formatExportExcelRowAfter(array $insertRow, array $row, int $rowNumber)
     {
         return $insertRow;
     }
