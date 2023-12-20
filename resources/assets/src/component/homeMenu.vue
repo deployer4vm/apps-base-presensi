@@ -67,12 +67,12 @@
                                     style="cursor: pointer;"
                                     class="card bg-hover-gradient card-bordered shadow-none gr-purple mb-3 h-100">
                                     <b-card-body class="p-4">
-                                        <div class="d-flex flex-column align-items-start">
+                                        <div class="d-flex flex-column justify-content-between">
                                             <i :class="data.icon + ' text-gd-purple'" style="font-size: 2rem;" /></i>
                                             <b-badge variant="danger indicator" v-if="data.indicator">{{ data.indicator }}</b-badge>
                                             <div class="text-right card-title w-100 mb-0">
                                                 <h5 class="m-0 mt-3">{{ data.title }}</h5>
-                                                <small class="text-muted">{{ data.description }}</small>
+                                                <small class="text-muted text-truncate d-block" style="max-width: 100%;">{{ data.description }}</small>
                                             </div>
                                         </div>
                                     </b-card-body>

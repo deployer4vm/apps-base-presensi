@@ -8,7 +8,7 @@
                     <i class="ion ion-md-menu text-large align-middle" />
                 </a>
             </b-navbar-nav>
-            <span class="app-brand-logo demo square">
+            <span class="app-brand-logo demo square py-2">
                 <img v-if="koperasi && koperasi.logo.length > 0" :src="`${uploadedUrl}${koperasi.logo[0].   filepath}`" alt="">
                 <img v-else :src="`${publicUrl}assets/images/koperasi_logo.png`" alt="">
             </span>

@@ -1,12 +1,15 @@
 <template>
     <nav class="layout-footer footer" :class="getLayoutFooterBg()">
         <div
-            class="container-fluid d-flex flex-wrap justify-content-between text-center p-0"
+            class="container-fluid d-flex flex-wrap justify-content-between text-center p-0 mt-3"
         >
             <div>
-                <span class="footer-text font-weight-bolder">{{
+                <!-- <span class="footer-text font-weight-bolder">{{
                     footerText
-                }}</span>
+                }}</span> -->
+                <span class="footer-text font-weight-bold">
+                    © Copyright 2023 <a href="https://smartcoop.id/" target="_blacnk" class="text-main">Smartcoop.id </a>
+                </span>
             </div>
             <div>
                 <template v-for="(menu, i) in footerMenu">
