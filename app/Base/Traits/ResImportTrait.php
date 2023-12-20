@@ -738,7 +738,7 @@ trait ResImportTrait
      * @param int $rowNumber data ke berepa yg sedang diproses
      *
      */
-    public function importReadExcelCall(array $row = [], int $rowNumber)
+    public function importReadExcelCall(array $row, int $rowNumber)
     {
         $this->appendImportLog('. ');
     }
@@ -752,7 +752,7 @@ trait ResImportTrait
      *
      * @return array
      */
-    public function formatImportExcelRow(array $row = [], array $header = [], int $rowNumber)
+    public function formatImportExcelRow(array $row, array $header, int $rowNumber)
     {
         $insertRow = [];
         $i = 0;
@@ -800,7 +800,7 @@ trait ResImportTrait
         array $insertRow = [],
         array $row = [],
         array $header = [],
-        int $rowNumber
+        int $rowNumber = 0
     ) {
         return $insertRow;
     }
