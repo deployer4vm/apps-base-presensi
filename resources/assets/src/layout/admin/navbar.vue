@@ -5,15 +5,15 @@
             <!-- Sidenav toggle -->
             <b-navbar-nav class="layout-sidenav-toggle d-lg-none align-items-lg-center mr-auto" v-if="sidenavToggle">
                 <a class="nav-item nav-link px-0 mr-lg-4" href="javascript:void(0)" @click="toggleSidenav">
-                    <i class="ion ion-md-menu text-large align-middle" />
+                    <i class="fi fi-rs-burger-menu"></i>
                 </a>
             </b-navbar-nav>
             <span class="app-brand-logo demo square py-2">
                 <img v-if="koperasi && koperasi.logo.length > 0" :src="`${uploadedUrl}${koperasi.logo[0].   filepath}`" alt="">
                 <img v-else :src="`${publicUrl}assets/images/koperasi_logo.png`" alt="">
             </span>
-            <div class="app-brand-text d-none d-lg-block  nav-item text-big font-weight-light line-height-1 opacity-50 mr-2 ml-3">|</div>
-            <h5 class="app-brand-text d-none d-lg-block  demo ml-2 mb-0">{{ title }}</h5>
+            <div class="app-brand-text d-none d-md-block  nav-item text-big font-weight-light line-height-1 opacity-50 mr-2 ml-3">|</div>
+            <h5 class="app-brand-text d-none d-md-block  demo ml-2 mb-0">{{ title }}</h5>
         </b-navbar-brand>
 
         <!-- Navbar toggle -->
