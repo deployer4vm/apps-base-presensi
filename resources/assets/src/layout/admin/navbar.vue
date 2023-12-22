@@ -1,13 +1,13 @@
 <template>
     <b-navbar toggleable="lg" :variant="getLayoutNavbarBg()" class="layout-navbar navbar-expand align-items-lg-center container-p-x" >
+        <!-- Sidenav toggle -->
+        <b-navbar-nav class="layout-sidenav-toggle d-lg-none align-items-lg-center" v-if="sidenavToggle">
+            <a class="nav-item nav-link px-0 mr-lg-4" href="javascript:void(0)" @click="toggleSidenav">
+                <i class="fi fi-rs-burger-menu"></i>
+            </a>
+        </b-navbar-nav>
         <!-- Brand saat mode mobile (tidak ada sidebar) -->
         <b-navbar-brand :to="{name : 'home'}" class="app-brand demo py-0 mr-4">
-            <!-- Sidenav toggle -->
-            <b-navbar-nav class="layout-sidenav-toggle d-lg-none align-items-lg-center mr-auto" v-if="sidenavToggle">
-                <a class="nav-item nav-link px-0 mr-lg-4" href="javascript:void(0)" @click="toggleSidenav">
-                    <i class="fi fi-rs-burger-menu"></i>
-                </a>
-            </b-navbar-nav>
             <span class="app-brand-logo demo square py-2">
                 <img v-if="koperasi && koperasi.logo.length > 0" :src="`${uploadedUrl}${koperasi.logo[0].   filepath}`" alt="">
                 <img v-else :src="`${publicUrl}assets/images/koperasi_logo.png`" alt="">

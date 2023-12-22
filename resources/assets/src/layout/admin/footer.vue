@@ -1,7 +1,7 @@
 <template>
     <nav class="layout-footer footer" :class="getLayoutFooterBg()">
         <div
-            class="container-fluid d-flex flex-wrap justify-content-between text-center p-0 mt-3"
+            class="container-fluid d-flex flex-wrap justify-content-between text-center pb-lg-0 pb-3"
         >
             <div>
                 <!-- <span class="footer-text font-weight-bolder">{{
