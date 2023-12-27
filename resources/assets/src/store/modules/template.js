@@ -55,7 +55,9 @@ const state = {
         },
         sidenav: {
             show: true,
+            initHorizontal: globals().AppConfig.system.web_admin.sidenav_horizontal == 1 ? true : false,
             isHorizontal: globals().AppConfig.system.web_admin.sidenav_horizontal == 1 ? true : false,//jika null berarti ikut setingan template di system.json nya
+            verticalMaxWidth: globals().AppConfig.system.web_admin.sidenav_vertical_max_width?globals().AppConfig.system.web_admin.sidenav_vertical_max_width:0,
             menu: {},
             customMenu: {}
         },
@@ -104,11 +106,17 @@ const getters = {
     getCustomSidenavMenu(state) {
         return state.admin.sidenav.customMenu;
     },
+    getSidenavVerticalMaxWidth(state) {
+        return state.admin.sidenav.verticalMaxWidth;
+    },
     isSidenavShowed(state) {
         return state.admin.sidenav.show;
     },
     isSidenavHorizontal(state) {
         return state.admin.sidenav.isHorizontal;
+    },
+    initSidenavHorizontal(state) {
+        return state.admin.sidenav.initHorizontal;
     },
     //---------------body-------------------
     getBreadcrumb(state) {

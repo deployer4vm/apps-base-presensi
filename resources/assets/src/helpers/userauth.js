@@ -109,7 +109,6 @@ export default {
             name: "login",
             params: { group_app: this.store.getters.getTenantGroupApp }
         }).href);
-        // console.log('go to login : ', this.store.getters.getTenantGroupApp,' - ',this.store.state.tenant);
         this.router.push({
             name: "login",
             params: { group_app: this.store.getters.getTenantGroupApp }

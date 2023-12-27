@@ -137,14 +137,26 @@ export default {
         "app-layout-sidenav": sidenav,
         "app-layout-footer": footer
     },
+    data() {
+        return {
+            windowHeight: window.innerWidth,
+            lastSidenavHorizontal: false,
+        }
+    },
     mounted() {
         this.layoutHelpers.init();
         this.layoutHelpers.update();
         // this.layoutHelpers._bindSidenavMouseEvents();
         this.layoutHelpers.setAutoUpdate(true);
+        this.lastSidenavHorizontal = this.isSidenavHorizontal;
+        
+        this.$nextTick(() => {
+            window.addEventListener('resize', this.onResize);
+        })
     },
     beforeDestroy() {
         this.layoutHelpers.destroy();
+        window.removeEventListener('resize', this.onResize);
     },
     computed: {
         bodyWithPadding() {
@@ -183,6 +195,27 @@ export default {
         closeSidenav() {
             console.log('icloseSidenav clicked');
             this.layoutHelpers.setCollapsed(true);
+        },
+        onResize() {
+            this.windowWidth = window.innerWidth;
+            if(this.$store.getters.initSidenavHorizontal && this.$store.getters.getSidenavVerticalMaxWidth>0){
+                this.autoResponsive();
+            }
+        },
+        autoResponsive() {
+            // jika harus horizontal
+            if(this.windowWidth > this.$store.getters.getSidenavVerticalMaxWidth){
+                if(!this.lastSidenavHorizontal){
+                    this.lastSidenavHorizontal = true;
+                    this.Web.setSidenavHorizontal(true);
+                }
+            // jika harus vertikal
+            }else{
+                if(this.lastSidenavHorizontal){
+                    this.lastSidenavHorizontal = false;
+                    this.Web.setSidenavHorizontal(false);
+                }
+            }
         }
     }
 };

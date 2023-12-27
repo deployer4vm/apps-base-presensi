@@ -113,7 +113,7 @@ router.afterEach((to, from) => {
     ) {
         //jika tidak login dan mengakses halaman selain auth maka redirect ke halaman login
         if (!globals().UserAuth.isLogin() && !globals().Web.isAuthEdnpoint()) {
-            console.log('redirect ke login (from main router)');
+            console.log('redirect ke login (from main router)',globals().UserAuth.isLogin(),globals().Web.isAuthEdnpoint());
             globals().UserAuth.goToLogin();
             return;
             //jika sudah login tapi mengakses halaman auth maka redirect
