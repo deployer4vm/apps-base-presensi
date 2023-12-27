@@ -149,6 +149,7 @@ export default {
         // this.layoutHelpers._bindSidenavMouseEvents();
         this.layoutHelpers.setAutoUpdate(true);
         this.lastSidenavHorizontal = this.isSidenavHorizontal;
+        this.onResize();
         
         this.$nextTick(() => {
             window.addEventListener('resize', this.onResize);
