@@ -54,12 +54,12 @@
             var isOnTenantManager = {{ config('tenant.isOnTenantManager', false) ? 'true' : 'false' }};
             var tenantData = <?php echo json_encode(config('tenant', []), JSON_PRETTY_PRINT); ?>;
         @endif
-        var onIframe = {{  config('AppConfig.system.coop_var.force_on_iframe', 1) || request('onIframeConfig') ? 'true' : 'false' }};
-        @if (config('AppConfig.system.coop_var.force_on_iframe', 1) || isset($_GET['onIframeConfig']))
+        var onIframe = {{  config('AppConfig.system.coop_var.force_on_iframe', config()->has('AppConfig.system.coop_var')) || request('onIframeConfig') ? 'true' : 'false' }};
+        @if (config('AppConfig.system.coop_var.force_on_iframe', config()->has('AppConfig.system.coop_var')) || request('onIframeConfig'))
             var byPassViewConfig = {
-                showNavbar: {{ config('AppConfig.system.coop_var.force_on_iframe', 1) || request('onIframeConfig.showNavbar', 1) == 0 ? '0' : '1' }},
-                showSidenav: {{ config('AppConfig.system.coop_var.force_on_iframe', 1) || request('onIframeConfig.showSidenav', 1) == 0 ? '0' : '1' }},
-                showFooter: {{ config('AppConfig.system.coop_var.force_on_iframe', 1) || request('onIframeConfig.showFooter', 1) == 0 ? '0' : '1' }}
+                showNavbar: {{ config('AppConfig.system.coop_var.force_on_iframe', config()->has('AppConfig.system.coop_var')) || request('onIframeConfig.showNavbar', config()->has('AppConfig.system.coop_var')) == 0 ? '0' : '1' }},
+                showSidenav: {{ config('AppConfig.system.coop_var.force_on_iframe', config()->has('AppConfig.system.coop_var')) || request('onIframeConfig.showSidenav', config()->has('AppConfig.system.coop_var')) == 0 ? '0' : '1' }},
+                showFooter: {{ config('AppConfig.system.coop_var.force_on_iframe', config()->has('AppConfig.system.coop_var')) || request('onIframeConfig.showFooter', config()->has('AppConfig.system.coop_var')) == 0 ? '0' : '1' }}
             };
         @endif
         var first_login = {{ request('first_login') ? 'true' : 'false' }};
