@@ -257,7 +257,7 @@ if (isset($system['multitenant']['active'])
 $envEndpoint = $client['endpoint'][$system['mode']];
 
 $homeSlug = $envEndpoint['home_slug'] ?? '';
-$homeSlug = $homeSlug != '/' ? '/' . trim($homeSlug, '/') : '';
+$homeSlug = $homeSlug ? '/' . trim($homeSlug, '/') : '';
 
 //initiate config ednpoint.json
 $endpoint = [
