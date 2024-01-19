@@ -12,6 +12,8 @@ use App\Base\BaseController;
  */
 class StorageController extends BaseController
 {
+    private $filemtime = '';
+
     /**
      * Create a new controller instance.
      *
@@ -32,7 +34,7 @@ class StorageController extends BaseController
     {
         $segment = $request->segments();
         array_shift($segment); // buang segment "storage"
-
+        
         $fullFilePath = implode('/', $segment);
         // dd(Storage::path($fullFilePath));
         //isi segement di /storage/*
@@ -76,14 +78,13 @@ class StorageController extends BaseController
                 }
                 break;
         }
-
         return $this->serveNotFound($fullFilePath);
     }
 
     private function serveNotFound($path)
     {
         // jika gambar maka serve default
-        if(strpos(strtolower($path),'image')!==false){
+        if($this->isImage($path)){
             $fileName = 'image-not-found.jpg';
             $fullFilePathTmp = resource_path('assets/images/default/default.jpg');
 
@@ -102,6 +103,15 @@ class StorageController extends BaseController
         }else{
             abort(404);
         }
+    }
+
+    private function isImage($path)
+    {
+        return strpos(strtolower($path),'image')!==false 
+            || strpos(strtolower($path),'.jpg')!==false 
+            || strpos(strtolower($path),'.jpeg')!==false 
+            || strpos(strtolower($path),'.gif')!==false 
+            || strpos(strtolower($path),'.png')!==false;
     }
 
     /**

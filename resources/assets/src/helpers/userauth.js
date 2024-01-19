@@ -71,6 +71,16 @@ export default {
             });
         }
     },
+    // logout & reset local storage, lalu redirect ke halaman login
+    logoutAndReset() {
+        this.store.dispatch('logout');
+        var tmpLoginUrl = this.router.resolve({
+            name: "login",
+            params: { group_app: this.store.getters.getTenantGroupApp }
+        }).href; 
+        window.localStorage.clear();
+        window.location.href = tmpLoginUrl;
+    },
     //cek apakah sedang login atau tidak
     isLogin() {
         return this.store.getters.isLogin ? true : false;

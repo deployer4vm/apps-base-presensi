@@ -45,6 +45,10 @@ if (globals().AppConfig.system.web_serviceworker == 1) {
 
 // vue general global event bus
 window.EventBus = new Vue({ store });
+// general global synapse object
+window.Syn = {
+    firstStart:true, // to identify first hard reload
+};
 
 Vue.use(Vuelidate);
 Vue.use(Notifications);

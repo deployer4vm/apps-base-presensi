@@ -50,7 +50,7 @@ export default {
         return this.router.currentRoute.path == endpoint || this.router.currentRoute.path.indexOf(endpoint + '/') === 0;
     },
     //cek apakah 'path' adalah url auth endpoin di aplikasi 'app'
-    isAuthEdnpoint(path = null, app = "admin") {
+    isAuthEndpoint(path = null, app = "admin") {
         if (path == null) {
             path = this.router.currentRoute.path;
         }
@@ -58,6 +58,16 @@ export default {
         let atuhEndpoint = this.getEndpoint(this.endpoint[app]["auth"]);
         //cek apakah parameter auth yg diinputkan berarawalan path auth
         return path.indexOf(atuhEndpoint) === 0;
+    },
+    // cek apakah 'path' adalah url system
+    isSystemEndpoint(path = null) {
+        if (path == null) {
+            path = this.router.currentRoute.path;
+        }
+        //get url/path auth
+        let systemEndpoint = this.getEndpoint(this.endpoint.admin.app + '\/system');
+        //cek apakah parameter auth yg diinputkan berarawalan path auth
+        return path.indexOf(systemEndpoint) === 0;
     },
     //cek apakah halaman yang diakses sekarang admin area
     isAdminEndpoint(path = null, app = null) {

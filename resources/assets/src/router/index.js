@@ -1,5 +1,6 @@
 import Vue from "vue";
 import Router from "vue-router";
+import {START_LOCATION} from "vue-router";
 // import NProgress from 'node_modules/nprogress';
 import Meta from "vue-meta";
 // import authAxios from "axios";
@@ -49,7 +50,10 @@ const router = new Router({
 
 var _groupApp = '';
 router.afterEach((to, from) => {
-
+    
+    if (from !== START_LOCATION)
+        Syn.firstStart = false;
+    
     if (globals().AppConfig.system.multitenant.active) {
 
         if (tenantData == undefined) {
@@ -111,15 +115,18 @@ router.afterEach((to, from) => {
         globals().AppConfig.system.web_admin.protected_by_auth &&
         globals().Web.isAdminEndpoint()
     ) {
-        //jika tidak login dan mengakses halaman selain auth maka redirect ke halaman login
-        if (!globals().UserAuth.isLogin() && !globals().Web.isAuthEdnpoint()) {
-            console.log('redirect ke login (from main router)',globals().UserAuth.isLogin(),globals().Web.isAuthEdnpoint());
-            globals().UserAuth.goToLogin();
-            return;
-            //jika sudah login tapi mengakses halaman auth maka redirect
-        } else if (globals().UserAuth.isLogin() && globals().Web.isAuthEdnpoint()) {
-            globals().UserAuth.goToHome();
-            return;
+        // selain system endpoin cek session auth
+        if(!globals().Web.isSystemEndpoint()){
+            //jika tidak login dan mengakses halaman selain auth maka redirect ke halaman login
+            if (!globals().UserAuth.isLogin() && !globals().Web.isAuthEndpoint()) {
+                console.log('redirect ke login (from main router)',globals().UserAuth.isLogin(),globals().Web.isAuthEndpoint());
+                globals().UserAuth.goToLogin();
+                return;
+                //jika sudah login tapi mengakses halaman auth maka redirect
+            } else if (globals().UserAuth.isLogin() && globals().Web.isAuthEndpoint()) {
+                globals().UserAuth.goToHome();
+                return;
+            }
         }
 
         //jika berpindah tenant maka logout kan dahulu, jika hanya mengakses halaman utama maka redirect ke home
@@ -168,6 +175,7 @@ router.afterEach((to, from) => {
     globals().Web.setLoadingPage(false);
     // NProgress.done();
     EventBus.$emit('onAfterEach', { to, from });
+    
 });
 
 router.beforeEach((to, from, next) => {

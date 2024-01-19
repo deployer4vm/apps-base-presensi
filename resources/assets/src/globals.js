@@ -88,7 +88,7 @@ localapi.interceptors.response.use((response) => response, (error) => {
                 });
 
                 if (UserAuth.isLogin())
-                    UserAuth.logout(Web.isAuthEdnpoint() ? false : true);
+                    UserAuth.logout(Web.isAuthEndpoint() ? false : true);
 
                 localapi.showAllert = false;
                 //munculkan alert session expired hanya setelah 5 detik kemudian, jadi tidak ada pesan error bertubi-tubi
