@@ -14,7 +14,7 @@
         "box/spout": "dev-master",
         "doctrine/dbal": "^3.2",
         "dompdf/dompdf": "^2.0",
-        "endroid/qr-code": "^4.8",
+        "endroid/qr-code": "^5.0",
         "guzzlehttp/guzzle": "^7.7",
         "hp-synapse/mod-user": "dev-master",
         "hp-synapse/apps-manager": "dev-master",

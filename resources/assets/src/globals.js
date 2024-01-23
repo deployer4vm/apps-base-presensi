@@ -312,6 +312,9 @@ formater.maskedInputOnBlur = function (ev, emptyFormat) {
 
 export default function () {
     return {
+        // url domain utama + app path (jika ada)
+        mainDomainAppUrl: AppConfig.system.multitenant.main_domain + AppConfig.endpoint.admin.app + '/',
+
         // Public url
         publicUrl: AppConfig.system.public_url ? AppConfig.system.public_url : '/',
 
