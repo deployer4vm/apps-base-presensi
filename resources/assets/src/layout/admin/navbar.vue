@@ -59,7 +59,7 @@
                         <span class="d-inline-flex flex-lg-row-reverse align-items-center align-middle">
                             <div class="d-block ui-w-30 rounded-circle overflow-hidden box-avatar">
                                 <div class="thumb-img">
-                                    <img :src="`${publicUrl}assets/images/avatar.png`">
+                                    <img :src="`${publicUrl}` + UserAuth.getUser('avatar')">
                                 </div>
                             </div>
                             <div class="px-1 mr-lg-2 ml-2 ml-lg-0 d-none d-lg-block text-right line-height-1">
