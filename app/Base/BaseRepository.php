@@ -21,6 +21,8 @@ abstract class BaseRepository
     //list field yg dimasukan untuk search
     protected $searchField = ['name'];
 
+    protected $_tmpListData = [];
+
     protected $pagination = [
         'count' => 0,
         'offset' => 0,
