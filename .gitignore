@@ -30,3 +30,4 @@ package-lock.json
 composer.lock.bak
 error_log
 *.ini
+.DS_Store
