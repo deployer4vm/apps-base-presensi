@@ -169,7 +169,7 @@ return [
             'download_format' => 'Download Format File Import',
             'guide' => 'Panduan',
             'guide_description' => 'Silahkan download format file yang telah disediakan, dan jangan mengubah struktur kolom dan urutan baris data.',
-            'last_log' => 'Log import terkahir',
+            'last_log' => 'Log import terakhir',
             'empty_file' => 'belum ada file import',
             'approve' => 'Approve',
             'cancel' => 'Cancel Import',
