@@ -1,6 +1,6 @@
 <template>
     <div>
-
+            
         <div class="media align-items-center">
             <div class="ui-w-100 bg-light text-center rounded overflow-hidden">
                 <a :href="localImagePath" target="_blank" v-if="!isImageEmpty"><img :src="localImagePath" style="max-width: 100px; max-height: 100px;" /></a>
@@ -21,15 +21,15 @@
             style="display: none;"
             @change="onFileSelect"
         />
-
+        
         <!-- <VueCropper
             v-show="!isImageEmpty"
             ref="cropper"
             :src="selectedFile"
             alt="Source Image"
         ></VueCropper>
-
-        <b-modal size="md" scrollable centered id="crob-modals"
+        
+        <b-modal size="md" scrollable centered id="crob-modals" 
             @ok="saveImage"
             >
 
@@ -101,10 +101,10 @@ export default {
         };
     },
     watch: {
-        imagePath(){
-            if( typeof this.imagePath == 'string')
+        imagePath(){       
+            if( typeof this.imagePath == 'string')     
             if(this.imagePath){
-                this.localImagePath = this.publicUrl + this.uploadedUrl + "/" + this.imagePath;
+                this.localImagePath = this.publicUrl + 'upload/' + this.imagePath;            
                 this.isImageEmpty = false;
             }else{
                 this.localImagePath = this.publicUrl + this.defImage;
@@ -133,10 +133,10 @@ export default {
                     }
                 })
                 .then(res => {
-                    this.Web.showAlert({
+                    this.Web.showAlert({ 
                         title: this.Trans.get("alert.success_title"),
-                        text: this.Trans.get("alert.update_success",{attribute:this.fieldCaption}),
-                        type: "success"
+                        text: this.Trans.get("alert.update_success",{attribute:this.fieldCaption}), 
+                        type: "success" 
                     });
                 });
         },
@@ -149,10 +149,10 @@ export default {
             this.name = file.name;
 
             if(this.maxSize && this.size > this.maxSize){
-                this.Web.showAlert({
+                this.Web.showAlert({ 
                     title: this.Trans.get("alert.warning_title"),
-                    text: "Ukuran file melebihi batas, maksimal " + parseInt(this.maxSize/100) + " Kb",
-                    type: "warning"
+                    text: "Ukuran file melebihi batas, maksimal " + parseInt(this.maxSize/100) + " Kb", 
+                    type: "warning" 
                 });
                 return false;
             }
@@ -163,7 +163,7 @@ export default {
                     // this.selectedFile = event.target.result;
                     // // this.$bvModal.show("crob-modals");
                     // this.$refs.cropper.replace(event.target.result);
-                    this.localImagePath = event.target.result;
+                    this.localImagePath = event.target.result;                    
                     this.$emit("setValue", e.target.files[0]);
                     // jika set upload api maka saat set langsung upload (khusus jika cropper belum jalan)
                     // if(this.uploadApi)
@@ -195,13 +195,13 @@ export default {
     },
     created() {
         if(this.imagePath){
-            this.localImagePath = this.publicUrl + this.uploadedUrl + "/" + this.imagePath;
+            this.localImagePath = this.publicUrl + 'upload/' + this.imagePath;            
             this.isImageEmpty = false;
         }else{
             this.localImagePath = this.publicUrl + this.defImage;
         }
-
-        this.selectedFile = this.publicUrl + this.uploadedUrl + "/" + this.localImagePath;
+        
+        this.selectedFile = this.publicUrl + 'upload/' + this.localImagePath;
     }
 };
 </script>
