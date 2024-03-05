@@ -711,6 +711,24 @@ class Import extends BaseRepository
     }
 
     /**
+     * Update Add Param
+     *
+     * @param string $cacheKey
+     * @param array $addsParam
+     * 
+     * @return boolean false = Data Import tidak ada
+     */
+    public function updateAddsParam(string $cacheKey, array $addsParam): bool
+    {
+        $importData = $this->getImport($cacheKey);
+        if ($importData == false) return false;
+
+        $importData['addsParam'] = array_merge($importData['addsParam'], $addsParam);
+        $this->updateImport($cacheKey, $importData);
+        return true;
+    }
+
+    /**
      * -------------------------------------------------------------------------
      */
 
