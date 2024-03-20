@@ -80,7 +80,7 @@ class AppServiceProvider extends ServiceProvider
             //load alias class
             $tenantConfig = 'AppConfig.system.binding.tenant.' . $params['tenant_id'];
             if (config($tenantConfig . '.alias', false)) {
-                $this->app->booting(function () use ($params) {
+                $this->app->booting(function () use ($params,$tenantConfig) {
                     $loader = \Illuminate\Foundation\AliasLoader::getInstance();
                     foreach (config($tenantConfig . '.alias', []) as $classAliasName => $className) {
                         $loader->alias($classAliasName, $className);

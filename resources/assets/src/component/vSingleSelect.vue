@@ -87,7 +87,6 @@ export default {
         },
         'options': function(v) {
             this.setSelected(this.modelData);
-            // console.log('v-single-select Options : ',v);
         }
     },
     methods: {

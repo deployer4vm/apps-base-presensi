@@ -22,7 +22,9 @@ class DatabaseSeeder extends Seeder
         $namespaces = config('hpsynapse.namespaces.general',[]);
         $nameSpaceTenant = config('hpsynapse.namespaces.pertenant',[]);
         foreach ($nameSpaceTenant as $key => $value) {
-            $namespaces[] = $value;
+            foreach ($value as $key => $value2) {
+                $namespaces[] = $value2;
+            }
         }
         $modulePath = Utilities::listModulePath($namespaces, function($namespace,$pathToModule){              
             $moduleNamespace = explode('\\',trim($namespace,'\\'));
@@ -69,7 +71,7 @@ class DatabaseSeeder extends Seeder
             return;
         }
 
-        //jika mode nya 1 tenant 1 database
+        //jika mode nya 1 tenant 1 database atau 1 tenant beda table
         if(config('AppConfig.system.multitenant.active',false) && config('AppConfig.system.multitenant.data_mode',1)!=1){  
 
             $this->callPerTenant($runAbleSeeds); 
@@ -88,6 +90,9 @@ class DatabaseSeeder extends Seeder
 
     }
 
+    /**
+     * jika seed multi tenant
+     */
     public function callPerTenant($runAbleSeeds)
     {            
         ini_set('memory_limit','5524M');
@@ -133,7 +138,7 @@ class DatabaseSeeder extends Seeder
                         
                     // jika per table pake prefix nama table
                     }else{
-                        
+                        // TO DO - seed tenant per table
                     }
                 }
             }else{                
