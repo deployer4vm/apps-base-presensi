@@ -167,7 +167,8 @@ class BaseController extends LaravelBaseController
         if ($this->isWebCall() && $this->forceOutput != 2) {
             Session::put('alert', [
                 'type' => $type,
-                'message' => $message,
+                'message' => $this->output['message'],
+                'errors' => (array) $this->output['errors'],
             ]);
         }
     }

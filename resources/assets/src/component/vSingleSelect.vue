@@ -96,10 +96,11 @@ export default {
         onSearhChange(query){
             this.$emit('onSearhChange', query);
         },
-        setSelected(value) {     
-            this.modelDataTmp = this.options.find(function( d ) {
-                return d.value == value
-            });
+        setSelected(value) {  
+            if(this.options)   
+                this.modelDataTmp = this.options.find(function( d ) {
+                    return d.value == value
+                });
         }
     }
 };

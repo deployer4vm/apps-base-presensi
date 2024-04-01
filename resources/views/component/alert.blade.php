@@ -7,13 +7,15 @@ Session::save();
 $availbleAlert = ['success','info','warning','danger'];
 $alertType = in_array($alert['type'],$availbleAlert)?$alert['type']:'info';
 ?>
-<div class="alert alert-dark-{{ $errors->any()?'warning':$alertType }} alert-dismissible fade show my-4">
+<div class="alert alert-dark-{{ $alertType }} alert-dismissible fade show my-4">
 	<button type="button" class="close" data-dismiss="alert">×</button>
 	{!! $alert['message'] !!}
-	@if($errors->any())
+	@if($alert['errors'] && !isset($alert['errors'][0]))
 	<ul>
-	@foreach ($errors->all() as $error)
-		<li>{{ $error }}</li>
+	@foreach ($alert['errors'] as $key => $error)
+	@foreach ($error as $errorMessage)
+		<li>{{ $errorMessage }}</li>
+	@endforeach
 	@endforeach
 	</ul>
 	@endif
