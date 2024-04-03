@@ -90,7 +90,7 @@ router.afterEach((to, from) => {
                 //jika tenant berubah atau saat pertama kali akses
             } else {
                 console.log('load tenant baru : ', to.params);
-                globals().Web.loadTenant(_groupApp).then((val) => {
+                globals().Web.reloadTenant(_groupApp).then((val) => {
                     console.log('tenant baru : ', val);
                     EventBus.$emit('onTenantChange', val);
                     //jika tenant tidak ditemukan

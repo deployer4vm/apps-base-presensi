@@ -138,7 +138,7 @@ export default {
         }
     },
     //force reload tenant data from server
-    reLoadTenant(groupApp) {
+    reloadTenant(groupApp) {
         return this.store.dispatch('reloadTenant', groupApp).then((val) => {
             this.tenantList = this.store.getters.getTenantList;
         });
