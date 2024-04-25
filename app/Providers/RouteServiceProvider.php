@@ -148,6 +148,7 @@ class RouteServiceProvider extends ServiceProvider
 
             $moduleNamespace = explode("\\", trim($namespace, "\\"));
             $moduleNamespace = array_pop($moduleNamespace);
+            $moduleNamespace = strtolower($moduleNamespace);
 
             $namespace .= 'Controllers';
 

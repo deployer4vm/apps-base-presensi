@@ -11,7 +11,7 @@
     <title>{{ config('AppConfig.system.template.admin.title') }}</title>
 
     <link rel="shortcut icon" href="{{asset(config('AppConfig.system.template.favicon','assets/images/favicon.ico'))}}"/>
-    
+
     <!-- Main font -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i,900" rel="stylesheet">
 
@@ -31,6 +31,9 @@
     @if(config('AppConfig.system.web_admin.assets_template.font.pe-icon-7-stroke'))
     <link rel="stylesheet" href="{{ asset('/dist/vendor/fonts/pe-icon-7-stroke.css') }}">
     @endif
+    @if (config('AppConfig.system.web_admin.assets_template.font.uicons'))
+        <link rel="stylesheet" href="{{ asset('/dist/vendor/fonts/uicons-all.css') }}">
+    @endif
 
     <!-- Core stylesheets -->
     <link rel="stylesheet" href="{{ asset('/dist/css/bootstrap.css') }}">
@@ -39,7 +42,7 @@
     <link rel="stylesheet" href="{{ asset('/dist/css/colors.css') }}">
     <link rel="stylesheet" href="{{ asset('/dist/css/uikit.css') }}">
     <link rel="stylesheet" href="{{ asset('/dist/css/style.css') }}">
-    
+
     @if(config('AppConfig.system.web_admin.assets_link'))
     @foreach (config('AppConfig.system.web_admin.assets_link') as $value)
     <link rel="stylesheet" href="{{ asset($value) }}">
@@ -78,7 +81,7 @@
 <body>
 
     @yield('layout-content')
-    
+
     @if(config('AppConfig.system.web_admin.assets_js'))
     @foreach (config('AppConfig.system.web_admin.assets_js') as $value)
     <script src="{{ asset($value) }}"></script>
@@ -108,7 +111,7 @@
         @if(UserAuth::isLogin())
         //set token di LocalApi
         <?php //var_dump(UserAuth::getToken('api_token'));die(); ?>
-        window.axios.defaults.headers.common['Authorization'] = 'Bearer <?php echo UserAuth::getToken('api_token') ?>'; 
+        window.axios.defaults.headers.common['Authorization'] = 'Bearer <?php echo UserAuth::getToken('api_token') ?>';
         @endif
         //convert array to query string
         function params(object) {
@@ -137,7 +140,7 @@
 
         //parsing error local api
         function localApiErrorParse(res) {
-            
+
             let err = { status: 400, message: "request error" , errors: []};
             //jika error server
             if (!res.data) {
@@ -157,7 +160,7 @@
             return err;
         }
     </script>
-    
+
     @if(config('AppConfig.system.has_editor',true))
     <script>
         var editorUrl = {
@@ -168,7 +171,7 @@
     <script src="{{ asset('/dist/vendor/libs/kindeditor/kindeditor.js') }}"></script>
     <script src="{{ asset('/dist/vendor/libs/kindeditor/lang/en.js') }}"></script>
     @endif
-	
+
     @yield('scripts')
 
 </body>
