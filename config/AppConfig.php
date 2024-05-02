@@ -52,6 +52,28 @@ if (!function_exists('processSidenav')) {
     }
 }
 
+if (!function_exists('clean_endpoint')) {
+    function clean_endpoint($endpoint)
+    {
+        $cleaned = [];
+        foreach ($endpoint as $key => $value) {
+            $cleaned[$key] = is_array($value) ? clean_endpoint($value) : str_replace('//', '/', $value);
+        }
+
+        return $cleaned;
+    }
+}
+
+if (!function_exists('get_module_folder')) {
+    function get_module_folder($packageConfigPath)
+    {
+        $path = str_replace('/packageconfig.json', '', $packageConfigPath);
+        $paths = explode('/', $path);
+
+        return array_pop($paths);
+    }
+}
+
 /**
  * Config utama yang menyimpan semua config aplikasi. Datanya disimpan di app/MainApp/config
  */
@@ -157,12 +179,14 @@ $moduleList = array_merge(
     glob(base_path('vendor/hp-synapse/*/packageconfig.json'))
 );
 $package = [];
+$packageFolder = [];
 foreach ($moduleList as $path) {
     $tmpPackage = json_decode(file_get_contents($path), true);
     if (!isset($tmpPackage['load_priority'])) {
         $tmpPackage['load_priority'] = 99;
     }
     $package[$tmpPackage['package_namespace']] = $tmpPackage;
+    $packageFolder[get_module_folder($path)] = $tmpPackage['package_namespace'];
 }
 
 $packageCollection = collect($package);
@@ -264,7 +288,7 @@ $envEndpoint = $client['endpoint'][$system['mode']];
 
 $homeSlug = $envEndpoint['home_slug'] ?? '';
 $homeSlug = $homeSlug ? '/' . trim($homeSlug, '/') : '';
-$homeSlug = str_replace('//', '/', $homeSlug);
+// $homeSlug = str_replace('//', '/', $homeSlug);
 // $homeSlug = trim($homeSlug, '/');
 // $homeSlug = $homeSlug  ? '/' . $homeSlug : '';
 
@@ -272,28 +296,28 @@ $homeSlug = str_replace('//', '/', $homeSlug);
 $endpoint = [
     'domain' => $envEndpoint['domain'],
     'admin' => [
-        'app' => str_replace('//', '/', $homeSlug . $multiTenantVuePrefix . $envEndpoint['admin']),
+        'app' => $homeSlug . $multiTenantVuePrefix . $envEndpoint['admin'],
         'auth' => $homeSlug . $multiTenantVuePrefix,
     ],
     'frontend' => [
-        'app' => str_replace('//', '/', $homeSlug . $multiTenantVuePrefix . $envEndpoint['frontend']),
-        'auth' => str_replace('//', '/', $homeSlug . $multiTenantVuePrefix),
+        'app' => $homeSlug . $multiTenantVuePrefix . $envEndpoint['frontend'],
+        'auth' => $homeSlug . $multiTenantVuePrefix,
     ],
     'api' => [
-        'app' => str_replace('//', '/', $homeSlug . $envEndpoint['api']),
+        'app' => $homeSlug . $envEndpoint['api'],
         'auth' => $homeSlug,
     ],
     'laravel' => [
         'admin' => [
-            'app' => str_replace('//', '/', $multiTenantLaravelPrefix . $envEndpoint['admin']),
-            'auth' => str_replace('//', '/', $multiTenantLaravelPrefix),
+            'app' => $multiTenantLaravelPrefix . $envEndpoint['admin'],
+            'auth' => $multiTenantLaravelPrefix,
         ],
         'frontend' => [
-            'app' => str_replace('//', '/', $multiTenantLaravelPrefix . $envEndpoint['frontend']),
-            'auth' => str_replace('//', '/', $multiTenantLaravelPrefix),
+            'app' => $multiTenantLaravelPrefix . $envEndpoint['frontend'],
+            'auth' => $multiTenantLaravelPrefix,
         ],
         'api' => [
-            'app' => str_replace('//', '/', $envEndpoint['api']),
+            'app' => $envEndpoint['api'],
             'auth' => '',
         ],
     ],
@@ -558,8 +582,8 @@ foreach ($packageLocal as $item) {
             $endpoint[$app][$item['package_namespace']] = $homeSlug . $multiTenantVuePrefix . $moduleEndpoint;
             $endpoint['laravel'][$app][$item['package_namespace']] = $multiTenantLaravelPrefix . $moduleEndpoint;
         }
-        $endpoint[$app][$item['package_namespace']] = str_replace('//', '/', $endpoint[$app][$item['package_namespace']]);
-        $endpoint['laravel'][$app][$item['package_namespace']] = str_replace('//', '/', $endpoint['laravel'][$app][$item['package_namespace']]);
+        // $endpoint[$app][$item['package_namespace']] = str_replace('//', '/', $endpoint[$app][$item['package_namespace']]);
+        // $endpoint['laravel'][$app][$item['package_namespace']] = str_replace('//', '/', $endpoint['laravel'][$app][$item['package_namespace']]);
         //jika memiliki fitur auth dan module user maka assign auth endpointnya
         if ($system['has_auth'] && isset($packageLocal['moduser']) && $packageLocal['moduser']['enable']) {
             $authEndpoint = $packageLocal['moduser']['auth_endpoint'][$system['mode']];
@@ -570,8 +594,8 @@ foreach ($packageLocal as $item) {
                 $endpoint[$app]['auth'] = $homeSlug . $multiTenantVuePrefix . $authEndpoint;
                 $endpoint['laravel'][$app]['auth'] = $multiTenantLaravelPrefix . $authEndpoint;
             }
-            $endpoint[$app]['auth'] = str_replace('//', '/', $endpoint[$app]['auth']);
-            $endpoint['laravel'][$app]['auth'] = str_replace('//', '/', $endpoint['laravel'][$app]['auth']);
+            // $endpoint[$app]['auth'] = str_replace('//', '/', $endpoint[$app]['auth']);
+            // $endpoint['laravel'][$app]['auth'] = str_replace('//', '/', $endpoint['laravel'][$app]['auth']);
         }
     }
 
@@ -777,6 +801,9 @@ if (isset($system['multitenant']['active']) && $system['multitenant']['active'])
         }
     }
 }
+
+// Clean endpoint
+$endpoint = clean_endpoint($endpoint);
 
 $newPackageLocalString = json_encode($newPackageLocal, JSON_PRETTY_PRINT);
 //save ulang pakcageLocal hanya jika ada perubahan
@@ -1001,6 +1028,7 @@ return [
     'packageLocal' => $packageLocal, //config2 dari module dan lib yang sudah diedit per project
     'packageLocalPerTenant' => $packageLocalPerTenant, //list package local per tenant
     'package' => $package, //config2 default dari module dan lib
+    'packageFolder' => $packageFolder,
     // 'listener' => $listener,
     'sidenav' => $sidenav,
     'tenant' => $tenantList, //_tenant.json , list tenant

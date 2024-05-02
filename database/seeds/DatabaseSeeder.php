@@ -29,7 +29,7 @@ class DatabaseSeeder extends Seeder
         $modulePath = Utilities::listModulePath($namespaces, function ($namespace, $pathToModule) {
             $moduleNamespace = explode('\\', trim($namespace, '\\'));
             $moduleNamespace = array_pop($moduleNamespace);
-            $moduleNamespace = strtolower($moduleNamespace);
+            // $moduleNamespace = strtolower($moduleNamespace);
 
             $pathToModule .= DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'SeedList.php';
             if (config('AppConfig.packageLocal.' . $moduleNamespace . '.database.run_seed', true) && file_exists($pathToModule)) {
