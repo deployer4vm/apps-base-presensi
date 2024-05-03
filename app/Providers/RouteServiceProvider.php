@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use App\Services\Utilities;
+use Illuminate\Support\Facades\Log;
+
 // use Illuminate\Http\Request;
 
 class RouteServiceProvider extends ServiceProvider
@@ -148,12 +150,13 @@ class RouteServiceProvider extends ServiceProvider
 
             $moduleNamespace = explode("\\", trim($namespace, "\\"));
             $moduleNamespace = array_pop($moduleNamespace);
+            // $moduleNamespace = strtolower($moduleNamespace);
 
             $namespace .= 'Controllers';
 
             //load seluruh routes yg ada di setiap module
             foreach ($fileNames as $fileName => $isApi) {
-                $path = sprintf('%s/%s.php', $pathToModule, $fileName);
+                $path = sprintf('%s' . DIRECTORY_SEPARATOR . '%s.php', $pathToModule, $fileName);
 
                 // var_dump([$namespace,$path]);echo('<br><br>');
 
@@ -181,6 +184,7 @@ class RouteServiceProvider extends ServiceProvider
                     continue;
                 }
 
+                // Log::debug([$moduleNamespace, $namespace, $path, config('AppConfig.endpoint.laravel.api.' . $moduleNamespace)]);
                 // register router utama per module
                 Route::middleware($isApi ? ['api'] : ['web'])
                     ->prefix(

@@ -64,7 +64,7 @@ class AcceesConfigCheck
             if ($isWebReq) {
                 if ($isLogin)
                     Auth::logout();
-                return redirect()->route('login');
+                return redirect()->route('auth.login');
             } else {
                 ApiToken::where('api_token', $token)->delete();
                 throw new \Illuminate\Auth\AuthenticationException();

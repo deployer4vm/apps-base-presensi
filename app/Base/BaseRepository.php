@@ -583,7 +583,7 @@ abstract class BaseRepository
 
     /**
      * Hapus semua item array $data yang ada di $rejectedFields.
-     * 
+     *
      * filter array berdasarkan field yang tidak boleh ada (dihapus)
      * filter data yang akan di update / output / field, jika ada field yang terdaftar
      * di rejectedField maka akan dihapus
@@ -799,7 +799,7 @@ abstract class BaseRepository
     ) {
 
         if (!empty($orderBy)) {
-            if (!is_array($orderBy[0]))
+            if (isset($orderBy[0]) && !is_array($orderBy[0]))
                 $orderBy = [$orderBy];
 
             foreach ($orderBy as $oBitem) {
@@ -1064,7 +1064,7 @@ abstract class BaseRepository
             unset($filter['function']);
         }
 
-        if (isset($filter))
+        if (!empty($filter))
             $model = $this->_where($model, $filter);
 
         if ($qSearch) {
@@ -1230,7 +1230,7 @@ abstract class BaseRepository
             } else {
                 $this->error = __('lang.data_not_found');
             }
-            
+
         } catch (\Illuminate\Database\QueryException $ex) {
             $this->error = $ex->getMessage();
         }
@@ -1285,7 +1285,7 @@ abstract class BaseRepository
             return false;
 
         $model = $this->_where($model, $where);
-        
+
         if ($model && $model->exists()) {
             if ($model->count() <= 0)
                 return true;

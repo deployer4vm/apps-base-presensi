@@ -34,6 +34,9 @@
     @if (config('AppConfig.system.web_admin.assets_template.font.pe-icon-7-stroke'))
         <link rel="stylesheet" href="{{ asset('/dist/vendor/fonts/pe-icon-7-stroke.css') }}">
     @endif
+    @if (config('AppConfig.system.web_admin.assets_template.font.uicons'))
+        <link rel="stylesheet" href="{{ asset('/dist/vendor/fonts/uicons-all.css') }}">
+    @endif
 
     <link href="{{ asset('/dist/css/bootstrap.css') }}" rel="stylesheet">
     <link href="{{ asset('/dist/css/appwork.css') }}" rel="stylesheet">
