@@ -5,6 +5,7 @@ namespace App\Services;
 use Exception;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 use App\Models\SystemCallback as MSystemCallback;
 use App\Models\SystemCallbackLog;
@@ -20,9 +21,44 @@ class SystemCallback
     {
         return $this->error;
     }
+    
+    public function listActiveCallBack()
+    {        
+        $listCallback = MSystemCallback::where('status',0)->where(function($m){
+            $m->whereRaw('hit_count < max_hit_retry')->orWhere('max_hit_retry',0);
+        })->where('last_hit_at','<=',now()->subMinute(5)->format('Y-m-d H:i:s'));
 
+        if($listCallback->count()>=1){
+            return $listCallback->toArray();
+        }
+
+        return [];
+    }
+
+    public function retrySecureCallBack($callbackId)
+    {
+        $callback = MSystemCallback::where('id',$callbackId)->first();
+        if(!$callback){
+            $this->error = 'Callback tidak ditemukan.';
+            return false;
+        }
+
+        return $this->secureCallBack([
+            'id'=>$callback->id,
+            'callback_id'=>$callback->callback_id,
+            'tenant_id'=>$callback->tenant_id,
+            'system_user_id'=>$callback->system_user_id,
+            'callback_url'=>$callback->callback_url,
+            'data'=>$callback->data,
+        ]);
+    }
+    
     /**
+     * create new callback
+     * 
      * @param Array $data
+     *      id                  *optional, jika re-callback yg sebelumnya gagal
+     *      max_hit_retry       *optional, jumlah maksimal retry, def 3
      *      callback_id
      *      tenant_id
      *      system_user_id
@@ -52,6 +88,9 @@ class SystemCallback
         $user = User::where('id',$data['system_user_id'])->where('system_user',1)
             ->whereNotNull('secret_key')->first();
         
+        if(!array_key_exists('max_hit_retry',$data))
+            $data['max_hit_retry'] = 3;        
+
         if($user){      
             $callbackData = [
                 'tenant_id'=>isset($data['tenant_id'])?$data['tenant_id']:0,
@@ -79,8 +118,16 @@ class SystemCallback
                 $callbackData['callback_url'] = $data['callback_url'];
                 $callbackData['data'] = $data['data'];
                 $callbackData['status'] = 1;
+                $callbackData['hit_count'] = 0;
+                $callbackData['max_hit_retry'] = $data['max_hit_retry'];
 
                 $callbackData = MSystemCallback::create($callbackData); 
+            }else{
+                // jika sudah mencapai max hit maka tolak
+                if( $callbackData['hit_count'] >= $callbackData->max_hit_retry ){
+                    $this->error = 'Callback sudah mencapai batas maksimal hit';
+                    return false;
+                }
             }
 
             $tmpData = $data['data'];
@@ -96,9 +143,12 @@ class SystemCallback
                 return false;
             }
 
+            
+
             $return = $this->sendCallBack($data,$user->toArray(),$callbackData);
             MSystemCallback::where('id',$callbackData->id)->update([
-                'status'=>$return?1:0//update status gagal tidak nya
+                'status'=>$return?1:0,//update status gagal tidak nya
+                'hit_count'=>DB::raw('hit_count + 1')
             ]);
 
             $this->error = '';

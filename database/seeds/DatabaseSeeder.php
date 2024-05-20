@@ -9,6 +9,8 @@ use App\Facades\Tenant;
 
 class DatabaseSeeder extends Seeder
 {
+    public $tenantId = 0;
+    
     /**
      * Seed the application's database.
      *
@@ -16,6 +18,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        $run = true;
+        $addToSeed = true;
+
+        // $run = false;
+        // $addToSeed = false;
+
         /**
          * Load seed per module
          */
@@ -76,14 +84,17 @@ class DatabaseSeeder extends Seeder
         //jika mode nya 1 tenant 1 database atau 1 tenant beda table
         if (config('AppConfig.system.multitenant.active', false) && config('AppConfig.system.multitenant.data_mode', 1) != 1) {
 
-            $this->callPerTenant($runAbleSeeds);
+            $this->callPerTenant($runAbleSeeds,$run, $addToSeed);
 
             // jika dalam 1 database utama
         } else {
             foreach ($runAbleSeeds as $class) {
                 try {
-                    $this->call($class);
-                    Seed::create(['seed' => $class]);
+                    if($run)
+                        $this->call($class);
+
+                    if($addToSeed)
+                        Seed::create(['seed' => $class]);
                 } catch (Exception $th) {
                     throw $th;
                 }
@@ -94,7 +105,7 @@ class DatabaseSeeder extends Seeder
     /**
      * jika seed multi tenant
      */
-    public function callPerTenant($runAbleSeeds)
+    public function callPerTenant($runAbleSeeds,$run=true,$addToSeed=true)
     {
         ini_set('memory_limit', '5524M');
 
@@ -124,7 +135,8 @@ class DatabaseSeeder extends Seeder
                             $tmpClass->setTenantId($tenant['id']);
 
                             try {
-                                $tmpClass->run();
+                                if($run)
+                                    $tmpClass->run();
                             } catch (Exception $th) {
                                 throw $th;
                             }
@@ -143,11 +155,13 @@ class DatabaseSeeder extends Seeder
                     }
                 }
             } else {
-                $tmpClass->run();
+                if($run)
+                    $tmpClass->run();
             }
 
             // tambahkan class seed yg sudah dieksekusi
-            Seed::create(['seed' => $class]);
+            if($addToSeed)
+                Seed::create(['seed' => $class]);
         }
     }
 }

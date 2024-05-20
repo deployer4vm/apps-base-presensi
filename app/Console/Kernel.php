@@ -44,6 +44,9 @@ class Kernel extends ConsoleKernel
             $schedule->command('websockets:serve')->everyMinute()->withoutOverlapping();
         }
 
+        // pastikan callback yg gagal di retry sampe 3 kali
+        $schedule->command('synapse:callbackbg')->everyFiveMinutes()->withoutOverlapping();
+
         // run telescope prune 1 minggu sekali (sunday at 00:00)
         $schedule->job(new PruneTelescope)->weekly()->withoutOverlapping();
     }
