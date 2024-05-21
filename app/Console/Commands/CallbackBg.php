@@ -37,9 +37,6 @@ class CallbackBg extends Command
      */
     public function handle()
     {
-        $backupDate = $this->argument('backupDate');
-        RestoreBackup::dispatch($backupDate);
-        $this->info('SUCCESS!');
 
         $listCallback = SystemCallback::listActiveCallBack();
 
