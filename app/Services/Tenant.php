@@ -476,12 +476,13 @@ class Tenant extends BaseRepository
     public function getDbSize($tenantId = 0)
     {
         if ($this->dbExists($tenantId)) {
-            $result = $this->db($tenantId)
-                ->select(DB::raw('SELECT table_name AS "Table",
+            $query = 'SELECT table_name AS "Table",
                     ((data_length + index_length) / 1024 / 1024) AS "Size"
                     FROM information_schema.TABLES
                     WHERE table_schema = "' . $this->getDbConnection($tenantId)['database'] . '"
-                    ORDER BY (data_length + index_length) DESC'));
+                    ORDER BY (data_length + index_length) DESC';
+            $result = $this->db($tenantId)
+                ->select($query);
             $size = array_sum(array_column($result, 'Size'));
             return round((float) $size, 2);
         }
@@ -1228,10 +1229,10 @@ class Tenant extends BaseRepository
         return array_sum(
             array_map(
                 function ($file) {
-                    return (float) $file['size'];
+                    return (float) $file['fileSize'];
                 },
                 array_filter(
-                    Storage::disk($disk)->listContents('/', true /*<- recursive*/),
+                    Storage::disk($disk)->listContents('/', true /*<- recursive*/)->toArray(),
                     function ($file) {
                         return $file['type'] == 'file';
                     }

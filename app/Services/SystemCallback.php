@@ -29,7 +29,7 @@ class SystemCallback
         })->where('last_hit_at','<=',now()->subMinute(5)->format('Y-m-d H:i:s'));
 
         if($listCallback->count()>=1){
-            return $listCallback->toArray();
+            return $listCallback->get()->toArray();
         }
 
         return [];
