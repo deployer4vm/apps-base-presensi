@@ -106,41 +106,46 @@ trait MigrateDataTenant
             $filter = isset($this->tenantId) ? [['id', $this->tenantId]] : [];
             $tenantList = Tenant::listTenant($filter);
             foreach ($tenantList['data'] as $tenant) {
-                //jika per database
-                if (config('AppConfig.system.multitenant.data_mode', 1) == 3) {
-                    Tenant::setDb($tenant['id']);
-                    if (
-                        Tenant::dbExists($tenant['id'])
-                        && Schema::connection(config('database.perTenant') . $tenant['id'])
-                        ->hasTable($table)
-                    ) {
+                try{
+                    //jika per database
+                    if (config('AppConfig.system.multitenant.data_mode', 1) == 3) {
+                        Tenant::setDb($tenant['id']);
                         if (
-                            $column == false
-                            || (!$ifColumnExist
-                                && !Schema::connection(config('database.perTenant') . $tenant['id'])
+                            Tenant::dbExists($tenant['id'])
+                            && Schema::connection(config('database.perTenant') . $tenant['id'])
+                            ->hasTable($table)
+                        ) {
+                            if (
+                                $column == false
+                                || (!$ifColumnExist
+                                    && !Schema::connection(config('database.perTenant') . $tenant['id'])
+                                        ->hasColumn($table, $column)
+                                )
+                                || ($ifColumnExist
+                                    && Schema::connection(config('database.perTenant') . $tenant['id'])
                                     ->hasColumn($table, $column)
-                            )
-                            || ($ifColumnExist
-                                && Schema::connection(config('database.perTenant') . $tenant['id'])
-                                ->hasColumn($table, $column)
-                            )
-                        ) {
-                            Schema::connection(config('database.perTenant') . $tenant['id'])
-                                ->table($table, $bluePrint);
+                                )
+                            ) {
+                                Schema::connection(config('database.perTenant') . $tenant['id'])
+                                    ->table($table, $bluePrint);
+                            }
                         }
-                    }
-                    // jika per table
-                } else {
-                    $tmpTable = Tenant::getTableName($table, $tenant['id']);
-                    if (Schema::hasTable($tmpTable)) {
-                        if (
-                            $column == false
-                            || (!$ifColumnExist && !Schema::hasColumn($tmpTable, $column))
-                            || ($ifColumnExist && Schema::hasColumn($tmpTable, $column))
-                        ) {
-                            Schema::table($tmpTable, $bluePrint);
+                        // jika per table
+                    } else {
+                        $tmpTable = Tenant::getTableName($table, $tenant['id']);
+                        if (Schema::hasTable($tmpTable)) {
+                            if (
+                                $column == false
+                                || (!$ifColumnExist && !Schema::hasColumn($tmpTable, $column))
+                                || ($ifColumnExist && Schema::hasColumn($tmpTable, $column))
+                            ) {
+                                Schema::table($tmpTable, $bluePrint);
+                            }
                         }
-                    }
+                    }                    
+                }catch(\Exception $e){
+                    echo 'Error tenant : '.$tenant['id'];
+                    throw $e;
                 }
             }
             // jika di 1 table
@@ -170,46 +175,52 @@ trait MigrateDataTenant
             $tenantList = Tenant::listTenant($filter);
             // if ($unique) Log::debug($indexName);
             foreach ($tenantList['data'] as $tenant) {
-                //jika per database
-                if (config('AppConfig.system.multitenant.data_mode', 1) == 3) {
-                    Tenant::setDb($tenant['id']);
-                    if (
-                        Tenant::dbExists($tenant['id'])
-                        && Schema::connection(config('database.perTenant') . $tenant['id'])
-                        ->hasTable($table)
-                    ) {
-                        $schemaManager = Schema::connection(config('database.perTenant') . $tenant['id'])->getConnection()
-                            ->getDoctrineSchemaManager();
-                        $indexesFound  = $schemaManager->listTableIndexes($table);
-                        // if ($unique) {
-                        //     Log::debug($indexesFound);
-                        //     Log::debug((int) array_key_exists($indexName, $indexesFound));
-                        // }
+                try{
+                    //jika per database
+                    if (config('AppConfig.system.multitenant.data_mode', 1) == 3) {
+                        Tenant::setDb($tenant['id']);
                         if (
-                            ($ifIndexExist === false
-                                && array_key_exists($indexName, $indexesFound) === false
-                            )
-                            || ($ifIndexExist
-                                && array_key_exists($indexName, $indexesFound)
-                            )
+                            Tenant::dbExists($tenant['id'])
+                            && Schema::connection(config('database.perTenant') . $tenant['id'])
+                            ->hasTable($table)
                         ) {
-                            Schema::connection(config('database.perTenant') . $tenant['id'])
-                                ->table($table, $bluePrint);
+                            $schemaManager = Schema::connection(config('database.perTenant') . $tenant['id'])->getConnection()
+                                ->getDoctrineSchemaManager();
+                            $indexesFound  = $schemaManager->listTableIndexes($table);
+                            // if ($unique) {
+                            //     Log::debug($indexesFound);
+                            //     Log::debug((int) array_key_exists($indexName, $indexesFound));
+                            // }
+                            if (
+                                ($ifIndexExist === false
+                                    && array_key_exists($indexName, $indexesFound) === false
+                                )
+                                || ($ifIndexExist
+                                    && array_key_exists($indexName, $indexesFound)
+                                )
+                            ) {
+                                Schema::connection(config('database.perTenant') . $tenant['id'])
+                                    ->table($table, $bluePrint);
+                            }
+                        }
+                        // jika per table
+                    } else {
+                        $tmpTable = Tenant::getTableName($table, $tenant['id']);
+                        $schemaManager = Schema::getConnection()->getDoctrineSchemaManager();
+                        $indexesFound  = $schemaManager->listTableIndexes($tmpTable);
+                        if (Schema::hasTable($tmpTable)) {
+                            if (
+                                (!$ifIndexExist && !array_key_exists($indexName, $indexesFound))
+                                || ($ifIndexExist && array_key_exists($indexName, $indexesFound))
+                            ) {
+                                Schema::table($tmpTable, $bluePrint);
+                            }
                         }
                     }
-                    // jika per table
-                } else {
-                    $tmpTable = Tenant::getTableName($table, $tenant['id']);
-                    $schemaManager = Schema::getConnection()->getDoctrineSchemaManager();
-                    $indexesFound  = $schemaManager->listTableIndexes($tmpTable);
-                    if (Schema::hasTable($tmpTable)) {
-                        if (
-                            (!$ifIndexExist && !array_key_exists($indexName, $indexesFound))
-                            || ($ifIndexExist && array_key_exists($indexName, $indexesFound))
-                        ) {
-                            Schema::table($tmpTable, $bluePrint);
-                        }
-                    }
+                    
+                }catch(\Exception $e){
+                    echo 'Error tenant : '.$tenant['id'];
+                    throw $e;
                 }
             }
             // jika di 1 table

@@ -198,22 +198,28 @@ class Tenant extends BaseRepository
      * Set Active Tenant by ID
      *
      * @param integer $tenantId
+     * @param array $bypassConfig *optional, bypass config
+     *      db              nomor urut server database
+     *      s3storage       1/0
      * @return void
      */
-    public function setActiveTenantById($tenantId)
+    public function setActiveTenantById($tenantId, array $bypassConfig = [])
     {
         $tenant = $this->getTenantById($tenantId);
         if ($tenant)
-            $this->setActiveTenant($tenant);
+            $this->setActiveTenant($tenant,$bypassConfig);
     }
 
     /**
      * Set Active Tenant by Group
      *
      * @param string $appGroup
+     * @param array $bypassConfig *optional, bypass config
+     *      db              nomor urut server database
+     *      s3storage       1/0
      * @return void
      */
-    public function setActiveTenantByGroup($appGroup = false)
+    public function setActiveTenantByGroup($appGroup = false, array $bypassConfig = [])
     {
         $appGroup = $appGroup
             ?: request()->header('Group-App', false)
@@ -236,7 +242,7 @@ class Tenant extends BaseRepository
         } else {
             $tenant = $this->getTenantByGroupApp($appGroup);
             if ($tenant)
-                $this->setActiveTenant($tenant->toArray());
+                $this->setActiveTenant($tenant->toArray(),$bypassConfig);
         }
     }
 
@@ -245,9 +251,12 @@ class Tenant extends BaseRepository
      * fungsi ini dieksekusi di RouteServiceProvider utama jika multi tentant nya didetect via domain
      *
      * @param string $domain
+     * @param array $bypassConfig *optional, bypass config
+     *      db              nomor urut server database
+     *      s3storage       1/0
      * @return void
      */
-    public function setActiveTenantByDomain($domain = false)
+    public function setActiveTenantByDomain($domain = false, array $bypassConfig = [])
     {
         $domain = $domain ?: request()->getHttpHost();
 
@@ -265,7 +274,7 @@ class Tenant extends BaseRepository
         } else {
             $tenant = $this->getTenantByDomain($domain); //$this->getTenantModel()->where('domain',$domain)->first();
             if ($tenant)
-                $this->setActiveTenant($tenant);
+                $this->setActiveTenant($tenant,$bypassConfig);
         }
     }
 
@@ -273,10 +282,13 @@ class Tenant extends BaseRepository
      * Set Active Tenant by Data Array
      *
      * @param array $dataTenant
+     * @param array $bypassConfig *optional, bypass config
+     *      db              nomor urut server database
+     *      s3storage       1/0
      * @return void
      * @throws Exception
      */
-    public function setActiveTenant(array $dataTenant)
+    public function setActiveTenant(array $dataTenant, array $bypassConfig = [])
     {
         if (!isset($dataTenant['id'])) {
             throw new Exception('Invalid Tenant array');
@@ -294,7 +306,7 @@ class Tenant extends BaseRepository
 
         resolve('bindTenant', ['tenant_id' => $dataTenant['id']]);
 
-        $this->setDb($dataTenant['id']);
+        $this->setDb($dataTenant['id'],empty($bypassConfig['db'])?false:$bypassConfig['db']);
     }
 
     /**
@@ -422,9 +434,10 @@ class Tenant extends BaseRepository
      * generate and get connection database pertenant
      *
      * @param integer $tenantId
-     * @return string
+     * @param Integer|False $tenantDbId     isi dengan nomor urut database jika akan di bypass
+     * @return Array
      */
-    public function getDbConnection($tenantId)
+    public function getDbConnection($tenantId,$tenantDbId=false)
     {
         // jika tenant id 0 atau mode data bukan beda database (!=3) berarti koneksi ke database utama
         if (empty($tenantId) || config('AppConfig.system.multitenant.data_mode', 1) != 3)
@@ -434,7 +447,7 @@ class Tenant extends BaseRepository
 
         // jika multidatabase server aktif maka detek dan sinkronkan konfig db nya
         if (config('database.multi_database_server.enable', false)) {
-            if (!($dbConfig = $this->getDbConnection_getServer($tenantId))) {
+            if (!($dbConfig = $this->getDbConnection_getServer($tenantId,$tenantDbId))) {
                 return false;
             }
         } else {
@@ -453,15 +466,16 @@ class Tenant extends BaseRepository
      * Get Server Data for Specific Tenant Database Connection
      *
      * @param integer $tenantId
+     * @param Integer|False $tenantDbId     isi dengan nomor urut database jika akan di bypass
      * @return mixed
      */
-    private function getDbConnection_getServer($tenantId)
+    private function getDbConnection_getServer($tenantId,$tenantDbId=false)
     {
         $server = config('database.multi_database_server.servers.' . config('tenant.db'));
         if (config('tenant.id') != $tenantId) {
             if (!($tenant = $this->getTenantById($tenantId)))
                 return false;
-            $server = config('database.multi_database_server.servers.' . $tenant['db']);
+            $server = config('database.multi_database_server.servers.' . ($tenantDbId?$tenantDbId:$tenant['db']));
         }
 
         return $server;
@@ -505,11 +519,12 @@ class Tenant extends BaseRepository
      * Get nama database untuk database pertenant
      *
      * @param integer $tenantId
+     * @param Integer|False $tenantDbId     isi dengan nomor urut database jika akan di bypass
      * @return mixed
      */
-    public function getDbName($tenantId)
+    public function getDbName($tenantId,$tenantDbId=false)
     {
-        if (!($dbConfig = $this->getDbConnection($tenantId)))
+        if (!($dbConfig = $this->getDbConnection($tenantId,$tenantDbId)))
             return false;
 
         return $dbConfig['database'];
@@ -524,14 +539,23 @@ class Tenant extends BaseRepository
      * cek apakah database pertenant sudah ada
      *
      * @param integer $tenantId
+     * @param Integer|False $tenantDbId     isi dengan nomor urut database jika akan di bypass
      * @return boolean
      */
-    public function dbExists($tenantId)
+    public function dbExists($tenantId,$tenantDbId=false)
     {
         // $schemaName = config("database.connections.".config("database.perTenant").".database_prefix").$tenantId;
-        $schemaName = $this->getDbName($tenantId);
+        $schemaName = $this->getDbName($tenantId,$tenantDbId);
         $query = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME =  ?";
-        $db = DB::select($query, [$schemaName]);
+        
+        $this->getDbConnection($tenantId,$tenantDbId);
+
+        // jika multidatabase server aktif maka detek dan sinkronkan konfig db nya
+        if ($tenantDbId === false) {
+            $db = DB::select($query, [$schemaName]);
+        } else {
+            $db = DB::connection($this->getDbConnectionName($tenantId))->select($query, [$schemaName]);
+        }  
 
         //jika empty berarti database belum ada
         return !empty($db);
@@ -572,8 +596,9 @@ class Tenant extends BaseRepository
      * set connection active database per tenant session saat ini
      *
      * @param integer $tenantId
+     * @param Integer|False $tenantDbId     isi dengan nomor urut database jika akan di bypass
      */
-    public function setDb($tenantId)
+    public function setDb($tenantId,$tenantDbId=false)
     {
         if (config('AppConfig.system.multitenant.data_mode', 1) != 3)
             return;
@@ -583,7 +608,7 @@ class Tenant extends BaseRepository
 
         // tambah connection database on thy fly sesuai tenant yang aktifnya (jika belum ditambah)
         if (config('database.connections.' . $dbConfigName, false) == false) {
-            $dbConfig = $this->getDbConnection($tenantId);
+            $dbConfig = $this->getDbConnection($tenantId,$tenantDbId);
             config(['database.connections.' . $dbConfigName => $dbConfig]);
         }
     }
