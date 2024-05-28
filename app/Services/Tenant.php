@@ -431,7 +431,7 @@ class Tenant extends BaseRepository
     }
 
     /**
-     * generate and get connection database pertenant
+     * generate and get config connection database pertenant
      *
      * @param integer $tenantId
      * @param Integer|False $tenantDbId     isi dengan nomor urut database jika akan di bypass
@@ -604,8 +604,8 @@ class Tenant extends BaseRepository
             return;
 
         $dbConfigName = $this->getDbConnectionName($tenantId);
-        config(['tenant.connection', $dbConfigName]);
-
+        config(['tenant.connection' => $dbConfigName]);
+        
         // tambah connection database on thy fly sesuai tenant yang aktifnya (jika belum ditambah)
         if (config('database.connections.' . $dbConfigName, false) == false) {
             $dbConfig = $this->getDbConnection($tenantId,$tenantDbId);
