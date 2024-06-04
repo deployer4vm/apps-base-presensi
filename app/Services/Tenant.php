@@ -122,7 +122,7 @@ class Tenant extends BaseRepository
      * Get Tenant Data by Group App
      *
      * @param string $groupApp
-     * @return false|array false = Tenant data not found
+     * @return Array|False false = Tenant data not found
      */
     public function getTenantByGroupApp($groupApp)
     {
@@ -242,7 +242,7 @@ class Tenant extends BaseRepository
         } else {
             $tenant = $this->getTenantByGroupApp($appGroup);
             if ($tenant)
-                $this->setActiveTenant($tenant->toArray(),$bypassConfig);
+                $this->setActiveTenant($tenant,$bypassConfig);
         }
     }
 

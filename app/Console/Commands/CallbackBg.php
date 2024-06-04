@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 
 use App\Jobs\RestoreBackup;
 use \App\Facades\SystemCallback;
+use App\Facades\Tenant;
 
 /**
  * dischedulling tiap 5 menit
@@ -41,6 +42,7 @@ class CallbackBg extends Command
         $listCallback = SystemCallback::listActiveCallBack();
 
         foreach ($listCallback as $key => $value) {
+            Tenant::setActiveTenantById($value['tenant_id']);
             SystemCallback::retrySecureCallBack($value['id']);
         }
     }

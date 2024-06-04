@@ -109,6 +109,8 @@ class SystemCallback
                 if(($callbackData = MSystemCallback::where('id',$data['id'])->first())==false){
                     $createData = true;
                     unset($data['id']);
+                }else{                                 
+                    $createData = false;   
                 }
             }
 
