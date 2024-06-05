@@ -57,30 +57,45 @@ class PostReference //extends BaseRepository
         }
 
         // generate refId yg uniq
-        $this->_tmpRefIdNow = now()->format('YmdHis');
-        $refId = $this->generateRandomrefId($formId, $tenantId, $userId);
-        while ($this->getModel($tenantId)
-            ->select('ref_id')
+        $refId = $this->doGetPostRef($formId, $tenantId, $userId);
+
+        // pastikan sekali lagi refid tidak double
+        if($this->getModel($tenantId)
             ->where('form_id', $formId)
             ->where('ref_id', $refId)
             ->where('tenant_id', $tenantId)
             ->where('user_id', $userId)
-            ->where('status', 0)
-            ->exists()
-        ) {
-            $refId = $this->generateRandomrefId($formId, $tenantId, $userId);
+            ->where('status', 0)->count()>=2){
+            $refId = $this->doGetPostRef($formId, $tenantId, $userId);
         }
-
-        $this->getModel($tenantId)->create([
-            'ref_id' => $refId,
-            'tenant_id' => $tenantId,
-            'user_id' => $userId,
-            'form_id' => $formId,
-            'status' => 0, // new input
-        ]);
 
         return $refId;
     }
+        private function doGetPostRef($formId, $tenantId = false, $userId = false)
+        {
+            $this->_tmpRefIdNow = now()->format('YmdHis');
+            $refId = $this->generateRandomrefId($formId, $tenantId, $userId);
+            while ($this->getModel($tenantId)
+                ->select('ref_id')
+                ->where('form_id', $formId)
+                ->where('ref_id', $refId)
+                ->where('tenant_id', $tenantId)
+                ->where('user_id', $userId)
+                ->where('status', 0)
+                ->exists()
+            ) {
+                $refId = $this->generateRandomrefId($formId, $tenantId, $userId);
+            }
+
+            $this->getModel($tenantId)->create([
+                'ref_id' => $refId,
+                'tenant_id' => $tenantId,
+                'user_id' => $userId,
+                'form_id' => $formId,
+                'status' => 0, // new input
+            ]);
+            return $refId;
+        }
 
     /**
      * Generate Random Ref ID
@@ -132,8 +147,7 @@ class PostReference //extends BaseRepository
             ->where('user_id', $userId)
             ->where('status', 0);
 
-        if ($tmp->exists()) {
-            $tmp->delete();
+        if ($tmp->delete()>0) {
             return true;
         }
 
