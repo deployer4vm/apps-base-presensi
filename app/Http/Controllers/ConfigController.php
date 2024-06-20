@@ -6,8 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 use App\Models\MConfig;
+use App\Models\MConfigTenant;
 use App\Facades\DbConfig;
 use App\Facades\CacheConfig;
+use App\Facades\Tenant;
 
 use App\Base\BaseController;
 
@@ -25,6 +27,17 @@ class ConfigController extends BaseController
     {
     }
 
+    private function initTenantId($request)
+    {        
+        $tenantId = $request->input('tenant_id', false);
+        if($tenantId && config('tenant.id', 0) != $tenantId){
+            Tenant::setActiveTenantById($tenantId);
+        }else{
+            $tenantId = config('tenant.id', 0);
+        }
+        return $tenantId;
+    }
+
     /**
      * GET - /sys/config/
      * api list config (config yang disimpan didatabase)
@@ -34,13 +47,15 @@ class ConfigController extends BaseController
      *      key *optional
      *      tenant_id *optional
      *
-     * @return array list data config
+     * @return JSON_ARRAY list data config dengan key 'group', 'key', 'value'
      */
     public function readList(Request $request)
     {
-        $model = MConfig::select(['group', 'key', 'value']);
+        $tenantId = $this->initTenantId($request);
 
-        $model = $model->where('tenant_id', $request->input('tenant_id', config('tenant.id', 0)));
+        $model = $tenantId?MConfigTenant::select(['group', 'key', 'value']):MConfig::select(['group', 'key', 'value']);
+
+        $model = $model->where('tenant_id', $tenantId);
 
         if ($group = $request->input('group', false)) {
             if (is_array($group)) {
@@ -68,6 +83,7 @@ class ConfigController extends BaseController
      * create or update
      *
      * @param Request $request
+     *      tenant_id
      *      data array list data config yang akan di create / update
      *          name
      *          value
@@ -78,7 +94,8 @@ class ConfigController extends BaseController
      */
     public function createUpdate(Request $request)
     {
-        $tenantId = $request->input('tenant_id', config('tenant.id', 0));
+        $tenantId = $this->initTenantId($request);
+
         $groupWhere = [];
         $keyWhere = [];
         if ($data = $request->input('data', false)) {
@@ -89,9 +106,11 @@ class ConfigController extends BaseController
                 if (isset($value['value']))
                     $updateData['value'] = $value['value'];
                 if ($updateData) {
-                    $model = MConfig::where('group', $value['group'])
-                        ->where('key', $value['key'])
+                    $model = $tenantId?MConfigTenant::where('group', $value['group']):MConfig::where('group', $value['group']);
+                    
+                    $model = $model->where('key', $value['key'])
                         ->where('tenant_id', $tenantId);
+
                     $groupWhere[] = $value['group'];
                     $keyWhere[] = $value['key'];
                     if ($model->exists()) {
@@ -105,8 +124,8 @@ class ConfigController extends BaseController
                 }
             }
         }
-
-        return response()->json(MConfig::where('tenant_id', $tenantId)
+        $model = $tenantId?MConfigTenant::where('tenant_id', $tenantId):MConfig::where('tenant_id', $tenantId);
+        return response()->json($model
             ->whereIn('group', $groupWhere)
             ->whereIn('key', $keyWhere)
             ->get());
@@ -117,18 +136,13 @@ class ConfigController extends BaseController
      *
      * manage access config
      *
+     * @param Request $request
+     *      tenant_id
      * @return SynapseReturnFormat
      */
     public function accessConfig(Request $request)
     {
-        // if(!($config = $this->_getCache('generalconfig','accesss'))){
-        //     $config = [
-        //         'allow_login' => 1,
-        //         'allow_login_exept' => [],
-        //         'allow_login_only' => []
-        //     ];
-        //     $this->_saveCache('generalconfig','accesss',$config);
-        // }
+        $this->initTenantId($request);
 
         $config = CacheConfig::getConfig('accesss', [
             'allow_login' => 1,
@@ -149,7 +163,6 @@ class ConfigController extends BaseController
         $this->forceApiOutput();
 
         \hpsynapse\moduser\Facades\UserAuth::unlockLogin();
-        // $this->output['data'] = ;
         return $this->done();
     }
 }

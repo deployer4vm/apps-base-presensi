@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\MConfig;
+use App\Models\MConfigTenant;
 use App\Base\BaseRepository;
 
 class DbConfig extends BaseRepository
@@ -65,7 +66,13 @@ class DbConfig extends BaseRepository
         $saveDefault = true,
         $castAsArray = false
     ) {
-        return $this->_getConfig($group, $key, $default, $saveDefault, 0, $castAsArray);
+        return $this->_getConfig(
+            $group, 
+            $key, 
+            $default, 
+            $saveDefault, 
+            0, 
+            $castAsArray);
     }
 
 
@@ -90,7 +97,8 @@ class DbConfig extends BaseRepository
         $tenantId = 0,
         $castAsArray = false
     ) {
-        $data = $this->_getOne(MConfig::select('value'), [
+        $model = $tenantId?MConfigTenant::select('value'):MConfig::select('value');
+        $data = $this->_getOne($model, [
             ['tenant_id', $tenantId],
             ['group', $group],
             ['key', $key]
@@ -156,7 +164,8 @@ class DbConfig extends BaseRepository
      */
     private function _listConfig($group, $tenantId = 0, $returnValue = false)
     {
-        $list = $this->_list(MConfig::select(['value', 'key']), [
+        $model = $tenantId?MConfigTenant::select(['value', 'key']):MConfig::select(['value', 'key']);
+        $list = $this->_list($model, [
             ['tenant_id', $tenantId],
             ['group', $group]
         ]);
@@ -218,15 +227,16 @@ class DbConfig extends BaseRepository
      */
     private function _setConfig(string $group, string $key, $value, $tenantId = 0)
     {
-        $oldConfig = $this->_getOne(new MConfig, [
+        $model = $tenantId?new MConfigTenant:new MConfig;
+        
+        //jika config sudah ada maka update data nya
+        if ($this->_exists($model, [
             ['tenant_id', $tenantId],
             ['group', $group],
             ['key', $key]
-        ]);
-
-        //jika config sudah ada maka update data nya
-        if ($oldConfig) {
-            return $this->_update(new Mconfig, [
+        ])) {
+            // $model = $tenantId?new MConfigTenant:new MConfig;
+            return $this->_update($model, [
                 ['tenant_id', $tenantId],
                 ['group', $group],
                 ['key', $key],
@@ -235,7 +245,8 @@ class DbConfig extends BaseRepository
             ]);
             //jika belum ada maka create
         } else {
-            return $this->_create(new Mconfig, [
+            // $model = $tenantId?new MConfigTenant:new MConfig;
+            return $this->_create($model, [
                 'tenant_id' => $tenantId,
                 'group' => $group,
                 'key' => $key,
@@ -268,7 +279,7 @@ class DbConfig extends BaseRepository
      */
     public function deleteGlobalConfig(string $group, string $key)
     {
-        return $this->_delete(new Mconfig, [
+        return $this->_delete(new MConfigTenant, [
             ['tenant_id', 0],
             ['group', $group],
             ['key', $key],

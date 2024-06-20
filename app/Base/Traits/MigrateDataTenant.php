@@ -340,8 +340,9 @@ trait MigrateDataTenant
      * eksekusi statement
      *
      * @param string            $statement
-     * @param string|false      $table  isi false jika tidak detek table ada atau tidak,
-     *                          isi dengan nama table jika mendetek table ada ataut tidak
+     * @param string|false      $table          isi false jika tidak detek table ada atau tidak,
+     *                                          isi dengan nama table jika mendetek table ada ataut tidak
+     * @param boolean           $ifTableExist
      */
     public function statementPerTenant($statement, $table = false, $ifTableExist = true)
     {
