@@ -422,7 +422,6 @@ class BaseController extends LaravelBaseController
     /**
      * Initialize auto request preparation
      * 
-     * @param Controller $controller        isi dengan $this dari controller
      * @param Request $request              isi dengan $request dari controller
      * @param Boolead $isListRequest        true jika request list, false input general
      * @param False|Array $requestClass     jika ingin setRequestClass langsung

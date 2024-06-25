@@ -53,7 +53,8 @@ router.afterEach((to, from) => {
     
     if (from !== START_LOCATION)
         Syn.firstStart = false;
-    
+    var loadTenantBaru = false;
+
     if (globals().AppConfig.system.multitenant.active) {
 
         if (tenantData == undefined) {
@@ -89,93 +90,109 @@ router.afterEach((to, from) => {
 
                 //jika tenant berubah atau saat pertama kali akses
             } else {
-                console.log('load tenant baru : ', to.params);
-                globals().Web.reloadTenant(_groupApp).then((val) => {
-                    console.log('tenant baru : ', val);
-                    EventBus.$emit('onTenantChange', val);
-                    //jika tenant tidak ditemukan
-                    if (!val) {
-                        //jika tenant yang tidak ditemukan adalah default tenant maka error
-                        if (_groupApp == globals().Web.getDefaultTenantRoute().params.group_app) {
-                            alert('Tenant Api Error');
-                        } else {
-                            globals().Web.goToDefaultTenant();
-                        }
+                // jika load tenant baru
+                loadTenantBaru = true;
+            }
+        }
+    }
+
+    async function waitForPromise() {
+        // jika load tenant baru
+        if(loadTenantBaru){
+            console.log('load tenant baru : ', to.params,', ',_groupApp);
+            var tmpAwait = await globals().Web.reloadTenant(_groupApp).then((val) => {
+                console.log('tenant baru : ', val);
+                EventBus.$emit('onTenantChange', val);
+                //jika tenant tidak ditemukan
+                if (!val) {
+                    //jika tenant yang tidak ditemukan adalah default tenant maka error
+                    if (_groupApp == globals().Web.getDefaultTenantRoute().params.group_app) {
+                        alert('Tenant Api Error');
+                    } else {
+                        globals().Web.goToDefaultTenant();
                     }
-                });
-            }
-        }
-    }
-
-    /*
-    jika mengakses halaman admin maka detek dan proteksi halaman admin dengan auth (jika fitur auth diaktifkan di config)
-    */
-    if (
-        globals().AppConfig.system.has_auth &&
-        globals().AppConfig.system.web_admin.protected_by_auth &&
-        globals().Web.isAdminEndpoint()
-    ) {
-        // selain system endpoin cek session auth
-        if(!globals().Web.isSystemEndpoint()){
-            //jika tidak login dan mengakses halaman selain auth maka redirect ke halaman login
-            if (!globals().UserAuth.isLogin() && !globals().Web.isAuthEndpoint()) {
-                console.log('redirect ke login (from main router)',globals().UserAuth.isLogin(),globals().Web.isAuthEndpoint());
-                globals().UserAuth.goToLogin();
+                    return false;
+                }
+                return true;
+            });
+            console.log('hasil await',tmpAwait);
+            // jika tenant tidak ada maka tidak perlu diproses
+            if(tmpAwait==false)
                 return;
-                //jika sudah login tapi mengakses halaman auth maka redirect
-            } else if (globals().UserAuth.isLogin() && globals().Web.isAuthEndpoint()) {
-                globals().UserAuth.goToHome();
-                return;
-            }
         }
 
-        //jika berpindah tenant maka logout kan dahulu, jika hanya mengakses halaman utama maka redirect ke home
+        /*
+        jika mengakses halaman admin maka detek dan proteksi halaman admin dengan auth (jika fitur auth diaktifkan di config)
+        */
         if (
-            globals().UserAuth.isLogin()
-            && globals().AppConfig.system.multitenant.active
-            && _groupApp != globals().Web.getTenantGroupApp()
+            globals().AppConfig.system.has_auth &&
+            globals().AppConfig.system.web_admin.protected_by_auth &&
+            globals().Web.isAdminEndpoint()
         ) {
-            globals().UserAuth.logout();
-            return;
-        }
-    }
-
-
-    // Remove initial splash screen
-    var splashScreen = document.querySelector(".app-splash-screen");
-    if (splashScreen) {
-        var op = 1;
-        var timer = setInterval(function () {
-            if (op <= 0.1) {
-                clearInterval(timer);
-                splashScreen.style.opacity = 0;
-                if (splashScreen.parentNode) splashScreen.parentNode.removeChild(splashScreen);
+            // selain system endpoin cek session auth
+            if(!globals().Web.isSystemEndpoint()){
+                //jika tidak login dan mengakses halaman selain auth maka redirect ke halaman login
+                if (!globals().UserAuth.isLogin() && !globals().Web.isAuthEndpoint()) {
+                    console.log('redirect ke login (from main router)',globals().UserAuth.isLogin(),globals().Web.isAuthEndpoint());
+                    globals().UserAuth.goToLogin();
+                    return;
+                    //jika sudah login tapi mengakses halaman auth maka redirect
+                } else if (globals().UserAuth.isLogin() && globals().Web.isAuthEndpoint()) {
+                    globals().UserAuth.goToHome();
+                    return;
+                }
             }
-            splashScreen.style.opacity = op;
-            splashScreen.style.filter = 'alpha(opacity=' + op * 100 + ")";
-            op -= op * 0.1;
-        }, 50);
+
+            //jika berpindah tenant maka logout kan dahulu, jika hanya mengakses halaman utama maka redirect ke home
+            if (
+                globals().UserAuth.isLogin()
+                && globals().AppConfig.system.multitenant.active
+                && _groupApp != globals().Web.getTenantGroupApp()
+            ) {
+                globals().UserAuth.logout();
+                return;
+            }
+        }
+
+
+        // Remove initial splash screen
+        var splashScreen = document.querySelector(".app-splash-screen");
+        if (splashScreen) {
+            var op = 1;
+            var timer = setInterval(function () {
+                if (op <= 0.1) {
+                    clearInterval(timer);
+                    splashScreen.style.opacity = 0;
+                    if (splashScreen.parentNode) splashScreen.parentNode.removeChild(splashScreen);
+                }
+                splashScreen.style.opacity = op;
+                splashScreen.style.filter = 'alpha(opacity=' + op * 100 + ")";
+                op -= op * 0.1;
+            }, 50);
+        }
+
+        // On small screens collapse sidenav
+        if (
+            globals().layoutHelpers &&
+            globals().layoutHelpers.isSmallScreen() &&
+            !globals().layoutHelpers.isCollapsed()
+        ) {
+            setTimeout(() => globals().layoutHelpers.setCollapsed(true, true), 10);
+        }
+
+        //reset
+        globals().Web.setSidenavHorizontalDefault();
+        globals().Web.setBodyWithPadding(true);
+
+        // Scroll to top of the page
+        globals().scrollTop(0, 0);
+        globals().Web.setLoadingPage(false);
+        // NProgress.done();
+        EventBus.$emit('onAfterEach', { to, from });
+        
     }
+    waitForPromise();
 
-    // On small screens collapse sidenav
-    if (
-        globals().layoutHelpers &&
-        globals().layoutHelpers.isSmallScreen() &&
-        !globals().layoutHelpers.isCollapsed()
-    ) {
-        setTimeout(() => globals().layoutHelpers.setCollapsed(true, true), 10);
-    }
-
-    //reset
-    globals().Web.setSidenavHorizontalDefault();
-    globals().Web.setBodyWithPadding(true);
-
-    // Scroll to top of the page
-    globals().scrollTop(0, 0);
-    globals().Web.setLoadingPage(false);
-    // NProgress.done();
-    EventBus.$emit('onAfterEach', { to, from });
-    
 });
 
 router.beforeEach((to, from, next) => {

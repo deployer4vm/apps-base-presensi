@@ -141,6 +141,7 @@ export default {
     reloadTenant(groupApp) {
         return this.store.dispatch('reloadTenant', groupApp).then((val) => {
             this.tenantList = this.store.getters.getTenantList;
+            return val;
         });
     },
     // set tenant aktif adalah aplikasi tenant manager nya
