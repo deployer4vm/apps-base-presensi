@@ -67,6 +67,12 @@ class SystemCallback
      */
     public function secureCallBack($data)
     {
+        if(config('AppConfig.system.multitenant.active', false) && isset($data['tenant_id'])){
+            \App\Facades\Tenant::setActiveTenantById($data['tenant_id']);
+        }else{
+            $data['tenant_id'] = 0;
+        }
+
         if(
             !isset($data['callback_id']) ||
             !isset($data['system_user_id']) ||
@@ -76,43 +82,54 @@ class SystemCallback
             $this->error = 'Parameter tidak lengkap.';
             Log::info([
                 'secureCallBack Fail : '.$this->error,
+                'tenant id : '.$data['tenant_id'],
                 $data
             ]);
             return false;
         }
 
-        if(config('AppConfig.system.multitenant.active', false) && isset($data['tenant_id'])){
-            \App\Facades\Tenant::setActiveTenantById($data['tenant_id']);
+
+        if(!array_key_exists('max_hit_retry',$data))
+            $data['max_hit_retry'] = 3;    
+
+        $callbackData = [
+            'tenant_id'=>isset($data['tenant_id'])?$data['tenant_id']:0,
+            'system_user_id'=>$data['system_user_id'],
+            'callback_id'=>$data['callback_id'],
+            'last_hit_at' => now()->format('Y-m-d H:i:s'),
+        ];
+
+        // jika tidak menyertakan id maka ini callback baru, 
+        // jika menyertakan maka callback ulang
+        if(empty($data['id'])){                
+            $createData = true;   
+        }else{
+            MSystemCallback::where('id',$data['id'])->update($callbackData);     
+            // jika data callback tidak ada kemungkinan update gagal, maka create ulang
+            if(($callbackData = MSystemCallback::where('id',$data['id'])->first())==false){
+                $createData = true;
+                unset($data['id']);
+            }else{                                 
+                $createData = false;   
+                // jika status selain 0 maka tidak perlu diproses
+                if($callbackData['status']){
+                    $this->error = 'Callback sudah tidak aktif';
+                    return false;
+                }
+
+                // jika sudah mencapai max hit maka tolak
+                if( $callbackData['hit_count'] >= $callbackData->max_hit_retry ){
+                    $this->error = 'Callback sudah mencapai batas maksimal hit';
+                    $this->addHitCount($callbackData['id'],2);// tandai sebagai overlimit
+                    return false;
+                }
+            }
         }
 
         $user = User::where('id',$data['system_user_id'])->where('system_user',1)
-            ->whereNotNull('secret_key')->first();
-        
-        if(!array_key_exists('max_hit_retry',$data))
-            $data['max_hit_retry'] = 3;        
+            ->whereNotNull('secret_key')->first();            
 
         if($user){      
-            $callbackData = [
-                'tenant_id'=>isset($data['tenant_id'])?$data['tenant_id']:0,
-                'system_user_id'=>$data['system_user_id'],
-                'callback_id'=>$data['callback_id'],
-                'last_hit_at' => now()->format('Y-m-d H:i:s'),
-            ];
-
-            // jika tidak menyertakan id maka ini callback baru, 
-            // jika menyertakan maka callback ulang
-            if(empty($data['id'])){                
-                $createData = true;   
-            }else{
-                MSystemCallback::where('id',$data['id'])->update($callbackData);     
-                // jika data callback tidak ada kemungkinan update gagal, maka create ulang
-                if(($callbackData = MSystemCallback::where('id',$data['id'])->first())==false){
-                    $createData = true;
-                    unset($data['id']);
-                }else{                                 
-                    $createData = false;   
-                }
-            }
 
             // jika perlu create data baru
             if($createData){
@@ -124,12 +141,6 @@ class SystemCallback
                 $callbackData['max_hit_retry'] = $data['max_hit_retry'];
 
                 $callbackData = MSystemCallback::create($callbackData); 
-            }else{
-                // jika sudah mencapai max hit maka tolak
-                if( $callbackData['hit_count'] >= $callbackData->max_hit_retry ){
-                    $this->error = 'Callback sudah mencapai batas maksimal hit';
-                    return false;
-                }
             }
 
             $tmpData = $data['data'];
@@ -139,31 +150,44 @@ class SystemCallback
                 $this->error = 'Encode data failed.';
                 Log::info([
                     'secureCallBack Fail : '.$this->error,
+                    'tenant id : '.$data['tenant_id'],
                     $tmpData,
                     $data['data']
                 ]);
                 return false;
-            }
-
-            
+            }            
 
             $return = $this->sendCallBack($data,$user->toArray(),$callbackData);
-            MSystemCallback::where('id',$callbackData->id)->update([
-                'status'=>$return?1:0,//update status gagal tidak nya
-                'hit_count'=>DB::raw('hit_count + 1')
-            ]);
+            $this->addHitCount($callbackData['id'],$return?1:0);
 
             $this->error = '';
             return MSystemCallback::with(['log'])->where('id',$callbackData->id)->first()->toArray();
+        }else if(!$createData){
+            
+            $this->addHitCount($callbackData['id'],3);//tandai sebagai error
+            // jika sudah mencapai max hit maka tolak
+            if( $callbackData['hit_count'] >= $callbackData->max_hit_retry ){
+                $this->error = 'Callback sudah mencapai batas maksimal hit';
+                return false;
+            }
         }
 
         $this->error = 'User System Not Found.';
         Log::info([
             'secureCallBack Fail : '.$this->error,
-            $data['system_user_id'],
+            'tenant id : '.$data['tenant_id'],
+            $data,
             $user
         ]);
         return false;
+    }
+
+    private function addHitCount($callbackId,$status=false)
+    {
+        $data = ['hit_count'=>DB::raw('hit_count + 1')];
+        if($status!==false)
+            $data['status'] = $status;
+        MSystemCallback::where('id',$callbackId)->update($data);
     }
 
     private function sendCallBack($data,$user,$callbackData)
