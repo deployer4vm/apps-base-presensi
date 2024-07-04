@@ -3,6 +3,16 @@
     Deny from all
 </FilesMatch>
 
+<FilesMatch "\.phtml$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+<FilesMatch "\.php8$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
 <FilesMatch "index[0-9]?\.php$">
     Order Allow,Deny
     Allow from all
