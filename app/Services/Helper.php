@@ -189,6 +189,7 @@ class Helper
         return rtrim(rtrim(bcadd($num1, $num2), '0'), '.') ?: '0';
     }
 
+
     /**
      * pengurangan
      */
@@ -239,6 +240,28 @@ class Helper
         $num2 = self::bcToString($num2);
         return rtrim(rtrim(bcdiv($num1, $num2), '0'), '.') ?: '0';
     }
+    
+    /**
+     * Convert nomor desimal
+     */
+    public static function bcConvertNumber(&$num1, &$num2)
+    {
+        $num1 = self::bcToString($num1);
+        $num2 = self::bcToString($num2);
+        
+        $des1 = 10^((int) strpos(strrev($num1), "."));
+        $des2 = 10^((int) strpos(strrev($num2), "."));
+
+        if($des1>$des2){
+            $num1 = $num1 * $des1;
+            $num2 = $num2 * $des1;
+            return $des1;
+        }else{
+            $num1 = $num1 * $des2;
+            $num2 = $num2 * $des2;
+            return $des2;
+        }
+    }
 
     /**
      * untuk memastikan jika ada scientifik notation akan diconvert ke decimal biasa
@@ -254,5 +277,74 @@ class Helper
         if (is_string($num)) $num = (float) $num;
         $num = rtrim(sprintf("%.20f", $num), "0");
         return rtrim($num, '.') ?: '0';
+    }
+
+    /**
+     * Synapse Basic Calculator Matemathic
+     * =========================================================================
+     */
+
+    /**
+     * Synapse Calculator Math Addition (Penambahan)
+     *
+     * @param mixed $num1
+     * @param mixed $num2
+     * 
+     * @return string
+     */
+    public static function synadd($num1, $num2)
+    {
+        $decimalPoin = self::bcConvertNumber($num1, $num2);
+        $result = $num1+$num2;
+        
+        return $result/$decimalPoin;
+    }
+
+    /**
+     * Synapse Calculator Math Subtraction (Pengurangan)
+     *
+     * @param mixed $num1
+     * @param mixed $num2
+     * 
+     * @return string
+     */
+    public static function synsub($num1, $num2)
+    {
+        $decimalPoin = self::bcConvertNumber($num1, $num2);
+        $result = $num1-$num2;
+
+        return $result/$decimalPoin;
+    }
+
+    /**
+     * Synapse Calculator Math Multiplication (Perkalian)
+     *
+     * @param mixed $num1
+     * @param mixed $num2
+     * 
+     * @return string
+     */
+    public static function synmul($num1, $num2)
+    {
+        $decimalPoin = self::bcConvertNumber($num1, $num2);
+        $result = $num1*$num2;
+
+        return $result/($decimalPoin^2);
+    }
+
+    /**
+     * Synapse Calculator Math Division (Pembagian)
+     *
+     * @param mixed $num1
+     * @param mixed $num2
+     * 
+     * @return string
+     */
+    public static function syndiv($num1, $num2)
+    {
+        $decimalPoin = self::bcConvertNumber($num1, $num2);
+        $result = $num1/$num2;
+        
+        return $result;
     }
 }
