@@ -385,6 +385,54 @@ trait MigrateDataTenant
     }
 
     /**
+     * truncate table
+     *
+     * @param string|false      $table          isi false jika tidak detek table ada atau tidak,
+     *                                          isi dengan nama table jika mendetek table ada ataut tidak
+     * @param boolean           $ifTableExist
+     */
+    public function truncatePerTenant($table = false, $ifTableExist = true)
+    {
+        //jika mode nya tidak share dalam 1 table
+        if (
+            config('AppConfig.system.multitenant.active', false)
+            && config('AppConfig.system.multitenant.data_mode', 1) != 1
+        ) {
+            $filter = isset($this->tenantId) ? [['id', $this->tenantId]] : [];
+            $tenantList = Tenant::listTenant($filter);
+            foreach ($tenantList['data'] as $tenant) {
+                //jika per database
+                if (config('AppConfig.system.multitenant.data_mode', 1) == 3) {
+                    Tenant::setDb($tenant['id']);
+                    if (
+                        Tenant::dbExists($tenant['id'])
+                        && ($table == false
+                            || Schema::connection(config('database.perTenant') . $tenant['id'])
+                            ->hasTable($table) == $ifTableExist
+                        )
+                    ) {
+                        DB::connection(config('database.perTenant') . $tenant['id'])
+                            ->table($table)
+                            ->truncate();
+                    }
+
+                    // jika per table pake prefix nama table
+                } else {
+                    $tmpTable = $table ? Tenant::getTableName($table, $tenant['id']) : false;
+                    if ($tmpTable == false || Schema::hasTable($tmpTable) == $ifTableExist) {
+                        DB::table($tmpTable)->truncate();
+                    }
+                }
+            }
+            // jika di 1 table
+        } else {
+            if ($table == false || Schema::hasTable($table) == $ifTableExist) {
+                DB::table($table)->truncate();
+            }
+        }
+    }
+
+    /**
      */
     /**
      * delete table per tenant
