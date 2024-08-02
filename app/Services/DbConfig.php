@@ -115,6 +115,9 @@ class DbConfig extends BaseRepository
                 if ($castAsArray) {
                     $this->_setConfig($group, $key, json_encode($default), $tenantId);
                 } else {
+                    if (is_array($default)) {
+                        $default = $default['value'];
+                    }
                     $this->_setConfig($group, $key, $default, $tenantId);
                 }
             }
