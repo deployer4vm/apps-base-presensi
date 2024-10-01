@@ -5,15 +5,16 @@ let AppConfig = {
     system: require("../../../app/MainApp/config/_system.json"),
     binding: require("../../../app/MainApp/config/_binding.json"),
     client: require("../../../app/MainApp/config/_client.json"),
-    packageLocal: require("../../../app/MainApp/config/_packageLocal.json"),
-    packageLocalPerTenant: require("../../../app/MainApp/config/_packageLocalPertenant.json"),
-    package: require("../../../app/MainApp/config/package.json"),
     // listener: require("../../../app/MainApp/config/listener.json"),
     endpoint: require("../../../app/MainApp/config/_endpoint.json"),
+    // -- data-data yang besar
     sidenav: require("../../../app/MainApp/config/_sidenav.json"),
     sidenavOri: require("../../../app/MainApp/config/_sidenav.json"),
     customSidenav: require("../../../app/MainApp/config/sidenav.json"),
     customSidenavOri: require("../../../app/MainApp/config/sidenav.json"),
+    packageLocal: require("../../../app/MainApp/config/_packageLocal.json"),
+    packageLocalPerTenant: require("../../../app/MainApp/config/_packageLocalPerTenant.json"),
+    package: require("../../../app/MainApp/config/package.json"),
     acl: require("../../../app/MainApp/config/_acl.json")
 };
 

@@ -31,7 +31,7 @@ trait ModelDataTenant
      *
      * @param int $tenantId ID Tenant
      * @param boolean $isTenantId unused
-     * @return void
+     * @return self
      */
     
     public function setTenantId($tenantId, $isTenantId=true)
@@ -135,7 +135,6 @@ trait ModelDataTenant
         if($this->getDataMode()==2)
             $table = config('AppConfig.system.multitenant.table_prefix','_').$this->getTenantId().'_'.$this->table;
             
-
         return $table;
     }
 }

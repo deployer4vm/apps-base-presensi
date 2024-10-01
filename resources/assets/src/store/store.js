@@ -7,6 +7,11 @@ import configStore from "./modules/config";
 import tenantStore from "./modules/tenant";
 import storeRepo from "./storeRepo";
 import globals from "@/globals";
+// Aktifkan encryptor jika local storage akan di endcrypt
+// import { Encryptor } from "node_modules/node-laravel-encryptor";
+// var encryptor = new Encryptor({
+//     key: globals().AppConfig.client.secret_key,
+// });
 
 window.Vue.use(Vuex);
 
@@ -17,16 +22,16 @@ let vuexConfig = {
         trans: transStore,
         template: templateStore,
         storeRepo: storeRepo,
-        ...projectStore
-    }
+        ...projectStore,
+    },
 };
 
 const vuexPersist = new VuexPersist({
     //cache semua state kecuali template state
     reducer: (state) => {
         let newState = {
-            'auth': state.auth,
-            'trans': state.trans
+            auth: state.auth,
+            trans: state.trans,
         };
         if (globals().AppConfig.system.multitenant.active) {
             newState.tenant = state.tenant;
@@ -34,9 +39,12 @@ const vuexPersist = new VuexPersist({
 
         _.forEach(state, (value, index) => {
             //registrasikan vuexPersist jika diaktikan atau jika diset per store nya
-            if ((globals().AppConfig.system.web_state_persistant && value.persistant == undefined)
-                || value.persistant == true) {
-                if (index != 'template') {
+            if (
+                (globals().AppConfig.system.web_state_persistant &&
+                    value.persistant == undefined) ||
+                value.persistant == true
+            ) {
+                if (index != "template") {
                     newState[index] = value;
                 }
             }
@@ -46,6 +54,40 @@ const vuexPersist = new VuexPersist({
     },
     key: globals().AppConfig.client.apps_id,
     storage: localStorage
+    // Aktifkan storage dibawah jika localstorage akan di encrypt
+    // storage: {
+    //     getItem: (storageKey) => {
+    //         var now = Date.now();
+    //         // Get the store from local storage.
+    //         const store = window.localStorage.getItem(storageKey);
+
+    //         if (store) {
+    //             try {
+    //                 // Decrypt the store retrieved from local storage
+    //                 // using our encryption token stored in cookies.
+    //                 const bytes = encryptor.decryptSync(store);
+                    
+    //                 console.log('storage.getItem', Date.now()-now);
+    //                 return JSON.parse(bytes);
+    //             } catch (e) {
+    //                 // The store will be reset if decryption fails.
+    //                 window.localStorage.removeItem(storageKey);
+    //             }
+    //         }
+
+    //         return null;
+    //     },
+    //     setItem: (storageKey, value) => {
+    //         var now = Date.now();
+    //         // Encrypt the store using our encryption token stored in cookies.
+    //         const store = encryptor.encryptSync(value);
+    //         console.log('storage.setItem', Date.now()-now);
+
+    //         // Save the encrypted store in local storage.
+    //         return window.localStorage.setItem(storageKey, store);
+    //     },
+    //     removeItem: (storageKey) => window.localStorage.removeItem(storageKey),
+    // },
 });
 vuexConfig.plugins = [vuexPersist.plugin];
 

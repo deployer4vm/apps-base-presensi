@@ -2,7 +2,7 @@
 
 namespace App\Base;
 
-use App\Base\Traits\ResCacheTrait;
+// use App\Base\Traits\ResCacheTrait;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -15,7 +15,7 @@ class BaseController extends LaravelBaseController
     use AuthorizesRequests;
     use DispatchesJobs;
     use ValidatesRequests;
-    use ResCacheTrait;
+    // use ResCacheTrait;
 
     const MESSAGE_TYPE_SUCCESS = "success";
     const MESSAGE_TYPE_INFO = "info";
@@ -38,6 +38,7 @@ class BaseController extends LaravelBaseController
         'params' => null,
         'viewdata' => null, //data yang hanya disertakan di web request
         'errors' => null,
+        'error_code' => 0,
     ];
 
     /**

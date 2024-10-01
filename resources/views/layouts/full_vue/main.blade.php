@@ -55,7 +55,7 @@
         @if (config('AppConfig.system.multitenant.active'))
             var tenantId = {{ config('tenant.id', 'false') }};
             var isOnTenantManager = {{ config('tenant.isOnTenantManager', false) ? 'true' : 'false' }};
-            var tenantData = <?php echo json_encode(config('tenant', []), JSON_PRETTY_PRINT); ?>;
+            var tenantGroupApp = <?php echo config('tenant.group_app')?('"'.config('tenant.group_app').'"'):'false'; ?>;
         @endif
         var onIframe = {{  config('AppConfig.system.coop_var.force_on_iframe', config()->has('AppConfig.system.coop_var')) || request('onIframeConfig') ? 'true' : 'false' }};
         @if (config('AppConfig.system.coop_var.force_on_iframe', config()->has('AppConfig.system.coop_var')) || request('onIframeConfig'))
@@ -66,7 +66,7 @@
             };
         @endif
         var first_login = {{ request('first_login') ? 'true' : 'false' }};
-        // {{ config('AppConfig.system.coop_var.force_on_iframe', true) }}
+        <?php // {{ config('AppConfig.system.coop_var.force_on_iframe', true) }} ?>
     </script>
 
     <style>

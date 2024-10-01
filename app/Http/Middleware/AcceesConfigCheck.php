@@ -6,11 +6,12 @@ use Closure;
 use hpsynapse\moduser\Facades\UserAuth;
 use Illuminate\Support\Facades\Auth;
 use hpsynapse\moduser\Models\ApiToken;
-use App\Base\Traits\ResCacheTrait;
+// use App\Base\Traits\ResCacheTrait;
+use App\Facades\CacheConfig;
 
 class AcceesConfigCheck
 {
-    use ResCacheTrait;
+    // use ResCacheTrait;
     /**
      * Handle an incoming request.
      *
@@ -20,14 +21,14 @@ class AcceesConfigCheck
      */
     public function handle($request, Closure $next)
     {
-        $this->cacheActive = true;
-        if (!($config = $this->_getCache('generalconfig', 'accesss'))) {
+        // $this->cacheActive = true;
+        if (!($config = CacheConfig::getConfig('accesss'))) {
             $config = [
                 'allow_login' => 1,
                 'allow_login_exept' => [],
                 'allow_login_only' => []
             ];
-            $this->_saveCache('generalconfig', 'accesss', $config);
+            CacheConfig::setConfig('accesss', $config);
         }
 
         $isWebReq = true;
@@ -59,14 +60,14 @@ class AcceesConfigCheck
             }
         }
 
-
         if ($accessBlocked && $isLogin) {
             if ($isWebReq) {
                 if ($isLogin)
                     Auth::logout();
                 return redirect()->route('auth.login');
             } else {
-                ApiToken::where('api_token', $token)->delete();
+                ApiToken::where('api_token', $token)
+                    ->where('is_permanent',0)->delete();
                 throw new \Illuminate\Auth\AuthenticationException();
             }
         }

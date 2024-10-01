@@ -125,17 +125,19 @@ class AppServiceProvider extends ServiceProvider
         Validator::extend('cannot_empty', function ($attribute, $value, $parameters, $validator) {
             return !empty($value);
         });
-        $aksesId = rand() . '-' . hash_hmac('md5', now(), 'wek');
-        DB::listen(function ($query) use ($aksesId) {
-            // $query->sql
-            // $query->bindings
-            // $query->time
-            // if(true){//stripos($query->sql,'absensi')!=false && stripos($query->sql,'select')===false){
-            if (isset($_GET['logquery'])) {
-                $sql = str_replace('?', "'?'", $query->sql);
-                $sql = vsprintf(str_replace('?', '%s', $sql), $query->bindings);
-                Log::info('[QUERY] [' . $aksesId . '] : ' . $sql);
-            }
-        });
+
+        if (isset($_GET['logquery'])) {
+            $aksesId = rand() . '-' . hash_hmac('md5', now(), 'wek');
+            DB::listen(function ($query) use ($aksesId) {
+                // $query->sql
+                // $query->bindings
+                // $query->time
+                // if(true){//stripos($query->sql,'absensi')!=false && stripos($query->sql,'select')===false){
+                    $sql = str_replace('?', "'?'", $query->sql);
+                    $sql = vsprintf(str_replace('?', '%s', $sql), $query->bindings);
+                    Log::info('[QUERY] [' . $aksesId . '] '.$query->time.' : ' . $sql);
+                
+            });
+        }
     }
 }

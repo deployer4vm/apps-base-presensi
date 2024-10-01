@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddStatusConfigNoteInTenantsTable extends Migration
+class AddFeatureFieldToTenantsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,9 @@ class AddStatusConfigNoteInTenantsTable extends Migration
      */
     public function up()
     {
+        
         Schema::table('tenants', function (Blueprint $table) {
-            $table->unsignedTinyInteger('status')->default(1)->after('protected');
-            $table->text('note')->nullable()->after('name');            
-            $table->longText('config')->nullable()->after('s3storage');
+            $table->longText('feature')->nullable()->after('config');
         });
     }
 
@@ -28,7 +27,7 @@ class AddStatusConfigNoteInTenantsTable extends Migration
     public function down()
     {
         Schema::table('tenants', function (Blueprint $table) {
-            $table->dropColumn(['status','note','config']);
+            $table->dropColumn(['feature']);
         });
     }
 }

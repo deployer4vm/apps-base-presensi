@@ -257,6 +257,8 @@ if (!function_exists('initHPsynapseConfig')) {
                     $config['language_folder_name'],
                     $config['resource_namespace']
                 );
+                $langPath['pertenant'][$tenantId][] = app_path($mainAppProjectPath . DS  . 'Tenants' . DS . 'ID' . $tenantId . DS . 'resources' . DS . 'lang' . DS);
+
             }
         }
 
@@ -290,6 +292,8 @@ if (!function_exists('initHPsynapseConfig')) {
                     $config['view_folder_name'],
                     $config['resource_namespace']
                 );
+
+                $viewPath['pertenant'][$tenantId][] = app_path($mainAppProjectPath . DS  . 'Tenants' . DS . 'ID' . $tenantId . DS . 'resources' . DS . 'views' . DS);
             }
         }
 

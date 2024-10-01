@@ -57,10 +57,10 @@ router.afterEach((to, from) => {
 
     if (globals().AppConfig.system.multitenant.active) {
 
-        if (tenantData == undefined) {
+        if (tenantGroupApp == undefined) {
             _groupApp = to.params.group_app ? to.params.group_app : '';
         } else {
-            _groupApp = isOnTenantManager ? '' : tenantData.group_app;
+            _groupApp = isOnTenantManager ? '' : tenantGroupApp;
         }
 
         if (globals().LocalApi.defaults.headers.common["Group-App"] != _groupApp)

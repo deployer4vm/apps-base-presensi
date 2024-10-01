@@ -8,7 +8,7 @@ use App\Facades\Tenant;
 
 /**
  * SUDAH TIDAK DIGUNAKAN
- * dipindah ke routeserviceprovider
+ * dipindah ke TranslationServiceProvider
  */
 class AppGroupCheck
 {

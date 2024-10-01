@@ -321,6 +321,8 @@ export default function () {
         // Upload url
         uploadedUrl: AppConfig.system.uploaded_url ? AppConfig.system.uploaded_url : '/storage/',
 
+        isOnTenantManager: isOnTenantManager,
+        
         // Layout helpers
         layoutHelpers,
 

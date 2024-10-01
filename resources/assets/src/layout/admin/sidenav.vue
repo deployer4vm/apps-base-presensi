@@ -286,10 +286,10 @@ export default {
                         arr = [0];
                     return curTenantGroup.some(r => arr.indexOf(r) >= 0);
                 }else{
-                    return curTenantGroup == 0 || (curTenantGroup == 1 && !isOnTenantManager) || (curTenantGroup == 2 && isOnTenantManager);
+                    return curTenantGroup == 0 || (curTenantGroup == 1 && !isOnTenantManager) || ((curTenantGroup == 2 || curTenantGroup == 3) && isOnTenantManager);
                 }
             }else{
-                return curTenantGroup == 0 || curTenantGroup == 1;
+                return curTenantGroup == 0 || curTenantGroup == 1 || curTenantGroup == 3;
             }
         },
         isMenuActive(route, menuId, viewLog=false) {

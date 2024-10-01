@@ -9,7 +9,9 @@ use Carbon\Carbon;
 
 use hpsynapse\moduser\Models\ApiToken;
 
-
+/**
+ * Cek expired token (API)
+ */
 class TokenExpireCheck
 {
     /**
@@ -29,26 +31,28 @@ class TokenExpireCheck
                 $token = Auth::user()->api_token;
                 // jika token permanent maka tidak perlu dicek
                 if(Auth::user()->is_permanent){
-                    ApiToken::where('api_token', $token)->update(['updated_at' => now()]);
+                    ApiToken::where('api_token', $token)
+                        ->update(['updated_at' => now()]);
                     return $next($request);
                 }
             } else {
                 $updatedAt = UserAuth::getSessionLastUpdate();
-                $token = UserAuth::getToken();
             }
 
             $lastAccess = (new Carbon($updatedAt))->addMinute(config('session.lifetime'));
 
             if ($lastAccess->lessThan(now())) {
-                ApiToken::where('api_token', $token)->delete();
                 if ($isWebReq) {
                     Auth::logout();
                 } else {
+                    ApiToken::where('api_token', $token)
+                        ->where('is_permanent',0)->delete();
                     throw new \Illuminate\Auth\AuthenticationException();
                 }
                 return;
-            } else {
-                ApiToken::where('api_token', $token)->update(['updated_at' => now()]);
+            } else if(!$isWebReq) {
+                ApiToken::where('api_token', $token)
+                    ->update(['updated_at' => now()]);
             }
         }
         return $next($request);

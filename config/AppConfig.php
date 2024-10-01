@@ -75,7 +75,55 @@ if (!function_exists('get_module_folder')) {
 }
 
 /**
+ * add config dashboard per module atau dari system ke config _dashboard.json
+ */
+if (!function_exists('add_config_dashboard_template')) {
+    function add_config_dashboard_template($dashboard, $configDashboard)
+    {
+        // var_dump($configDashboard);
+        foreach ($configDashboard['template'] as $value) {
+            if(!isset($dashboard[$value['code']])){
+                $dashboard[$value['code']] = $value;
+                $dashboard[$value['code']]['module'] = [];
+            }
+        }
+        return $dashboard;
+    }
+}
+
+if (!function_exists('add_config_dashboard_feature')) {
+    // baru digunakan jika semua template sudah di add di variable $dashboard
+    // jadi tinggal tambah feature nya saja
+    function add_config_dashboard_feature($dashboard, $templateList, $moduleNamespace, $configDashboard)
+    {
+        $tmpTemplateList = [];
+        foreach ($configDashboard['feature'] as $featureCode => $value) {
+            if(!isset($value['code']))$value['code'] = $featureCode;
+            if(empty($value['template_code'])){
+                $tmpTemplateList = $templateList;
+            }else{
+                $tmpTemplateList = $value['template_code'];
+            }
+            
+            foreach ($tmpTemplateList as $templateCode) {
+                if(!isset($dashboard[$templateCode]['module'][$moduleNamespace]))
+                    $dashboard[$templateCode]['module'][$moduleNamespace]=[];
+                unset($value['template_code']);
+                $dashboard[$templateCode]['module'][$moduleNamespace][$value['code']] = $value;
+
+            }
+        }
+        return $dashboard;
+    }
+}
+
+/**
  * Config utama yang menyimpan semua config aplikasi. Datanya disimpan di app/MainApp/config
+ */
+ 
+/**
+ * Load config client.json
+ * -----------------------------------------------------------------------------
  */
 $mainAppPath = __DIR__ . '/../app/MainApp';
 $client = json_decode(file_get_contents($mainAppPath . '/config/client.json'), true);
@@ -86,21 +134,17 @@ if (file_exists($mainAppPath . '/config/clientEnv.json')) {
     $client = recuresive_array_merge($client, $tmpEnvClient);
 } else {
     file_put_contents($mainAppPath . '/config/clientEnv.json', json_encode($client, JSON_PRETTY_PRINT));
-    //$tmpEnvClient = $client;
 }
 
-//load config listener.json jika ada
-// $listener = [];
-// if(file_exists($mainAppPath . '/config/listener.json')){
-//     $listener = json_decode(file_get_contents($mainAppPath . '/config/listener.json'), true);
-// }
-
+// load config utama
 $keyConfig = json_decode(file_get_contents(__DIR__ . '/../resources/assets/src/config.json'), true);
 
 /**
  * Load config system.json
  * -----------------------------------------------------------------------------
  */
+
+// load system.json di MainApp
 $system = json_decode(file_get_contents($mainAppPath . '/config/system.json'), true);
 
 if (file_exists($mainAppPath . '/config/systemEnv.json')) {
@@ -178,6 +222,7 @@ $moduleList = array_merge(
     glob(base_path('app/MainApp/Modules/*/packageconfig.json')),
     glob(base_path('vendor/hp-synapse/*/packageconfig.json'))
 );
+
 $package = [];
 $packageFolder = [];
 foreach ($moduleList as $path) {
@@ -267,6 +312,7 @@ if (isset($system['multitenant']['active']) && $system['multitenant']['active'])
         foreach ($tenantList as $path) {
             $tenantId = explode('Tenants/ID', str_replace('/config/packageLocal.json', '', $path));
             $tmpPackageLocalPerTenant[$tenantId[1]] = json_decode(file_get_contents($path), true);
+            // var_dump($tmpPackageLocalPerTenant[$tenantId[1]]);
         }
     }
 }
@@ -331,9 +377,9 @@ $tmpSidenav = [];
 $tmpSidenavNoPos = []; //package yg tidak diset access.pos nya
 $sidenav = [];
 
-// looping semua packageconfig yg ada untuk proses filtering dan pemrosesan yang menghasilkan _packageLocal.json, _sidenav.json dan _acl.json di MainApp/config
+// looping semua packageconfig yg ada untuk proses filtering dan pemrosesan 
+// yang menghasilkan _packageLocal.json, _sidenav.json dan _acl.json di MainApp/config
 foreach ($package as $item) {
-
     // get data packageconfig dari packageLocal.json di MainApp/config untuk diproses selanjutnya
     $newPackageLocal[$item['package_namespace']] = $tmpPackageLocal[$item['package_namespace']] ?? [];
 
@@ -437,6 +483,100 @@ foreach ($tmpPackageLocalPerTenant as $tenantId => $pertenant) {
         );
     }
 }
+
+/**
+ * START generate _datarule.json, _dashboard.json & _notification.json
+ * -----------------------------------------------------------------
+ */
+$datarule = [
+    'subtype'=>[],
+    'feature'=>[]
+];
+$dashboard = [];
+// jika di system.json ada config dashboard maka ambil
+if(isset($system['dashboard']))
+    $dashboard = add_config_dashboard_template($dashboard,$system['dashboard']);
+
+$notification = [];
+if(isset($system['notification']))
+    $notification['system'] = [
+        'name'=>'System',
+        'feature' => $system['notification']['feature']
+    ];
+
+
+$tmpPackageLocalAll = $packageLocalPerTenant;
+$tmpPackageLocalAll[0] = $packageLocal;
+$templateList = [];
+
+foreach ($tmpPackageLocalAll as $tenantId => $dataPackage) {
+    foreach ($dataPackage as $tmpModuleName => $dataModule) {
+        
+        if(isset($dataModule['dashboard']))
+            $dashboard = add_config_dashboard_template($dashboard,$dataModule['dashboard']);
+
+        // set datarule
+        if(isset($dataModule['datarule']) && $dataModule['datarule']['enable']){
+
+            // set custom subtype
+            if(isset($dataModule['datarule']['subtype']))
+                foreach ($dataModule['datarule']['subtype'] as $subtypeId => $dataSubtype) {
+                    if(isset($datarule['subtype'][$subtypeId])){
+                        $datarule['subtype'][$subtypeId] = recuresive_array_merge($datarule['subtype'][$subtypeId],$dataSubtype);
+                    }else{
+                        $datarule['subtype'][$subtypeId] = $dataSubtype;
+                    }                    
+                }            
+
+            // set feature
+            if(isset($dataModule['datarule']['feature']))
+                foreach ($dataModule['datarule']['feature'] as $featureCode => $dataFeature) {
+                    if(isset($datarule['feature'][$featureCode])){
+                        $datarule['feature'][$featureCode] = recuresive_array_merge($datarule['feature'][$featureCode],$dataFeature);
+                    }else{
+                        $datarule['feature'][$featureCode] = $dataFeature;
+                    }   
+                }
+            
+        }
+        
+        if(isset($dataModule['notification']) && isset($dataModule['notification']['feature'])){
+            if(isset($notification[$tmpModuleName])){
+                foreach ($dataModule['notification']['feature'] as $key => $value) {
+                    if(isset($notification[$tmpModuleName]['feature'][$key])){
+                        $notification[$tmpModuleName]['feature'][$key] = 
+                            recuresive_array_merge($notification[$tmpModuleName]['feature'][$key],$value);
+                    }else{
+                        $notification[$tmpModuleName]['feature'][$key] = $value;
+                    }                    
+                }
+            }else{
+                $notification[$tmpModuleName] = [
+                    'name'=>$dataModule['name'],
+                    'feature' => $dataModule['notification']['feature']
+                ];
+            }
+        }
+    }
+}
+
+foreach ($dashboard as $templateCode => $tmpValue) {
+    $templateList[] = $templateCode;
+}
+
+foreach ($tmpPackageLocalAll as $tenantId => $dataPackage) {
+    foreach ($dataPackage as $tmpModuleName => $dataModule) {
+        
+        if(isset($dataModule['dashboard']))
+            $dashboard = add_config_dashboard_feature($dashboard,$templateList,$tmpModuleName,$dataModule['dashboard']);
+
+    }
+}
+
+/**
+ * -----------------------------------------------------------------
+ * END
+ */
 
 foreach ($tmpSidenavNoPos as $value) {
     $tmpSidenav[] = $value;
@@ -547,6 +687,9 @@ $binding = $hpsynapse['bindings'];
 ] : $hpsynapse['bindings'];*/
 $providers = [];
 
+$moduleStoreIncomplete = true;
+$moduleRouterIncomplete = true;
+
 foreach ($packageLocal as $item) {
     /*
  generate binding masing-masing module
@@ -566,7 +709,7 @@ foreach ($packageLocal as $item) {
         }
     }
 
-    /*
+ /*
  generate endpoint masing-masing module
  ----------------------------
   */
@@ -599,7 +742,7 @@ foreach ($packageLocal as $item) {
         }
     }
 
-    /*
+ /*
  generate loader store, router, routerAdmin dan init.js untuk package
  -------------------------
   */
@@ -634,6 +777,7 @@ foreach ($packageLocal as $item) {
 
         //untuk loader vuex store
         if (file_exists($filePath . "resources/js/store/store.js")) {
+            $moduleStoreIncomplete = false;
             $moduleStore[] = "import " . $item['package_namespace'] . ' from "'
                 . $packagePath . 'resources/js/store/store";' . "\n";
             $moduleStoreNamespace[] = "    ..." . $item['package_namespace'];
@@ -648,6 +792,7 @@ foreach ($packageLocal as $item) {
 
         //untuk loader vue router
         if (file_exists($filePath . "resources/js/router/index.js")) {
+            $moduleRouterIncomplete = false;
             $moduleRouter[] = "import " . $item['package_namespace'] . ' from "'
                 . $packagePath . 'resources/js/router/index";' . "\n";
             $moduleRouterNamespace[] = "    .concat(" . $item['package_namespace'] . ")";
@@ -918,6 +1063,18 @@ if ($system['web_admin']['web']) {
     file_put_contents($mainAppPath . '/resources/js/webBuild.js', implode('', $moduleWebBuildJs));
 }
 
+// jika generate indexing store terdetek kosong maka kasih warning
+if($moduleStoreIncomplete){
+    echo "\n/MainApp/resource/js/store/modules.js Terdeteksi KOSONG, CEK KEMBALI !!!!!\n";
+}
+
+// jika generate indexing router terdetek kosong maka kasih warning
+if($moduleRouterIncomplete){
+    echo "\n/MainApp/resource/js/router/modules.js Terdeteksi KOSONG, CEK KEMBALI !!!!!\n";
+}
+
+
+
 file_put_contents(
     $mainAppPath . '/resources/js/modules.js',
     implode('', $moduleMainJs)
@@ -997,7 +1154,7 @@ file_put_contents(
     json_encode($packageLocal, JSON_PRETTY_PRINT)
 );
 file_put_contents(
-    $mainAppPath . '/config/_packageLocalPertenant.json',
+    $mainAppPath . '/config/_packageLocalPerTenant.json',
     json_encode($packageLocalPerTenant, JSON_PRETTY_PRINT)
 );
 file_put_contents(
@@ -1016,6 +1173,18 @@ file_put_contents(
     $mainAppPath . '/config/_sidenav.json',
     json_encode($sidenav, JSON_PRETTY_PRINT)
 );
+file_put_contents(
+    $mainAppPath . '/config/_datarule.json',
+    json_encode($datarule, JSON_PRETTY_PRINT)
+);
+file_put_contents(
+    $mainAppPath . '/config/_dashboard.json',
+    json_encode($dashboard, JSON_PRETTY_PRINT)
+);
+file_put_contents(
+    $mainAppPath . '/config/_notification.json',
+    json_encode($notification, JSON_PRETTY_PRINT)
+);
 
 /*
 package dan module berisi config yang sama persis
@@ -1030,7 +1199,11 @@ return [
     'package' => $package, //config2 default dari module dan lib
     'packageFolder' => $packageFolder,
     // 'listener' => $listener,
-    'sidenav' => $sidenav,
+    'sidenav' => $sidenav,    
+    'dashboard' => $dashboard,
+    'notification' => $notification,
+    'datarule' => $datarule,
+    //
     'tenant' => $tenantList, //_tenant.json , list tenant
     'acl' => $acl, //_acl.json
 ];

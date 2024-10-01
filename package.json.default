@@ -151,6 +151,7 @@
         ]
     },
     "dependencies": {
+        "firebase": "^10.13.1",
         "node-laravel-encryptor": "^3.0.2"
     }
 }

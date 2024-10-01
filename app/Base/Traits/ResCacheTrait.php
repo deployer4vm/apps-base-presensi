@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 
 /**
+ * JANGAN DIGUNAKAN SECARA LANGSUNG (engine CacheConfig), JIKA PERLU CACHE GUNAKAN CacheConfig
  * General Resource Cache Trait
  */
 trait ResCacheTrait
@@ -244,11 +245,11 @@ trait ResCacheTrait
         Cache::store($this->cacheEngine)->forget($fullPrefixKey);
         return true;
     }
+
     /*
      * CACHE ENGINE
      * -------------------------------------------------------------------------
      */
-
 
     /**
      *
