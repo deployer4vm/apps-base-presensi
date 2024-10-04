@@ -8,7 +8,7 @@
                     footerText
                 }}</span> -->
                 <span class="footer-text font-weight-bold">
-                    © Copyright 2023 <a href="https://smartcoop.id/" target="_blacnk" class="text-main">Smartcoop.id </a>
+                    © Copyright {{ tahun }} <a :href="urlCopyright" target="_blank" class="text-main">{{appName}}</a>
                 </span>
             </div>
             <div>
@@ -43,6 +43,18 @@ export default {
     name: "app-layout-footer",
 
     computed: {
+        appName() {
+            return this.AppConfig.client.app_name;
+        },
+        urlCopyright() {
+            return this.AppConfig.system.multitenant.active?(this.AppConfig.system.http_proto + this.AppConfig.system.multitenant.main_domain):this.AppConfig.client.endpoint[this.AppConfig.system.mode].domain;
+        },
+        proto() {
+            return this.AppConfig.system.http_proto;
+        },
+        tahun() {
+            return moment().format('YYYY');
+        },
         footerText() {
             return this.$store.getters.getFooterText;
         },

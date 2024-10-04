@@ -18,7 +18,8 @@
         "artisan_web_endpoint",
         "use_admin_full_vue",
         "broadcast",
-        "jobs"
+        "jobs",
+        "web_admin"
     ],
     "protected_packageLocal_key": [
         "name",
