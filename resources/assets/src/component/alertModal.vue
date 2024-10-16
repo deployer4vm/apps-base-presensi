@@ -10,7 +10,7 @@
                 {{ title }}
             </div>
 
-            <div v-html="text"></div>
+            <div v-html="text" class="mb-3"></div>
 
             <template slot="modal-footer" slot-scope="{ ok, cancel }">
                 <b-button size="sm" variant="secondary" class="w-icon" @click="cancel()">

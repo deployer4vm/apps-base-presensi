@@ -34,6 +34,10 @@ class StorageController extends BaseController
     {
         $segment = $request->segments();
         array_shift($segment); // buang segment "storage"
+
+        if (empty($segment)) {
+            return abort(404);
+        }
         
         $fullFilePath = implode('/', $segment);
         // dd(Storage::path($fullFilePath));
