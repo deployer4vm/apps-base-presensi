@@ -60,6 +60,9 @@
         @if(config('AppConfig.system.multitenant.active'))
             var tenantId = {{config('tenant.id','false')}};
             var isOnTenantManager = {{config('tenant.isOnTenantManager',false)?'true':'false'}};
+        @else
+            var tenantId = false;
+            var isOnTenantManager = false;
         @endif
     </script>
 

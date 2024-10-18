@@ -56,6 +56,10 @@
             var tenantId = {{ config('tenant.id', 'false') }};
             var isOnTenantManager = {{ config('tenant.isOnTenantManager', false) ? 'true' : 'false' }};
             var tenantGroupApp = <?php echo config('tenant.group_app')?('"'.config('tenant.group_app').'"'):'false'; ?>;
+        @else
+            var tenantId = false;
+            var isOnTenantManager = false;
+            var tenantGroupApp = false;
         @endif
         var onIframe = {{  config('AppConfig.system.coop_var.force_on_iframe', config()->has('AppConfig.system.coop_var')) || request('onIframeConfig') ? 'true' : 'false' }};
         @if (config('AppConfig.system.coop_var.force_on_iframe', config()->has('AppConfig.system.coop_var')) || request('onIframeConfig'))
