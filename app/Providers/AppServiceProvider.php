@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Log;
 use App\Mixins\RouterMixin;
 use Illuminate\Pagination\Paginator;
 
+use App\Facades\CacheConfig;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -125,7 +127,7 @@ class AppServiceProvider extends ServiceProvider
         Validator::extend('cannot_empty', function ($attribute, $value, $parameters, $validator) {
             return !empty($value);
         });
-
+        CacheConfig::setCacheEngine(config('cache.default','file'));
         if (isset($_GET['logquery'])) {
             $aksesId = rand() . '-' . hash_hmac('md5', now(), 'wek');
             DB::listen(function ($query) use ($aksesId) {

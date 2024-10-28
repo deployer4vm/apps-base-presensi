@@ -115,7 +115,7 @@ class CacheConfig extends BaseRepository
      *
      * @param string            $cacheEngine engine cache nya
      */
-    protected function _setCacheEngine($cacheEngine)
+    public function setCacheEngine($cacheEngine)
     {
         $this->cacheEngine = $cacheEngine;
     }
@@ -125,7 +125,7 @@ class CacheConfig extends BaseRepository
      *
      * @param string            $cacheEngine engine cache nya
      */
-    protected function _setCacheEngineStatus($cacheActive)
+    public function setCacheEngineStatus($cacheActive)
     {
         $this->cacheActive = $cacheActive;
     }
