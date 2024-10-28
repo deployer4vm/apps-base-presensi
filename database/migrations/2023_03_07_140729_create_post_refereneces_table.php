@@ -15,22 +15,24 @@ class CreatePostReferenecesTable extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('post_references')) {
-            Schema::create('post_references', function (Blueprint $table) {
-                $table->string('ref_id');
-                $table->unsignedBigInteger('tenant_id')->default(0);
-                $table->unsignedBigInteger('user_id')->default(0);
-                $table->string('form_id');
-                $table->unsignedTinyInteger('status')->default(0);
-                $table->timestamps();
+        if (config('AppConfig.system.multitenant.active', false) && $this->tenantMigrateMode() == false) {
+            if (!Schema::hasTable('post_references')) {
+                Schema::create('post_references', function (Blueprint $table) {
+                    $table->string('ref_id');
+                    $table->unsignedBigInteger('tenant_id')->default(0);
+                    $table->unsignedBigInteger('user_id')->default(0);
+                    $table->string('form_id');
+                    $table->unsignedTinyInteger('status')->default(0);
+                    $table->timestamps();
 
-                $table->unique('ref_id');
+                    $table->unique('ref_id');
 
-                $table->index('tenant_id');
-                $table->index('user_id');
-                $table->index('form_id');
-                $table->index('status');
-            });
+                    $table->index('tenant_id');
+                    $table->index('user_id');
+                    $table->index('form_id');
+                    $table->index('status');
+                });
+            }
         }
 
         $this->createPerTenant('post_references', function (Blueprint $table) {

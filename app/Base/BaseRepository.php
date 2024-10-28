@@ -774,6 +774,7 @@ abstract class BaseRepository
      *      tenantId|tenant_id      bigint              id tenant yang di filter
      *      q                       string              jika menyertakan ini maka akan dilakuan string filter berdasarkan field $searchField     *
      *      function                function($model)    filter tambahan jika diperlukan
+     *      datarule                array               config filter datarule jika ada
      *      searchField             array               list field/column yg termasuk kedalam filter search
      *      hiddenColumn            array               list field/column yg di hidde * -- HINDARI PENGGUNAAN HIDDEN COLUMN UNTUK DATA BESAR
      *      append                  array|string        list custom attribute yg akan ditampilkan
@@ -798,15 +799,6 @@ abstract class BaseRepository
         $returnModel = false
     ) {
 
-        if (!empty($orderBy)) {
-            if (isset($orderBy[0]) && !is_array($orderBy[0]))
-                $orderBy = [$orderBy];
-
-            foreach ($orderBy as $oBitem) {
-                $model = $model->orderBy($oBitem[0], $oBitem[1]);
-            }
-        }
-
         $hiddenColumn = null;
         $appendAttribut = null;
         $idAsKey = false; // key di list data, apakah menggunakan ID atau urut array secara default saja
@@ -815,6 +807,7 @@ abstract class BaseRepository
                 $idAsKey = true;
                 unset($filter['idAsKey']);
             }
+            
             $model = $this->_filter($model, $filter);
             if (isset($filter['hiddenColumn'])) {
                 $hiddenColumn = $filter['hiddenColumn'];
@@ -825,6 +818,15 @@ abstract class BaseRepository
                 unset($filter['append']);
             }
             unset($filter);
+        }
+
+        if (!empty($orderBy)) {
+            if (isset($orderBy[0]) && !is_array($orderBy[0]))
+                $orderBy = [$orderBy];
+
+            foreach ($orderBy as $oBitem) {
+                $model = $model->orderBy($oBitem[0], $oBitem[1]);
+            }
         }
 
         if (empty($model)) {
@@ -1008,6 +1010,8 @@ abstract class BaseRepository
      *
      * @param \Illuminate\Database\Eloquent\Model $model
      * @param array $filter
+     *      datarule
+     * 
      * @return \Illuminate\Database\Eloquent\Model
      */
     final protected function _filter($model, array $filter = [])
@@ -1016,6 +1020,16 @@ abstract class BaseRepository
 
         $qSearch = null;
         $searchField = null;
+
+        if(isset($filter['logquery']))
+            unset($filter['logquery']);
+
+        // jika ada datarule
+        if (array_key_exists('datarule',$filter)) {
+            if($filter['datarule'])
+                $model = $this->handleDatarule($model,$filter['datarule']);            
+            unset($filter['datarule']);
+        }
 
         if (isset($filter['with'])) {
             $model = $model->with($filter['with']);
@@ -1071,6 +1085,12 @@ abstract class BaseRepository
             $searchField = $searchField ? $searchField : $this->searchField;
             $model = $this->_searchString($model, $qSearch, $searchField);
         }
+        return $model;
+    }
+
+    protected function handleDatarule($model,$filterDatrule)
+    {        
+        $model = \hpsynapse\moduser\Facades\UserAuth::filterDatarule($model,$filterDatrule);  
         return $model;
     }
 

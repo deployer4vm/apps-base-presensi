@@ -1333,7 +1333,7 @@ class BaseExport extends BaseRepository
      *
      * @return array
      */
-    protected function formatExportExcelRow($cacheKey, array $row = [], int $indexExcelRow, int $indexData)
+    protected function formatExportExcelRow($cacheKey, array $row = [])//, int $indexExcelRow, int $indexData)
     {
         $exportData = $this->getExport($cacheKey);
         $insertRow = [];

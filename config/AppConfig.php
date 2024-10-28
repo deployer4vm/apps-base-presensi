@@ -531,15 +531,18 @@ foreach ($tmpPackageLocalAll as $tenantId => $dataPackage) {
             // set feature
             if(isset($dataModule['datarule']['feature']))
                 foreach ($dataModule['datarule']['feature'] as $featureCode => $dataFeature) {
-                    if(isset($datarule['feature'][$featureCode])){
-                        $datarule['feature'][$featureCode] = recuresive_array_merge($datarule['feature'][$featureCode],$dataFeature);
+                    if(!isset($datarule['feature'][$tmpModuleName]))
+                        $datarule['feature'][$tmpModuleName] = [];
+                    if(isset($datarule['feature'][$tmpModuleName][$featureCode])){
+                        $datarule['feature'][$tmpModuleName][$featureCode] = recuresive_array_merge($datarule['feature'][$tmpModuleName][$featureCode],$dataFeature);
                     }else{
-                        $datarule['feature'][$featureCode] = $dataFeature;
+                        $datarule['feature'][$tmpModuleName][$featureCode] = $dataFeature;
                     }   
                 }
             
         }
         
+        // set notification
         if(isset($dataModule['notification']) && isset($dataModule['notification']['feature'])){
             if(isset($notification[$tmpModuleName])){
                 foreach ($dataModule['notification']['feature'] as $key => $value) {

@@ -261,6 +261,7 @@ class BaseController extends LaravelBaseController
                 'has',
                 'view_import',
                 'import_id',
+                'logquery'
             ]),
             'query' => [ //parameter yang dipassing di URL, termasuk juga parameter filter, untuk di passing ke pagination juga
                 'limit' => request()->input('limit', 10),

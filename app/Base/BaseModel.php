@@ -14,7 +14,8 @@ class BaseModel extends Model
     {
         // unset kembali model_tenant_id jika di model per tenant
         if(property_exists($this,'tenantId'))
-            config(['model_tenant_id',null]);
+            static::$tenantId = 0;
+        //     config(['model_tenant_id',null]);
         
         parent::__construct($attributes);
     }

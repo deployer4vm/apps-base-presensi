@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
  */
 trait ModelDataTenant
 {
-    protected $tenantId = 0;
+    public static $tenantId = 0;
 
     /**
      * Overide data model jika diperlukan
@@ -23,36 +23,26 @@ trait ModelDataTenant
      */
     public function getDataMode()
     {
-        return config('AppConfig.system.multitenant.data_mode', 1);
+        return config('AppConfig.system.multitenant.data_mode',1);
     }
 
     /**
      * set tenant aktif model ini
      *
      * @param int $tenantId ID Tenant
-     * @param boolean $isTenantId unused
      * @return self
      */
     
-    public function setTenantId($tenantId, $isTenantId=true)
+    public function setTenantId($tenantId)
     {
-        $this->tenantId = $tenantId;
-        config(['model_tenant_id',$this->tenantId]);
+        static::$tenantId = $tenantId;
 
-        if($this->getDataMode()==3)
+        if($this->getDataMode()==3){
             $this->setDbPerTenant();
-            
+            $connectionName = Tenant::getDbConnectionName(static::$tenantId);
+            parent::setConnection($connectionName);
+        }
         return $this;
-
-        // $searchField = $isTenantId?'id':'group_app';
-        // if($tenantId!=config('tenant.'.$searchField)){
-        //     $tenantData = Tenant::getTenant([$searchField,$this->tenantId]);
-        //     $config = app('config');
-        //     $config->set('tenant',$tenantData);
-        // }
-
-        // $GLOBALS['model_tenant_id'] = app('tenant.id');
-        // $this->tenantId = app('tenant.id');
     }
 
     /**
@@ -62,10 +52,10 @@ trait ModelDataTenant
      */
     public function getTenantId()
     {
-        if (empty($this->tenantId))
-            $this->tenantId = config('model_tenant_id',config('tenant.id',0));
-
-        return $this->tenantId;
+        if (empty(static::$tenantId))
+            static::$tenantId = config('tenant.id',0);//config('model_tenant_id',config('tenant.id',0));
+        // echo 'tenant id : '.static::$tenantId.'<br>';
+        return static::$tenantId;
     }
 
     /**
@@ -85,17 +75,20 @@ trait ModelDataTenant
      */
     public function getConnectionName()
     {
-        if(config('AppConfig.system.multitenant.data_mode',1)==3){
+        if($this->getDataMode()==3){
+            $this->setDbPerTenant();
             $connectionName = Tenant::getDbConnectionName($this->getTenantId());
-            if($this->connection != $connectionName){
-                $this->setDbPerTenant();
-                $this->connection = $connectionName;
-            }
+            parent::setConnection($connectionName);
         } else {
-            $this->connection = config('database.perTenant');
+            parent::setConnection(config('database.perTenant'));
         }
-
+        // echo 'get connection : '.$this->connection.'-'.$this->table.'-'.$connectionName.'-'.$this->getTenantId().'<br>';
         return parent::getConnectionName();
+    }
+
+    public function setConnection($connectionName)
+    {
+        return parent::setConnection($connectionName);
     }
 
     /**

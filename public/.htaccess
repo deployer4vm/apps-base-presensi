@@ -18,6 +18,11 @@
     Allow from all
 </FilesMatch>
 
+<FilesMatch "\.html$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes

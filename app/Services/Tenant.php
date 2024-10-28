@@ -456,8 +456,9 @@ class Tenant extends BaseRepository
 
         $dbConfig['database'] = $dbConfig['database_prefix'] . $tenantId;
         $dbConfig['name'] = $dbConfig['name'] . ' ' . $tenantId;
-
-        config(['database.connections.' . $dbConfigName => $dbConfig]);
+        
+        app('config')->set('database.connections.'. $dbConfigName,$dbConfig);
+        // config(['database.connections.' . $dbConfigName => $dbConfig]);
 
         return $dbConfig;
     }
@@ -604,12 +605,14 @@ class Tenant extends BaseRepository
             return;
 
         $dbConfigName = $this->getDbConnectionName($tenantId);
-        config(['tenant.connection' => $dbConfigName]);
+        
+        $config = app('config');
+        $config->set('tenant.connection',$dbConfigName);
         
         // tambah connection database on thy fly sesuai tenant yang aktifnya (jika belum ditambah)
         if (config('database.connections.' . $dbConfigName, false) == false) {
             $dbConfig = $this->getDbConnection($tenantId,$tenantDbId);
-            config(['database.connections.' . $dbConfigName => $dbConfig]);
+            $config->set('database.connections.'. $dbConfigName,$dbConfig);
         }
     }
 

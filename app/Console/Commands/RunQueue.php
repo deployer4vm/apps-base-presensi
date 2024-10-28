@@ -65,7 +65,7 @@ class RunQueue extends Command
                 }
             }
 
-            sleep(1);
+            sleep(10);
 
             // detek apakah ada signal restart
             if ($lastRestart != Cache::get('illuminate:queue:restart')) {

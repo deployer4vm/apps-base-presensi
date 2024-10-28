@@ -97,6 +97,9 @@ export default {
     getToken() {
         return this.store.getters.getAuthToken;
     },
+    getApiWebToken(){
+        return this.store.getters.getApiWebToken;
+    },
     //get active role
     getAuthRole() {
         return this.store.getters.getAuthRole;
