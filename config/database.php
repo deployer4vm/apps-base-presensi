@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Str;
 
+// DB CONNECTION Per Tenant
 $mysqlPerTenant = [
     'cpanel' => [
         'dbcreate_use_cpanel' => env('CPANEL_CREATEDB_PERTENANT', false),
@@ -13,7 +14,7 @@ $mysqlPerTenant = [
     'name' => env('DB_PERTENANT_NAME', 'Default Tenant DB Server'),
     'driver' => env('DB_PERTENANT_DRIVER', 'mysql'),
     'url' => env('DATABASE_URL'),
-    'host' => env('DB_HOST_PERTENANT', '127.0.0.1'),
+    // 'host' => env('DB_HOST_PERTENANT', '127.0.0.1'),
     'port' => env('DB_PORT_PERTENANT', '3306'),
     'database_prefix' => env('DB_DATABASE_PREFIX_PERTENANT',
         env('DB_DATABASE_PERTENANT',
@@ -42,6 +43,15 @@ $mysqlPerTenant = [
     ]) : [],
 ];
 
+if (env('DB_HOST_READ_PERTENANT', false)) {
+    $mysqlPerTenant['read']['host'] = env('DB_HOST_READ_PERTENANT');
+    $mysqlPerTenant['write']['host'] = env('DB_HOST_WRITE_PERTENANT');
+    $mysqlPerTenant['sticky'] = true;
+} else {
+    $mysqlPerTenant['host'] = env('DB_HOST_PERTENANT');
+}
+
+// DB CONNECTION Multiserver MAIN
 $multiDatabaseServer = [
     'enable' => env('DB_MULTISERVER_ENABLE', false),
     'server_count' => 2, // jumlah db server, minimal 1 (main server)
@@ -51,7 +61,7 @@ $multiDatabaseServer = [
             'name' => env('DB_MULTISERVER_MAIN_NAME', 'Main DB Server'),
             'driver' => env('DB_MULTISERVER_MAIN_DRIVER', 'mysql'),
             'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
+            // 'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
             'database' => env('DB_DATABASE', 'forge'),
             'username' => env('DB_USERNAME', 'forge'),
@@ -81,9 +91,18 @@ $multiDatabaseServer = [
     ]
 ];
 
+if (env('DB_HOST_READ', false)) {
+    $multiDatabaseServer['servers'][0]['read']['host'] = env('DB_HOST_READ');
+    $multiDatabaseServer['servers'][0]['write']['host'] = env('DB_HOST_WRITE');
+    $multiDatabaseServer['servers'][0]['sticky'] = true;
+} else {
+    $multiDatabaseServer['servers'][0]['host'] = env('DB_HOST');
+}
+
+// DB CONNECTION Multiserver
 $i = 2;
-while (env('DB_MULTISERVER_' . $i . '_HOST', false)) {
-    $multiDatabaseServer['servers'][] = [
+while (env('DB_MULTISERVER_' . $i . '_DATABASE', false)) {
+    $multiDatabaseServer['servers'][$i] = [
         // config cpanel untuk server lain
         'cpanel' => [
             'dbcreate_use_cpanel' => env('DB_MULTISERVER_' . $i . '_CPANEL_CREATEDB', false),
@@ -95,7 +114,7 @@ while (env('DB_MULTISERVER_' . $i . '_HOST', false)) {
         'name' => env('DB_MULTISERVER_' . $i . '_NAME', 'DB Server ' . $i),
         'driver' => env('DB_MULTISERVER_' . $i . '_DRIVER', 'mysql'),
         'url' => env('DATABASE_URL'),
-        'host' => env('DB_MULTISERVER_' . $i . '_HOST', '127.0.0.1'),
+        // 'host' => env('DB_MULTISERVER_' . $i . '_HOST', '127.0.0.1'),
         'port' => env('DB_MULTISERVER_' . $i . '_PORT', '3306'),
         'database_prefix' => env('DB_MULTISERVER_' . $i . '_DATABASE_PREFIX',
             env('DB_DATABASE_PREFIX_PERTENANT',
@@ -127,14 +146,24 @@ while (env('DB_MULTISERVER_' . $i . '_HOST', false)) {
         ]) : [],
 
     ];
+
+    if (env('DB_MULTISERVER_' . $i . '_HOST_READ', false)) {
+        $multiDatabaseServer['servers'][$i]['read']['host'] = env('DB_MULTISERVER_' . $i . '_HOST_READ');
+        $multiDatabaseServer['servers'][$i]['write']['host'] = env('DB_MULTISERVER_' . $i . '_HOST_WRITE');
+        $multiDatabaseServer['servers'][$i]['sticky'] = true;
+    } else {
+        $multiDatabaseServer['servers'][$i]['host'] = env('DB_MULTISERVER_' . $i . '_HOST');
+    }
+
     $multiDatabaseServer['server_count']++;
     $i++;
 }
 
+// DB CONNECTION BASE
 $mysqlBaseConnection = [
     'driver' => 'mysql',
     'url' => env('DATABASE_URL'),
-    'host' => $multiDatabaseServer['servers'][0]['host'],
+    // 'host' => $multiDatabaseServer['servers'][0]['host'],
     'port' => $multiDatabaseServer['servers'][0]['port'],
     'database' => $multiDatabaseServer['servers'][0]['database'],
     'username' => $multiDatabaseServer['servers'][0]['username'],
@@ -159,8 +188,16 @@ $mysqlBaseConnection = [
     ]) : [],
 ];
 
-$connections = [
+if (isset($multiDatabaseServer['servers'][0]['read']['host'])) {
+    $mysqlBaseConnection['read']['host'] = $multiDatabaseServer['servers'][0]['read']['host'];
+    $mysqlBaseConnection['write']['host'] = $multiDatabaseServer['servers'][0]['write']['host'];
+    $mysqlBaseConnection['sticky'] = true;
+} else {
+    $mysqlBaseConnection['host'] = $multiDatabaseServer['servers'][0]['host'];
+}
 
+// CONNECTION
+$connections = [
     'sqlite' => [
         'driver' => 'sqlite',
         'url' => env('DATABASE_URL'),
@@ -205,11 +242,10 @@ $connections = [
         'prefix' => '',
         'prefix_indexes' => true,
     ],
-
 ];
 
+// CONFIG
 $config = [
-
     /*
     | Config tambahan untuk multi tenant dan multi database server
     */
@@ -295,22 +331,18 @@ $config = [
         ],
 
     ],
-
 ];
 
 // set tambahan connection jika ada, diset via env dengan key
 // DB_ADDS_[NOMOR URUT]_*
 $i = 1;
 while (env('DB_ADDS_' . $i . '_CONNECTION', false)) {
-    if(
-        !isset($config[env('DB_ADDS_' . $i . '_CONNECTION')]) &&
-        !isset($connections[env('DB_ADDS_' . $i . '_CONNECTION')])
-    ){
+    if(!isset($config[env('DB_ADDS_' . $i . '_CONNECTION')]) && !isset($connections[env('DB_ADDS_' . $i . '_CONNECTION')])) {
         $config[env('DB_ADDS_' . $i . '_CONNECTION')] = env('DB_ADDS_' . $i . '_CONNECTION');
         $connections[env('DB_ADDS_' . $i . '_CONNECTION')] = [
             'driver' => env('DB_ADDS_' . $i . '_DRIVER', 'mysql'),
             'url' => env('DATABASE_URL'),
-            'host' => env('DB_ADDS_' . $i . '_HOST', '127.0.0.1'),
+            // 'host' => env('DB_ADDS_' . $i . '_HOST', '127.0.0.1'),
             'port' => env('DB_ADDS_' . $i . '_PORT', '3306'),
             'database' => env('DB_ADDS_' . $i . '_DATABASE', 'forge'),
             'username' => env('DB_ADDS_' . $i . '_USERNAME', 'forge'),
@@ -336,6 +368,14 @@ while (env('DB_ADDS_' . $i . '_CONNECTION', false)) {
             ]) : [],
 
         ];
+
+        if (env('DB_ADDS_' . $i . '_HOST_READ')) {
+            $connections[env('DB_ADDS_' . $i . '_CONNECTION')]['read']['host'] = env('DB_ADDS_' . $i . '_HOST_READ');
+            $connections[env('DB_ADDS_' . $i . '_CONNECTION')]['write']['host'] = env('DB_ADDS_' . $i . '_HOST_WRITE');
+            $connections[env('DB_ADDS_' . $i . '_CONNECTION')]['sticky'] = true;
+        } else {
+            $connections[env('DB_ADDS_' . $i . '_CONNECTION')]['host'] = env('DB_ADDS_' . $i . '_HOST');
+        }
     }
     $i++;
 }
