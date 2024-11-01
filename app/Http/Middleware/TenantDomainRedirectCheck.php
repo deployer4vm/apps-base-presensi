@@ -27,12 +27,18 @@ class TenantDomainRedirectCheck
                 // jika bukan di storage dan di tenant manager maka redirect ke domain utama
             } else if (
                 (
+                    config('tenant.status') != 1 
+                    && !config('tenant.isOnTenantManager', false)
+                )
+                ||
+                (
                     !config('tenant.isOnStorageAlltenant', false)
                     && !config('tenant.isOnTenantManager', false)
                     && !config('tenant.isOnGeneralApi', false)
                     && !config('tenant.id')
                 )
-                || (
+                ||
+                (
                     config('tenant.isOnStorageAlltenant', false)
                     && request()->segments()[0] != 'storage'
                 )
