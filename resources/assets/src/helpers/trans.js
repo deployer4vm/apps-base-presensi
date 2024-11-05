@@ -47,12 +47,12 @@ export default {
     chose(langFile) {
         return this.choose(langFile);
     },
-    get(langKey, replace = {}) {
+    get(langKey, replace = {}, defaultVal='') {
         let lang = "";
         try {
             lang = eval("this.allLang." + langKey);
         } catch (err) {
-            lang = langKey;
+            lang = defaultVal?defaultVal:langKey;
         }
         if (lang == undefined) lang = langKey;
         _.forEach(replace, (v, k) => {

@@ -82,9 +82,9 @@ if (!function_exists('add_config_dashboard_template')) {
     {
         // var_dump($configDashboard);
         foreach ($configDashboard['template'] as $value) {
-            if(!isset($dashboard[$value['code']])){
-                $dashboard[$value['code']] = $value;
-                $dashboard[$value['code']]['module'] = [];
+            if(!isset($dashboard['template'][$value['code']])){
+                $dashboard['template'][$value['code']] = $value;
+                $dashboard['template'][$value['code']]['path'] = $configDashboard['path'];
             }
         }
         return $dashboard;
@@ -94,24 +94,15 @@ if (!function_exists('add_config_dashboard_template')) {
 if (!function_exists('add_config_dashboard_feature')) {
     // baru digunakan jika semua template sudah di add di variable $dashboard
     // jadi tinggal tambah feature nya saja
-    function add_config_dashboard_feature($dashboard, $templateList, $moduleNamespace, $configDashboard)
+    function add_config_dashboard_feature($dashboard, $moduleNamespace, $configDashboard)
     {
-        $tmpTemplateList = [];
+        $dashboard['feature'][$moduleNamespace] = [
+            'name'=>$configDashboard['name'],
+            'path'=>$configDashboard['path'],
+            'feature'=>[]
+        ];
         foreach ($configDashboard['feature'] as $featureCode => $value) {
-            if(!isset($value['code']))$value['code'] = $featureCode;
-            if(empty($value['template_code'])){
-                $tmpTemplateList = $templateList;
-            }else{
-                $tmpTemplateList = $value['template_code'];
-            }
-            
-            foreach ($tmpTemplateList as $templateCode) {
-                if(!isset($dashboard[$templateCode]['module'][$moduleNamespace]))
-                    $dashboard[$templateCode]['module'][$moduleNamespace]=[];
-                unset($value['template_code']);
-                $dashboard[$templateCode]['module'][$moduleNamespace][$value['code']] = $value;
-
-            }
+            $dashboard['feature'][$moduleNamespace]['feature'][$featureCode] = $value;
         }
         return $dashboard;
     }
@@ -488,14 +479,23 @@ foreach ($tmpPackageLocalPerTenant as $tenantId => $pertenant) {
  * START generate _datarule.json, _dashboard.json & _notification.json
  * -----------------------------------------------------------------
  */
+
 $datarule = [
     'subtype'=>[],
     'feature'=>[]
 ];
-$dashboard = [];
+
+$dashboard = [
+    'template'=>[],
+    'feature'=>[]
+];
+
 // jika di system.json ada config dashboard maka ambil
-if(isset($system['dashboard']))
+if(isset($system['dashboard']) && isset($system['dashboard']['template'])){
     $dashboard = add_config_dashboard_template($dashboard,$system['dashboard']);
+    $system['dashboard']['name']='Global';
+    $dashboard = add_config_dashboard_feature($dashboard,'system',$system['dashboard']);
+}
 
 $notification = [];
 if(isset($system['notification']))
@@ -504,15 +504,13 @@ if(isset($system['notification']))
         'feature' => $system['notification']['feature']
     ];
 
-
 $tmpPackageLocalAll = $packageLocalPerTenant;
 $tmpPackageLocalAll[0] = $packageLocal;
-$templateList = [];
 
 foreach ($tmpPackageLocalAll as $tenantId => $dataPackage) {
     foreach ($dataPackage as $tmpModuleName => $dataModule) {
         
-        if(isset($dataModule['dashboard']))
+        if(isset($dataModule['dashboard']) && isset($dataModule['dashboard']['template']))
             $dashboard = add_config_dashboard_template($dashboard,$dataModule['dashboard']);
 
         // set datarule
@@ -563,17 +561,30 @@ foreach ($tmpPackageLocalAll as $tenantId => $dataPackage) {
     }
 }
 
-foreach ($dashboard as $templateCode => $tmpValue) {
-    $templateList[] = $templateCode;
-}
-
 foreach ($tmpPackageLocalAll as $tenantId => $dataPackage) {
     foreach ($dataPackage as $tmpModuleName => $dataModule) {
         
-        if(isset($dataModule['dashboard']))
-            $dashboard = add_config_dashboard_feature($dashboard,$templateList,$tmpModuleName,$dataModule['dashboard']);
+        if(isset($dataModule['dashboard']) && isset($dataModule['dashboard']['feature']))
+            $dashboard = add_config_dashboard_feature($dashboard,$tmpModuleName,$dataModule['dashboard']);
 
     }
+}
+
+
+if (
+    !file_exists(
+        $mainAppPath . '/resources/js/dashboard.js'
+    )
+) {
+    file_put_contents(
+        $mainAppPath . '/resources/js/dashboard.js', 
+        "export default {/n".
+        "    template: {/n".
+        "    },/n".
+        "    feature: {/n".
+        "    }/n".
+        "};"
+    );
 }
 
 /**
@@ -1188,7 +1199,6 @@ file_put_contents(
     $mainAppPath . '/config/_notification.json',
     json_encode($notification, JSON_PRETTY_PRINT)
 );
-
 /*
 package dan module berisi config yang sama persis
  */
