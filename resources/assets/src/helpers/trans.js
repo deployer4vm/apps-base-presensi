@@ -51,6 +51,8 @@ export default {
         let lang = "";
         try {
             lang = eval("this.allLang." + langKey);
+            if(!lang)
+                lang = defaultVal?defaultVal:langKey;
         } catch (err) {
             lang = defaultVal?defaultVal:langKey;
         }
