@@ -13,7 +13,7 @@ trait ResetModelCacheTraits
     {
         $fillableKeyList = CacheConfig::getConfig('autoFillable-list', [], false);
         foreach ($fillableKeyList as $value) {
-            echo 'delete model fillable cache : ' . $value . "\n";
+            // echo 'delete model fillable cache : ' . $value . "\n";
             CacheConfig::deleteConfig($value);
         }
     }

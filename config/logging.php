@@ -37,6 +37,7 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
+            'tap' => [App\Logging\DefaultSynapseFormatter::class],
             'channels' => ['single', 'daily'],
             'ignore_exceptions' => false,
         ],
