@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 use App\Base\BaseController;
+use App\Facades\Tenant;
 
 class KindeditorController extends BaseController
 {
@@ -18,19 +20,18 @@ class KindeditorController extends BaseController
     }
 
     /**
-     * initiate language resource for vue apps
+     * GROUP_APP/api/sys/editor/
+     * Upload dari kindeditor
      *
      * @param \Illuminate\Http\Request $request *semua optional
-     *      lang : lang id nya
-     *      item : item nya jika diperlukan
      * @return \Illuminate\Http\Response JSON Response
      */
     public function upload(Request $request)
     {
         //File save directory path
-        $save_path = storage_path('app/upload/editor/');
+        $save_path = Storage::path('/editor'). DIRECTORY_SEPARATOR;//storage_path('app/upload/editor/');
         //File save directory URL
-        $save_url = url('upload/editor') . '/';
+        $save_url = url(Storage::url('/editor')).'/';//url('upload/editor') . '/';
         //Define file extensions that are allowed to upload
         $ext_arr = [
             'image' => ['gif', 'jpg', 'jpeg', 'png', 'bmp'],
@@ -159,16 +160,16 @@ class KindeditorController extends BaseController
     }
 
     /**
-     * GROUP_APP/api/sys/editor/fileManager'
+     * GROUP_APP/api/sys/editor/fileManager
      */
     public function filemanager(Request $request)
     {
 
         // Root directory path, you can specify an absolute path, such as / var / www / attached /
-        $root_path = storage_path('app/upload/editor') . DIRECTORY_SEPARATOR;
+        $root_path = Storage::path('/editor'). DIRECTORY_SEPARATOR;//storage_path('app/upload/editor') . DIRECTORY_SEPARATOR;
 
         // Root directory URL, you can specify an absolute path, such as http://www.yoursite.com/attached/
-        $root_url = url('upload/editor') . '/';
+        $root_url = url(Storage::url('/editor')).'/';//url('upload/editor') . '/';
 
         //Picture extension
         $ext_arr = array('gif', 'jpg', 'jpeg', 'png', 'bmp');

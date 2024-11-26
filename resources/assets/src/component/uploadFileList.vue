@@ -26,7 +26,7 @@
                             </h5>
                             <div
                                 @click="$refs[refID].$el.querySelector('input').click()"
-                                class="btn btn-outline-primary w-icon w-auto btn-xs"
+                                class="btn btn-outline-success w-icon w-auto btn-xs"
                                 >
                                 <i class="fi fi-rs-upload"></i>
                                 <span>Select File</span>

@@ -104,7 +104,7 @@ trait MigrateDataTenant
             && config('AppConfig.system.multitenant.data_mode', 1) != 1
         ) {
             $filter = isset($this->tenantId) ? [['id', $this->tenantId]] : [];
-            $tenantList = Tenant::listTenant($filter);
+            $tenantList = Tenant::listTenant($filter,0,0,['id','ASC']);
             foreach ($tenantList['data'] as $tenant) {
                 try{
                     //jika per database
@@ -142,9 +142,10 @@ trait MigrateDataTenant
                                 Schema::table($tmpTable, $bluePrint);
                             }
                         }
-                    }                    
+                    }                       
+                    echo "\nTenant : ".$tenant['id']." Migrated ! \n";                 
                 }catch(\Exception $e){
-                    echo 'Error tenant : '.$tenant['id'];
+                    echo "\nTenant : ".$tenant['id']." ERROR ! \n";
                     throw $e;
                 }
             }

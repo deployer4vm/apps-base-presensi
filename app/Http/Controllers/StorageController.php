@@ -217,6 +217,9 @@ class StorageController extends BaseController
      **/
     private function serverFileAlltenant($fullFilePath, $fileName, $size = false)
     {
+        if (!Storage::disk('alltenant')->exists($fullFilePath))
+            return $this->serveNotFound($fullFilePath);
+        
         $fullFilePathTmp = Storage::disk('alltenant')->path($fullFilePath);
         $mime = $this->getMime($fileName);
         $hash = sha1($fullFilePathTmp);
