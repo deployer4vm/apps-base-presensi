@@ -7,18 +7,18 @@ class DefaultRequestPrepare
     /*
      * process request preparation if needed
      */
-    public function prepare(&$controller,&$request,$isListRequest=false) 
+    public function prepare(&$controller, &$request, $isListRequest = false)
     {
-        if($isListRequest){
+        if ($isListRequest) {
             $controller->buildParams();
-        }else{
+        } else {
             $controller->setParams([
-                'input'=>$request->all(),
-                'query'=>$request->query(),
-                'route'=>$request->route()->parameters
+                'input' => $request->all(),
+                'query' => $request->query(),
+                'route' => $request->route()->parameters
             ]);
         }
-        
+
         return true;
     }
 }
