@@ -54,11 +54,19 @@ class RouteServiceProvider extends ServiceProvider
 
         // jika tenant aktif menggunakan s3 storage, maka set default dan public jadi s3 stroage bersangkutan
         if (config('tenant.s3storage', 0)) {
-            // set default ke s3 tenant
-            app()->config['filesystems.default'] = 's3_' . config('tenant.s3storage');
-
             // set public storage ke s3 public tenant
             $tmpConfig = config('filesystems.disks.s3_' . config('tenant.s3storage'));
+            if($tmpConfig){
+                // set default ke s3 tenant
+                app()->config['filesystems.default'] = 's3_' . config('tenant.s3storage');
+
+            // jika tidak multi server maka gunakan default s3
+            }else{
+                $tmpConfig = config('filesystems.disks.s3');
+                // set default ke s3 tenant
+                app()->config['filesystems.default'] = 's3';
+            }
+            
             $tmpConfig['visibility'] = 'public';
             app()->config['filesystems.disks.public'] = $tmpConfig;
         } else {

@@ -83,6 +83,8 @@ class ImportController extends BaseController
 
         $tmpUser = [];
         foreach ($this->output['data']['list'] as $k => $v) {
+            if(!Tenant::dbExists($v['tenant_id']))
+                continue;
             $userId = $v['user_id'];
             if (!isset($tmpUser[$v['tenant_id']][$userId])) {
                 $user = (new User);

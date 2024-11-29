@@ -16,7 +16,7 @@ use App\Models\Job;
 
 use hpsynapse\moduser\Models\User;
 
-class ImportController extends BaseController
+class TO_BE_DELETED_ImporController extends BaseController
 {
     /**
      * Create a new controller instance.

@@ -80,7 +80,10 @@ class ExportController extends BaseController
         );
 
         $tmpUser = [];
+        $tmpList = [];
         foreach ($this->output['data']['list'] as $k =>  $v) {
+            if(!Tenant::dbExists($v['tenant_id']))
+                continue;
             $userId = $v['user_id'];
             if (!isset($tmpUser[$v['tenant_id']][$userId])) {
                 $user = (new User);
@@ -89,7 +92,9 @@ class ExportController extends BaseController
             }
             $this->output['data']['list'][$k]['user'] = $tmpUser[$v['tenant_id']][$userId];
             $this->output['data']['list'][$k]['tenant'] = Tenant::getTenant($v['tenant_id']);
+            $tmpList[] = $this->output['data']['list'][$k];
         }
+        $this->output['data']['list'] = $tmpList;
 
         // set data2 khusus jika bukan API
         if ($this->isWebCall()) {
