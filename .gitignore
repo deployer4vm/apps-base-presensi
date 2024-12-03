@@ -10,6 +10,8 @@
 /public/storage/*
 /public/upload
 /public/upload/*
+/public/fonts
+/public/fonts/*
 /public/sw.js
 /public/mix-manifest.json
 /storage/*.key
