@@ -116,7 +116,7 @@ export default {
         return this.store.getters.isTenantLoaded;
     },
     isOnTenantManager() {
-        return isOnTenantManager ? true : false;//this.store.getters.isOnTenantManager;
+        return isOnTenantManager?true:false;
     },
     getEndpoint(endPoint) {
         return endPoint.replace(':group_app', this.router.currentRoute.params.group_app);
