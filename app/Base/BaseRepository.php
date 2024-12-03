@@ -124,9 +124,7 @@ abstract class BaseRepository
      *
      * @return void
      */
-    public function setAutoResourceCreateValidate()
-    {
-    }
+    public function setAutoResourceCreateValidate() {}
 
     /**
      * Override
@@ -135,9 +133,7 @@ abstract class BaseRepository
      *
      * @return void
      */
-    public function setAutoResourceUpdateValidate()
-    {
-    }
+    public function setAutoResourceUpdateValidate() {}
 
     /**
      * Magic function for method with prefix:
@@ -807,7 +803,7 @@ abstract class BaseRepository
                 $idAsKey = true;
                 unset($filter['idAsKey']);
             }
-            
+
             $model = $this->_filter($model, $filter);
             if (isset($filter['hiddenColumn'])) {
                 $hiddenColumn = $filter['hiddenColumn'];
@@ -1011,7 +1007,7 @@ abstract class BaseRepository
      * @param \Illuminate\Database\Eloquent\Model $model
      * @param array $filter
      *      datarule
-     * 
+     *
      * @return \Illuminate\Database\Eloquent\Model
      */
     final protected function _filter($model, array $filter = [])
@@ -1021,13 +1017,13 @@ abstract class BaseRepository
         $qSearch = null;
         $searchField = null;
 
-        if(isset($filter['logquery']))
+        if (isset($filter['logquery']))
             unset($filter['logquery']);
 
         // jika ada datarule
-        if (array_key_exists('datarule',$filter)) {
-            if($filter['datarule'])
-                $model = $this->handleDatarule($model,$filter['datarule']);            
+        if (array_key_exists('datarule', $filter)) {
+            if ($filter['datarule'])
+                $model = $this->handleDatarule($model, $filter['datarule']);
             unset($filter['datarule']);
         }
 
@@ -1088,9 +1084,9 @@ abstract class BaseRepository
         return $model;
     }
 
-    protected function handleDatarule($model,$filterDatrule)
-    {        
-        $model = \hpsynapse\moduser\Facades\UserAuth::filterDatarule($model,$filterDatrule);  
+    protected function handleDatarule($model, $filterDatrule)
+    {
+        $model = \hpsynapse\moduser\Facades\UserAuth::filterDatarule($model, $filterDatrule);
         return $model;
     }
 
@@ -1250,7 +1246,6 @@ abstract class BaseRepository
             } else {
                 $this->error = __('lang.data_not_found');
             }
-
         } catch (\Illuminate\Database\QueryException $ex) {
             $this->error = $ex->getMessage();
         }
@@ -1306,8 +1301,9 @@ abstract class BaseRepository
 
         $model = $this->_where($model, $where);
 
-        if ($model && $model->exists()) {
-            if ($model->count() <= 0)
+        // if ($model && $model->exists()) {
+        if ($model) {
+            if (!$model->exists())
                 return true;
             if ($model->delete())
                 return true;
