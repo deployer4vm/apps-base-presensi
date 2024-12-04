@@ -21,8 +21,8 @@ class BaseController extends LaravelBaseController
     const MESSAGE_TYPE_INFO = "info";
     const MESSAGE_TYPE_WARNING = "warning";
     const MESSAGE_TYPE_DANGER = "danger";
-    
-    private $requestPrepareClass = [['\App\Base\DefaultRequestPrepare','prepare']];
+
+    private $requestPrepareClass = [['\App\Base\DefaultRequestPrepare', 'prepare']];
 
     /**
      * default data parameter untuk Responseable
@@ -30,7 +30,7 @@ class BaseController extends LaravelBaseController
      * @var array
      */
     protected $output = [
-        'http_code' => 200,//khusus response api, tapi tidak akan disertakan di return
+        'http_code' => 200, //khusus response api, tapi tidak akan disertakan di return
         'status' => 200,
         'message' => '',
         'message_type' => 'info', //khusus warning view (bukan api), web request
@@ -61,7 +61,7 @@ class BaseController extends LaravelBaseController
     protected $viewWrapVarName = 'data'; //
 
     //default response paramter untuk
-    protected $response = '';    
+    protected $response = '';
 
     //nama class responsable nya
     private $responsableClass = '\App\Base\DefaultResponse';
@@ -92,7 +92,7 @@ class BaseController extends LaravelBaseController
         $this->output['params'] = $params;
         return $this;
     }
-    
+
     /**
      * Merge $this->output['params']
      *
@@ -101,7 +101,7 @@ class BaseController extends LaravelBaseController
      */
     public function mergeParams(array $params)
     {
-        $this->output['params'] = recuresive_array_merge($this->output['params'],$params);
+        $this->output['params'] = recuresive_array_merge($this->output['params'], $params);
         return $this;
     }
 
@@ -110,9 +110,30 @@ class BaseController extends LaravelBaseController
      *
      * @return array $this->output['params']
      */
-    public function getParams($paramKey=false)
+    public function getParams($paramKey = false)
     {
-        return $paramKey?$this->output['params'][$paramKey]:$this->output['params'];
+        return $paramKey ? ($this->output['params'][$paramKey] ?? null) : $this->output['params'];
+    }
+
+    public function getParamInput($paramKey = false, $default = false)
+    {
+        return $paramKey
+            ? ($this->output['params']['input'][$paramKey] ?? $default)
+            : ($this->output['params']['input'] ?? []);
+    }
+
+    public function getParamQuery($paramKey = false, $default = false)
+    {
+        return $paramKey
+            ? ($this->output['params']['query'][$paramKey] ?? $default)
+            : ($this->output['params']['query'] ?? []);
+    }
+
+    public function getParamRoute($paramKey = false, $default = false)
+    {
+        return $paramKey
+            ? ($this->output['params']['route'][$paramKey] ?? $default)
+            : ($this->output['params']['route'] ?? []);
     }
 
     /**
@@ -147,22 +168,22 @@ class BaseController extends LaravelBaseController
         $error = false,
         $response = null
     ) {
-        if($status===false)$status=$httpCode;
+        if ($status === false) $status = $httpCode;
 
         $this->output['http_code'] = $httpCode;
         $this->output['status'] = $status;
         $this->output['message'] = $message;
-        $this->output['message_type'] = empty($type)?self::MESSAGE_TYPE_WARNING:$type;
+        $this->output['message_type'] = empty($type) ? self::MESSAGE_TYPE_WARNING : $type;
         $this->output['errors'] =
             $error === true || $error === 1 || $error === false
-                ? [true]
-                : (empty($error)?[true]:$error);
+            ? [true]
+            : (empty($error) ? [true] : $error);
 
         if (!is_null($response)) {
             $this->response =
                 $response === true || $response === 1 || $response === false
-                    ? redirect(url()->previous())->withInput()
-                    : $response;
+                ? redirect(url()->previous())->withInput()
+                : $response;
         }
 
         if ($this->isWebCall() && $this->forceOutput != 2) {
@@ -190,8 +211,8 @@ class BaseController extends LaravelBaseController
         $status = false,
         $response = null
     ) {
-        if($status===false)$status=$httpCode;
-        
+        if ($status === false) $status = $httpCode;
+
         $this->setWarning($message, self::MESSAGE_TYPE_DANGER, $httpCode, $status, $error, $response);
     }
 
@@ -214,7 +235,7 @@ class BaseController extends LaravelBaseController
      * @param array $mergeParam     list parameter yg HANYA / TIDAK (tergantung parameter $mergeType) dimerge kan ke query & filter
      * @param bool $mergeType       true jika $mergeParam adalah list parameter yang tidak di merge
      *                              false jika $mergeParam adalah list parameter yang HANYA/ONLY di merge
-     * 
+     *
      * @return array format :
      *  [
      *      all => seluruh parameter input
@@ -305,7 +326,7 @@ class BaseController extends LaravelBaseController
         if (!empty($params['all'])) {
             foreach ($params['all'] as $key => $param) {
                 if (
-                    empty($mergeParam) || 
+                    empty($mergeParam) ||
                     ($mergeType && !in_array($key, $mergeParam)) ||
                     (!$mergeType && in_array($key, $mergeParam))
                 ) {
@@ -336,7 +357,7 @@ class BaseController extends LaravelBaseController
     /**
      * Otomatisasi `$this->output['params'] = $this->getListParam();`
      *
-     * @param boolean $mergeParam
+     * @param boolean $mergeToParam
      * @param array $mergeExcept
      * @return void
      */
@@ -344,7 +365,7 @@ class BaseController extends LaravelBaseController
         bool $mergeToParam = true,
         array $mergeParam = [],
         bool $mergeType = true
-    ){
+    ) {
         $this->setParams($this->getListParam($mergeToParam, $mergeParam, $mergeType));
     }
 
@@ -412,7 +433,7 @@ class BaseController extends LaravelBaseController
      * @param string $methodeName methodeName Class
      * @return $this
      */
-    protected function setRequestClass($requestPrepareClass,$methodeName='prepare')
+    protected function setRequestClass($requestPrepareClass, $methodeName = 'prepare')
     {
         $this->requestPrepareClass[] = [
             $requestPrepareClass,
@@ -423,19 +444,19 @@ class BaseController extends LaravelBaseController
 
     /**
      * Initialize auto request preparation
-     * 
+     *
      * @param Request $request              isi dengan $request dari controller
      * @param Boolead $isListRequest        true jika request list, false input general
      * @param False|Array $requestClass     jika ingin setRequestClass langsung
      */
-    protected function prepare(&$request,$isListRequest=false,$requestClass=false)
+    protected function prepare(&$request, $isListRequest = false, $requestClass = false)
     {
-        if($requestClass)
-            $this->setRequestClass($requestClass[0],$requestClass[1]);
+        if ($requestClass)
+            $this->setRequestClass($requestClass[0], $requestClass[1]);
 
-        $idx = count($this->requestPrepareClass)==1?0:1;
-        $isOnController = $this->requestPrepareClass[$idx][0]==get_class($this);
-        if(($isOnController?$this:(new $this->requestPrepareClass[$idx][0]))->{$this->requestPrepareClass[$idx][1]}(
+        $idx = count($this->requestPrepareClass) == 1 ? 0 : 1;
+        $isOnController = $this->requestPrepareClass[$idx][0] == get_class($this);
+        if (($isOnController ? $this : (new $this->requestPrepareClass[$idx][0]))->{$this->requestPrepareClass[$idx][1]}(
             $this,
             $request,
             $isListRequest
