@@ -25,11 +25,11 @@
                         :disabled="!canUpload"
 
                     ></b-file>
-                    <b-input-group-append v-if="importFile">
+                    <!-- <b-input-group-append v-if="importFile">
                         <b-btn variant="danger btn-md md-btn-flat" @click="importFile=null">
                             <i class="fi fi-rs-trash"></i>
                         </b-btn>
-                    </b-input-group-append>
+                    </b-input-group-append> -->
                 </b-input-group>
             </b-col>
         </b-row>
@@ -40,6 +40,10 @@
         </b-form-group> -->
 
         <div class="text-right">
+            <b-btn v-if="importFile" variant="danger btn-sm w-icon" @click="importFile=null" :disabled="!canUpload">
+                <i class="fi fi-rs-trash"></i>
+                <span>{{ Trans.get('lang.delete') }}</span>
+            </b-btn>
             <b-btn variant="success btn-sm w-icon" @click="uploadImpoart()"
                 :disabled="!canUpload">
                 <i class="fi fi-rs-cloud-upload"></i>
