@@ -48,6 +48,43 @@ class SecurityRoutesTest extends TestCase
     }
 
     /** @test */
+    public function presence_writes_are_throttled_per_authenticated_session(): void
+    {
+        $limiter = RateLimiter::limiter('presence-write');
+        $firstRequest = Request::create('/api/dashboard/presence', 'POST');
+        $firstRequest->setUserResolver(fn () => new class {
+            public function getAuthIdentifier(): int
+            {
+                return 101;
+            }
+        });
+        $secondRequest = Request::create('/api/dashboard/presence', 'POST');
+        $secondRequest->setUserResolver(fn () => new class {
+            public function getAuthIdentifier(): int
+            {
+                return 202;
+            }
+        });
+
+        $first = $limiter($firstRequest);
+        $second = $limiter($secondRequest);
+
+        $this->assertSame(10, $first[0]->maxAttempts);
+        $this->assertNotSame($first[0]->key, $second[0]->key);
+        $this->assertSame($first[1]->key, $second[1]->key);
+
+        $routes = app('router')->getRoutes();
+        $this->assertContains(
+            'throttle:presence-write',
+            $routes->getByName('dashboard.presence.create')->gatherMiddleware()
+        );
+        $this->assertContains(
+            'throttle:presence-write',
+            $routes->getByName('dashboard.presence.checkout')->gatherMiddleware()
+        );
+    }
+
+    /** @test */
     public function etask_sync_keeps_user_and_employee_columns_separate(): void
     {
         $controller = app(\App\MainApp\Modules\employee\Controllers\EmployeeController::class);

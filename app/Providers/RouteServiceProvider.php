@@ -75,6 +75,18 @@ class RouteServiceProvider extends ServiceProvider
                 Limit::perMinute(60)->by('etask-otp-ip:' . $request->ip()),
             ];
         });
+
+        RateLimiter::for('presence-write', function (Request $request) {
+            $sessionId = optional($request->user())->getAuthIdentifier();
+            $sessionKey = $sessionId
+                ? (string) $sessionId
+                : hash('sha256', (string) $request->bearerToken());
+
+            return [
+                Limit::perMinute(10)->by('presence-session:' . $sessionKey),
+                Limit::perMinute(120)->by('presence-ip:' . $request->ip()),
+            ];
+        });
     }
 
     private function bootStorage()
