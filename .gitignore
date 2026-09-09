@@ -34,3 +34,5 @@ error_log
 *.ini
 .DS_Store
 firebase_credentials.json
+
+/firebase_credentials.json
