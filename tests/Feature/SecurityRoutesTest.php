@@ -4,10 +4,47 @@ namespace Tests\Feature;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use ReflectionMethod;
 use Tests\TestCase;
 
 class SecurityRoutesTest extends TestCase
 {
+    /** @test */
+    public function etask_sync_keeps_user_and_employee_columns_separate(): void
+    {
+        $controller = app(\App\MainApp\Modules\employee\Controllers\EmployeeController::class);
+        $externalUser = [
+            'id' => 56,
+            'username' => 'Nisa Agustina M',
+            'email' => 'nisa@example.test',
+            'jabatan' => ['nama' => 'Programmer'],
+            'divisi' => ['nama' => 'Project'],
+        ];
+
+        $userMethod = new ReflectionMethod($controller, 'buildUserPayload');
+        $userMethod->setAccessible(true);
+        $employeeMethod = new ReflectionMethod($controller, 'buildEmployeePayload');
+        $employeeMethod->setAccessible(true);
+
+        $userPayload = $userMethod->invoke($controller, $externalUser);
+        $employeePayload = $employeeMethod->invoke($controller, $externalUser);
+
+        $expectedUserKeys = ['username', 'name', 'email', 'role_code', 'user_type'];
+        $actualUserKeys = array_keys($userPayload);
+        sort($expectedUserKeys);
+        sort($actualUserKeys);
+
+        $expectedEmployeeKeys = ['api_id', 'name', 'position', 'division'];
+        $actualEmployeeKeys = array_keys($employeePayload);
+        sort($expectedEmployeeKeys);
+        sort($actualEmployeeKeys);
+
+        $this->assertSame($expectedUserKeys, $actualUserKeys);
+        $this->assertSame($expectedEmployeeKeys, $actualEmployeeKeys);
+        $this->assertArrayNotHasKey('api_token', $userPayload);
+        $this->assertArrayNotHasKey('api_token', $employeePayload);
+    }
+
     /** @test */
     public function language_endpoint_returns_login_labels(): void
     {
