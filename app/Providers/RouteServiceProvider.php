@@ -5,9 +5,10 @@ namespace App\Providers;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use App\Services\Utilities;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-
-// use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -34,6 +35,8 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->configureEtaskRateLimiting();
+
         if ($this->app->runningInConsole()) {
             $this->bootMigration();
         } else if (config('AppConfig.system.multitenant.active', false)) {
@@ -42,6 +45,36 @@ class RouteServiceProvider extends ServiceProvider
         }
 
         parent::boot();
+    }
+
+    private function configureEtaskRateLimiting(): void
+    {
+        RateLimiter::for('etask-login', function (Request $request) {
+            $email = strtolower(trim((string) $request->input('email', '')));
+
+            return [
+                Limit::perMinute(8)->by('etask-login-email:' . hash('sha256', $email)),
+                Limit::perMinute(60)->by('etask-login-ip:' . $request->ip()),
+            ];
+        });
+
+        RateLimiter::for('etask-verify', function (Request $request) {
+            $flowToken = (string) $request->input('flow_token', '');
+
+            return [
+                Limit::perMinute(10)->by('etask-verify-flow:' . hash('sha256', $flowToken)),
+                Limit::perMinute(120)->by('etask-verify-ip:' . $request->ip()),
+            ];
+        });
+
+        RateLimiter::for('etask-otp', function (Request $request) {
+            $flowToken = (string) $request->input('flow_token', '');
+
+            return [
+                Limit::perMinute(3)->by('etask-otp-flow:' . hash('sha256', $flowToken)),
+                Limit::perMinute(60)->by('etask-otp-ip:' . $request->ip()),
+            ];
+        });
     }
 
     private function bootStorage()

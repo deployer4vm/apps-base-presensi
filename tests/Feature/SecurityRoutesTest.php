@@ -2,13 +2,51 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\RateLimiter;
 use ReflectionMethod;
 use Tests\TestCase;
 
 class SecurityRoutesTest extends TestCase
 {
+    /** @test */
+    public function etask_otp_throttles_are_scoped_to_the_login_flow(): void
+    {
+        $limiter = RateLimiter::limiter('etask-verify');
+        $first = $limiter(Request::create('/api/employee/etask/verify-login', 'POST', [
+            'flow_token' => str_repeat('a', 64),
+        ]));
+        $second = $limiter(Request::create('/api/employee/etask/verify-login', 'POST', [
+            'flow_token' => str_repeat('b', 64),
+        ]));
+
+        $this->assertCount(2, $first);
+        $this->assertSame(10, $first[0]->maxAttempts);
+        $this->assertNotSame($first[0]->key, $second[0]->key);
+        $this->assertSame($first[1]->key, $second[1]->key);
+    }
+
+    /** @test */
+    public function etask_routes_use_the_named_limiters(): void
+    {
+        $routes = app('router')->getRoutes();
+
+        $this->assertContains(
+            'throttle:etask-login',
+            $routes->getByName('employee.api.etask.login')->gatherMiddleware()
+        );
+        $this->assertContains(
+            'throttle:etask-verify',
+            $routes->getByName('employee.api.etask.verifyLogin')->gatherMiddleware()
+        );
+        $this->assertContains(
+            'throttle:etask-otp',
+            $routes->getByName('employee.api.etask.otp')->gatherMiddleware()
+        );
+    }
+
     /** @test */
     public function etask_sync_keeps_user_and_employee_columns_separate(): void
     {
