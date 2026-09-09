@@ -348,6 +348,19 @@ export default function () {
         //local api
         LocalApi: localapi,
 
+        openProtectedFile: function (path, filename = 'attachment') {
+            return localapi.get(path, { responseType: 'blob' }).then(response => {
+                const url = window.URL.createObjectURL(response.data);
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', filename);
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                window.URL.revokeObjectURL(url);
+            });
+        },
+
         //user auth helper
         UserAuth,
 

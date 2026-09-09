@@ -148,10 +148,10 @@
   }
 }
 
-@mixin bg-variant($parent, $color, $rth-color: #000) {
+@mixin bg-variant($parent, $color, $ignore-warning: false) {
   @include bg-color-variant($parent, $color);
-  @include bg-color-variant("#{$parent}-dark", rgba-to-hex(rgba($color, .9), $background: $rth-color));
-  @include bg-color-variant("#{$parent}-darker", rgba-to-hex(rgba($color, .85), $background: $rth-color));
+  @include bg-color-variant("#{$parent}-dark", rgba-to-hex(rgba($color, .9), $background: #000));
+  @include bg-color-variant("#{$parent}-darker", rgba-to-hex(rgba($color, .85), $background: #000));
 }
 
 // *******************************************************************************

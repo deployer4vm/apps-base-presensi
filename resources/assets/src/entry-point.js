@@ -4,18 +4,8 @@ window._.forEach = require("lodash/forEach");
 window.moment = require('moment');
 window.$ = require('jquery');
 
-// Polyfills
-require("core-js/modules/es6.array.fill");
-require("core-js/modules/es6.array.iterator");
-require("core-js/modules/es6.object.assign");
-require("core-js/modules/es6.object.keys");
-require("core-js/modules/es6.promise");
-require("core-js/modules/es6.string.includes");
-require("core-js/modules/es6.symbol");
-require("core-js/modules/es7.array.includes");
-require("core-js/modules/es7.object.entries");
-require("core-js/modules/es7.promise.finally");
-require("core-js/modules/es7.symbol.async-iterator");
+// Polyfills maintained by core-js 3.
+require("core-js/stable");
 
 import Vue from "vue";
 import axios from "axios";

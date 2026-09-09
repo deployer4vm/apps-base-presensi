@@ -23,7 +23,7 @@ export default {
     implementAcl() {
         return this.store.dispatch('implementAcl');
     },
-    hasAccess(key, subkey = 'has_access', defaultAccess = true) {
+    hasAccess(key, subkey = 'has_access', defaultAccess = false) {
         if (!this.isActive() || this.store.getters.getAuthRole.rule == null) return true;
         let access = 1;
         access = this.store.getters.getAuthRole.rule[key];

@@ -35,7 +35,7 @@ class StorageController extends BaseController
         $segment = $request->segments();
         array_shift($segment); // buang segment "storage"
 
-        if (empty($segment)) {
+        if (empty($segment) || in_array('..', $segment, true) || in_array("\0", $segment, true)) {
             return abort(404);
         }
         
@@ -43,6 +43,9 @@ class StorageController extends BaseController
         // dd(Storage::path($fullFilePath));
         //isi segement di /storage/*
         switch ($segment[0]) {
+            case 'attachment':
+                // Application attachments are served only by their owner-aware API endpoint.
+                return abort(404);
             case 'editor': // handle file yang diupload dari kind editor
                 return $this->editor($request, $segment, $fullFilePath);
                 break;

@@ -8,9 +8,6 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
 
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-
 use App\Mixins\RouterMixin;
 use Illuminate\Pagination\Paginator;
 
@@ -128,18 +125,5 @@ class AppServiceProvider extends ServiceProvider
             return !empty($value);
         });
         CacheConfig::setCacheEngine(config('cache.default','file'));
-        if (isset($_GET['logquery'])) {
-            $aksesId = rand() . '-' . hash_hmac('md5', now(), 'wek');
-            DB::listen(function ($query) use ($aksesId) {
-                // $query->sql
-                // $query->bindings
-                // $query->time
-                // if(true){//stripos($query->sql,'absensi')!=false && stripos($query->sql,'select')===false){
-                    $sql = str_replace('?', "'?'", $query->sql);
-                    $sql = vsprintf(str_replace('?', '%s', $sql), $query->bindings);
-                    Log::info('[QUERY] [' . $aksesId . '] '.$query->time.' : ' . $sql);
-                
-            });
-        }
     }
 }

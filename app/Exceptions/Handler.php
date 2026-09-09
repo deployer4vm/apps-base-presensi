@@ -62,7 +62,8 @@ class Handler extends ExceptionHandler
                     [
                         'message' => __('alert.resource_not_found'),
                         'code' => 404
-                    ]
+                    ],
+                    404
                 );
             }
         } else if ($exception instanceof \Illuminate\Auth\AuthenticationException) {
@@ -86,7 +87,7 @@ class Handler extends ExceptionHandler
                     return response()->view('error.generic', [
                         'message' => __('alert.auth_required'),
                         'code' => 401
-                    ]);
+                    ], 401);
                 }
             }
         } else if ($exception instanceof \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException) {
@@ -101,7 +102,7 @@ class Handler extends ExceptionHandler
                 return response()->view('error.generic', [
                     'message' => __('alert.resource_not_found'),
                     'code' => 405
-                ]);
+                ], 405);
             }
         } else if ($exception instanceof \Error) {
             $pattern = '/Class \'([^\s]+)\' not found/m';

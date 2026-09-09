@@ -9,8 +9,8 @@
         <!-- Brand saat mode mobile (tidak ada sidebar) -->
         <b-navbar-brand :to="{name : 'home'}" class="app-brand demo py-0 mr-4">
             <span class="app-brand-logo demo square py-2">
-                <img v-if="koperasi && koperasi.logo.length > 0" :src="`${uploadedUrl}${koperasi.logo[0].filepath}`" alt="">
-                <img v-else :src="`${publicUrl}assets/images/logo.png`" alt="">
+                <!-- <img v-if="koperasi && koperasi.logo.length > 0" :src="`${uploadedUrl}${koperasi.logo[0].filepath}`" alt="">
+                <img v-else :src="`${publicUrl}assets/images/logo.png`" alt=""> -->
             </span>
             <div class="app-brand-text d-none d-md-block  nav-item text-big font-weight-light line-height-1 opacity-50 mr-2 ml-3">|</div>
             <h5 class="app-brand-text d-none d-md-block  demo ml-2 mb-0">{{ title }}</h5>

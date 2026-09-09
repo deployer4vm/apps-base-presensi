@@ -2,11 +2,7 @@
 
 use Illuminate\Support\Str;
 
-if (env('SESSION_LIFETIME', false)) {
-    $lifetime = config('AppConfig.packageLocal.moduser.session_lifetime');
-} else {
-    $lifetime = env('SESSION_LIFETIME');
-}
+$lifetime = (int) config('AppConfig.packageLocal.moduser.session_lifetime', 120);
 
 return [
 
@@ -52,7 +48,7 @@ return [
     |
     */
 
-    'encrypt' => false,
+    'encrypt' => env('SESSION_ENCRYPT', true),
 
     /*
     |--------------------------------------------------------------------------
@@ -174,7 +170,7 @@ return [
     |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE'),
+    'secure' => env('SESSION_SECURE_COOKIE', env('APP_ENV') === 'production'),
 
     /*
     |--------------------------------------------------------------------------
@@ -202,6 +198,6 @@ return [
     |
     */
 
-    'same_site' => 'lax',
+    'same_site' => env('SESSION_SAME_SITE', 'lax'),
 
 ];

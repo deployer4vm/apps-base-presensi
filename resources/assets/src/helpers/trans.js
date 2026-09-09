@@ -48,15 +48,16 @@ export default {
         return this.choose(langFile);
     },
     get(langKey, replace = {}, defaultVal='') {
-        let lang = "";
-        try {
-            lang = eval("this.allLang." + langKey);
-            if(!lang)
-                lang = defaultVal?defaultVal:langKey;
-        } catch (err) {
-            lang = defaultVal?defaultVal:langKey;
+        const blockedKeys = ['__proto__', 'prototype', 'constructor'];
+        let lang = this.allLang;
+        for (const key of String(langKey).split('.')) {
+            if (!key || blockedKeys.includes(key) || lang === null || typeof lang !== 'object') {
+                lang = undefined;
+                break;
+            }
+            lang = Object.prototype.hasOwnProperty.call(lang, key) ? lang[key] : undefined;
         }
-        if (lang == undefined) lang = langKey;
+        if (typeof lang !== 'string') lang = defaultVal || langKey;
         _.forEach(replace, (v, k) => {
             lang = lang.replace(":" + k, v);
         });

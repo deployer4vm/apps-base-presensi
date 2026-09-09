@@ -40,16 +40,21 @@ $tmpService = [
         ],
     ],
 
+    'fcm' => [
+        'project_id' => env('FIREBASE_PROJECT_ID'),
+        'credentials' => env('FIREBASE_CREDENTIALS', app_path('MainApp/config/firebase.json')),
+    ],
+
 ];
 
 /**
  * merge config services dari MainApp jika ada
  */
-$mainAppServiceConfigPath = __DIR__ . '/../app/MainApp/config/services.php';  
-if(file_exists($mainAppServiceConfigPath)){
+$mainAppServiceConfigPath = __DIR__ . '/../app/MainApp/config/services.php';
+if (file_exists($mainAppServiceConfigPath)) {
     $tmpMainAppService = include($mainAppServiceConfigPath);
-    if(is_array($tmpMainAppService)){
-        $tmpService = array_merge($tmpService,$tmpMainAppService);
+    if (is_array($tmpMainAppService)) {
+        $tmpService = array_merge($tmpService, $tmpMainAppService);
     }
 }
 

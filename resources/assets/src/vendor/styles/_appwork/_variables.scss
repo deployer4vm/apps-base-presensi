@@ -331,9 +331,9 @@ $form-feedback-icon-valid:                  str-replace(url("data:image/svg+xml,
 $form-feedback-icon-valid-rtl:              str-replace(url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='#{$form-feedback-icon-valid-color}' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z' transform='scale(-1, 1) translate(-8, 0)'/%3e%3c/svg%3e"), "#", "%23") !default;
 $form-feedback-icon-invalid:                str-replace(url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='#{$form-feedback-icon-invalid-color}' viewBox='-2 -2 7 7'%3e%3cpath stroke='#{$form-feedback-icon-invalid-color}' d='M0 0l3 3m0-3L0 3'/%3e%3ccircle r='.5'/%3e%3ccircle cx='3' r='.5'/%3e%3ccircle cy='3' r='.5'/%3e%3ccircle cx='3' cy='3' r='.5'/%3e%3c/svg%3E"), "#", "%23") !default;
 $form-feedback-icon-invalid-rtl:            str-replace(url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='#{$form-feedback-icon-invalid-color}' viewBox='-2 -2 7 7'%3e%3cpath stroke='#{$form-feedback-icon-invalid-color}' d='M0 0l3 3m0-3L0 3'/%3e%3ccircle r='.5'/%3e%3ccircle cx='3' r='.5'/%3e%3ccircle cy='3' r='.5'/%3e%3ccircle cx='3' cy='3' r='.5'/%3e%3c/svg%3E"), "#", "%23") !default;
-$custom-select-feedback-icon-padding:       $custom-select-indicator-padding + $input-height-inner !default;
-$custom-select-feedback-icon-padding-sm:    $custom-select-indicator-padding + $input-height-inner-sm !default;
-$custom-select-feedback-icon-padding-lg:    $custom-select-indicator-padding + $input-height-inner-lg !default;
+$custom-select-feedback-icon-padding:       calc(#{$custom-select-indicator-padding} + #{$input-height-inner}) !default;
+$custom-select-feedback-icon-padding-sm:    calc(#{$custom-select-indicator-padding} + #{$input-height-inner-sm}) !default;
+$custom-select-feedback-icon-padding-lg:    calc(#{$custom-select-indicator-padding} + #{$input-height-inner-lg}) !default;
 
 $form-validation-states: (
   "valid": (

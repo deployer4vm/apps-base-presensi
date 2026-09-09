@@ -52,7 +52,6 @@
     <!-- Load polyfills -->
     <script src="{{ asset('/dist/vendor/webjs/polyfills.js') }}"></script>
     <script>
-        document['documentMode']===10&&document.write('<script src="https://polyfill.io/v3/polyfill.min.js?features=Intl.~locale.en"><\/script>');
         var localUrl = {
             logout: "{{route('auth.logout')}}",
             login: "{{route('auth.login')}}"

@@ -13,9 +13,6 @@ class Authenticate extends Middleware
         if ($request->header('Authorization', false) == false){
             if($request->header('Syn-Api-Token', false) != false) {
                 $request->headers->add(['Authorization' => 'Bearer ' . $request->header('Syn-Api-Token', '')]);
-            }else if($request->input('syn_api_webauth',false)){
-                $request->headers->add(['Authorization' => 'Bearer ' . $request->input('syn_api_webauth', '')]);
-                $request->query->remove('syn_api_webauth');
             }
         }
 

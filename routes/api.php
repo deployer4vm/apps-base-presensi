@@ -32,12 +32,11 @@ Route::group($group,function(){
     //access config
     Route::group(['prefix' => 'access'],function(){
         Route::get('/', 'ConfigController@accessConfig');
-        Route::get('/unlock', 'ConfigController@unlockAccess');
         Route::middleware('auth:api')->put('/', 'ConfigController@unlockAccess');
     });
     
     //db config
-    Route::get('/', 'ConfigController@readList');
+    Route::middleware(['auth:api'])->get('/', 'ConfigController@readList');
     //create atau update config
     Route::middleware(['auth:api'])->post('/', 'ConfigController@createUpdate');
 
@@ -56,10 +55,10 @@ Route::group($group,function(){
     // /api/sys/tenant/active
     Route::get(config('AppConfig.system.multitenant.api_endpoint.tenant_active','/active'),'TenantController@activeTenant');    
     // /api/sys/tenant/group
-    Route::get(config('AppConfig.system.multitenant.api_endpoint.tenant_group','/group'),'TenantController@tenantGroupList');
+    Route::middleware('auth:api')->get(config('AppConfig.system.multitenant.api_endpoint.tenant_group','/group'),'TenantController@tenantGroupList');
     //----read tenant resource
     //list tenant - /api/sys/tenant
-    Route::get('/','TenantController@listTenant');
+    Route::middleware('auth:api')->get('/','TenantController@listTenant');
 });
 
 /**
@@ -73,8 +72,10 @@ Route::get(config('AppConfig.system.lang_endpoint','/sys/lang'),'LangController@
  * kindeditor
  * -------------------------------------------------
  */
-Route::match(['post','get'],config('AppConfig.system.editor_endpoint.upload','/sys/editor/upload'),'KindeditorController@upload')->name('sys.editor.upload');
-Route::match(['post','get'],config('AppConfig.system.editor_endpoint.filemanager','/sys/editor/filemanager'),'KindeditorController@filemanager')->name('sys.editor.filemanager');
+Route::middleware(['auth:api', 'auth.useronly'])->group(function () {
+    Route::post(config('AppConfig.system.editor_endpoint.upload','/sys/editor/upload'),'KindeditorController@upload')->name('sys.editor.upload');
+    Route::get(config('AppConfig.system.editor_endpoint.filemanager','/sys/editor/filemanager'),'KindeditorController@filemanager')->name('sys.editor.filemanager');
+});
 
 /**
  * Post reference

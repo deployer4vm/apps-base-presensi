@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 use App\Base\BaseController;
-use App\Facades\Tenant;
 
 class KindeditorController extends BaseController
 {
@@ -28,124 +29,26 @@ class KindeditorController extends BaseController
      */
     public function upload(Request $request)
     {
-        //File save directory path
-        $save_path = Storage::path('/editor'). DIRECTORY_SEPARATOR;//storage_path('app/upload/editor/');
-        //File save directory URL
-        $save_url = url(Storage::url('/editor')).'/';//url('upload/editor') . '/';
-        //Define file extensions that are allowed to upload
-        $ext_arr = [
-            'image' => ['gif', 'jpg', 'jpeg', 'png', 'bmp'],
-            'flash' => ['swf', 'flv'],
-            'media' => ['swf', 'flv', 'mp3', 'wav', 'wma', 'wmv', 'mid', 'avi', 'mpg', 'asf', 'rm', 'rmvb'],
-            'file' => ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'htm', 'html', 'txt', 'zip', 'rar', 'gz', 'bz2'],
-        ];
-        //Maximum file size
-        $max_size = 1000000;
-
-        $save_path = realpath($save_path) . '/';
-
-        //PHP upload failed
-        if (!empty($_FILES['imgFile']['error'])) {
-            switch ($_FILES['imgFile']['error']) {
-                case '1':
-                    $error = 'Exceeded the size allowed by php.ini. ';
-                    break;
-                case '2':
-                    $error = 'Exceeded the size allowed by the form. ';
-                    break;
-                case '3':
-                    $error = 'Only part of the image was uploaded. ';
-                    break;
-                case '4':
-                    $error = 'Please select an image. ';
-                    break;
-                case '6':
-                    $error = 'Temporary directory not found. ';
-                    break;
-                case '7':
-                    $error = 'Error writing file to hard disk. ';
-                    break;
-                case '8':
-                    $error = 'File upload stopped by extension. ';
-                    break;
-                case '999':
-                default:
-                    $error = 'Unknown error. ';
-            }
-            return $this->uploadAlert($error);
+        if ($request->input('dir', 'image') !== 'image') {
+            return $this->uploadAlert('Only image uploads are allowed.');
         }
 
-        // When uploading files
-        if (empty($_FILES) === false) {
-            // Original file name
-            $file_name = $_FILES['imgFile']['name'];
-            // Temporary file name on the server
-            $tmp_name = $_FILES['imgFile']['tmp_name'];
-            //File size
-            $file_size = $_FILES['imgFile']['size'];
-            // Check the file name
-            if (!$file_name) {
-                return $this->uploadAlert("Please select a file.");
-            }
-            // Check the directory
-            if (@is_dir($save_path) === false) {
-                return $this->uploadAlert("The upload directory does not exist.");
-            }
-            // Check the directory write permission
-            if (@is_writable($save_path) === false) {
-                return $this->uploadAlert("The upload directory does not have write permission.");
-            }
-            // Check if it has been uploaded
-            if (@is_uploaded_file($tmp_name) === false) {
-                return $this->uploadAlert("Upload failed.");
-            }
-            //Check file size
-            if ($file_size > $max_size) {
-                return $this->uploadAlert("The upload file size exceeds the limit.");
-            }
-            //Check directory name
-            $dir_name = $request->input('dir', 'image');
-            if (empty($ext_arr[$dir_name])) {
-                return $this->uploadAlert("The directory name is incorrect.");
-            }
-            //Get file extension
-            $temp_arr = explode(".", $file_name);
-            $file_ext = array_pop($temp_arr);
-            $file_ext = trim($file_ext);
-            $file_ext = strtolower($file_ext);
-            //Check extension
-            if (in_array($file_ext, $ext_arr[$dir_name]) === false) {
-                return $this->uploadAlert("Upload file extension is not allowed. \n Only allowed"
-                    . implode(",", $ext_arr[$dir_name])
-                    . "format.");
-            }
-            //Create Folder
-            if ($dir_name !== '') {
-                $save_path .= $dir_name . "/";
-                $save_url .= $dir_name . "/";
-                if (!file_exists($save_path)) {
-                    mkdir($save_path, 0766, true);
-                }
-            }
-            $ymd = date("Ymd");
-            $save_path .= $ymd . "/";
-            $save_url .= $ymd . "/";
-            if (!file_exists($save_path)) {
-                mkdir($save_path, 0766, true);
-            }
-            //New file name
-            $new_file_name = date("YmdHis") . '_' . rand(10000, 99999) . '.' . $file_ext;
-            //Move file
-            $file_path = $save_path . $new_file_name;
-            if (move_uploaded_file($tmp_name, $file_path) === false) {
-                return $this->uploadAlert("File upload failed.");
-            }
-            @chmod($file_path, 0644);
-            $file_url = $save_url . $new_file_name;
-
-            return response()->json(array('error' => 0, 'url' => $file_url));
+        $validator = Validator::make($request->all(), [
+            'imgFile' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,gif', 'max:2048'],
+        ]);
+        if ($validator->fails()) {
+            return $this->uploadAlert($validator->errors()->first('imgFile'));
         }
-        return $this->uploadAlert("File upload failed.");
+
+        $file = $request->file('imgFile');
+        $directory = 'editor/image/' . now()->format('Ymd');
+        $filename = Str::random(40) . '.' . strtolower($file->extension());
+        Storage::putFileAs($directory, $file, $filename);
+
+        return response()->json([
+            'error' => 0,
+            'url' => url(Storage::url($directory . '/' . $filename)),
+        ]);
     }
 
     /**
@@ -166,38 +69,40 @@ class KindeditorController extends BaseController
     {
 
         // Root directory path, you can specify an absolute path, such as / var / www / attached /
-        $root_path = Storage::path('/editor'). DIRECTORY_SEPARATOR;//storage_path('app/upload/editor') . DIRECTORY_SEPARATOR;
+        Storage::makeDirectory('editor/image');
+        $root_path = realpath(Storage::path('editor/image')) . DIRECTORY_SEPARATOR;
 
         // Root directory URL, you can specify an absolute path, such as http://www.yoursite.com/attached/
-        $root_url = url(Storage::url('/editor')).'/';//url('upload/editor') . '/';
+        $root_url = url(Storage::url('editor/image')).'/';
 
         //Picture extension
         $ext_arr = array('gif', 'jpg', 'jpeg', 'png', 'bmp');
 
         //Directory name
-        $dir_name = $request->input('dir');
-        if (!in_array($dir_name, array('', 'image', 'flash', 'media', 'file'))) {
-            echo "Invalid Directory name.";
-            exit;
-        }
-        if ($dir_name !== '') {
-            $root_path .= $dir_name . "/";
-            $root_url .= $dir_name . "/";
-            if (!file_exists($root_path)) {
-                mkdir($root_path, 0766, true);
-            }
+        $dir_name = $request->input('dir', 'image');
+        if (!in_array($dir_name, ['', 'image'], true)) {
+            return response()->json(['error' => 'Invalid directory name.'], 422);
         }
 
         //According to the path parameter, set each path and URL
-        if (!$request->input('path')) {
-            $current_path = realpath($root_path) . '/';
+        $relativePath = (string) $request->input('path', '');
+        if ($relativePath !== '' && !preg_match('#^[A-Za-z0-9_/-]+$#', $relativePath)) {
+            return response()->json(['error' => 'Invalid path.'], 422);
+        }
+
+        if (!$relativePath) {
+            $current_path = $root_path;
             $current_url = $root_url;
             $current_dir_path = '';
             $moveup_dir_path = '';
         } else {
-            $current_path = realpath($root_path) . '/' . $request->input('path');
-            $current_url = $root_url . $request->input('path');
-            $current_dir_path = $request->input('path');
+            $resolvedPath = realpath($root_path . $relativePath);
+            if (!$resolvedPath || !str_starts_with($resolvedPath . DIRECTORY_SEPARATOR, $root_path)) {
+                return response()->json(['error' => 'Access is not allowed.'], 403);
+            }
+            $current_path = $resolvedPath . DIRECTORY_SEPARATOR;
+            $current_url = $root_url . $relativePath;
+            $current_dir_path = $relativePath;
             $moveup_dir_path = preg_replace('/(.*?)[^\/]+\/$/', '$1', $current_dir_path);
         }
         //echo realpath($root_path);
@@ -205,19 +110,16 @@ class KindeditorController extends BaseController
         $order = $request->input('order', 'name');
 
         //Not allowed to use: move to the previous directory
-        if (preg_match('/\.\./', $current_path)) {
-            echo 'Access is not allowed.';
-            exit;
+        if (str_contains($relativePath, '..')) {
+            return response()->json(['error' => 'Access is not allowed.'], 403);
         }
         //The last character is not /
         if (!preg_match('/\/$/', $current_path)) {
-            echo 'Parameter is not valid.';
-            exit;
+            return response()->json(['error' => 'Parameter is not valid.'], 422);
         }
         //Directory does not exist or is not a directory
         if (!file_exists($current_path) || !is_dir($current_path)) {
-            echo 'Directory does not exist.';
-            exit;
+            return response()->json(['error' => 'Directory does not exist.'], 404);
         }
 
         //Traverse the directory to get file information

@@ -150,7 +150,9 @@ class ConfigController extends BaseController
             'allow_login_only' => []
         ]);
 
-        $this->output['data'] = $config; //UserAuth::getAccessConfig();
+        $this->output['data'] = [
+            'allow_login' => (bool) ($config['allow_login'] ?? true),
+        ];
         return $this->done();
     }
 

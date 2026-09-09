@@ -1,4 +1,5 @@
 var mix = require("laravel-mix");
+const webpack = require("webpack");
 const glob = require("glob");
 const path = require("path");
 // const forEach = require("lodash/forEach");
@@ -18,6 +19,7 @@ mix.options({
     postCss: [require("autoprefixer")]
 });
 mix.setPublicPath(publicPath);
+mix.vue({ version: 2 });
 
 /*
  |--------------------------------------------------------------------------
@@ -43,8 +45,19 @@ mix.webpackConfig({
         alias: {
             "@": path.join(__dirname, "resources/assets/src"),
             node_modules: path.join(__dirname, "node_modules")
+        },
+        fallback: {
+            crypto: require.resolve("crypto-browserify"),
+            stream: require.resolve("stream-browserify"),
+            vm: false
         }
     },
+    plugins: [
+        new webpack.ProvidePlugin({
+            Buffer: ["buffer", "Buffer"],
+            process: "process/browser"
+        })
+    ],
     output: {
         chunkFilename: "dist/chunks/[name].[contenthash].js"
     }
@@ -66,8 +79,7 @@ function mixAssetsDir(query, cb) {
 }
 
 const sassOptions = {
-    // precision: 5,
-    implementation: () => require("node-sass")
+    implementation: require("sass")
 };
 
 // Core javascripts
