@@ -762,8 +762,10 @@ foreach ($packageLocal as $item) {
   */
     if ($item['is_package']) {
         $filePath = "vendor/hp-synapse/" . $item['package_dir'] . "/src/";
-        $packagePath = $pathToBase . "/vendor/hp-synapse/" . $item['package_dir'] . "/src/";
-        $packageMainPath = $pathToBase . "/vendor/hp-synapse/" . $item['package_dir'] . "/src/";
+        // Generated loaders live below app/MainApp/resources/js. Keep their
+        // imports relative so a checkout can be built on any host/path.
+        $packagePath = "../../../../../vendor/hp-synapse/" . $item['package_dir'] . "/src/";
+        $packageMainPath = "../../../../vendor/hp-synapse/" . $item['package_dir'] . "/src/";
     } else {
         $filePath = "app/MainApp/Modules/" . $item['package_dir'] . "/";
         $packagePath = "../../../Modules/" . $item['package_dir'] . "/";
