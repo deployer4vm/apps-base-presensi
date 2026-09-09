@@ -44,6 +44,7 @@
     <link href="{{ asset('/dist/css/colors.css') }}" rel="stylesheet">
     <link href="{{ asset('/dist/css/uikit.css') }}" rel="stylesheet">
     <link href="{{ asset('/dist/css/style.css') }}" rel="stylesheet">
+    <link href="{{ mix('/dist/css/authentication.css') }}" rel="stylesheet">
 
     @if (config('AppConfig.system.web_admin.assets_link'))
         @foreach (config('AppConfig.system.web_admin.assets_link') as $value)

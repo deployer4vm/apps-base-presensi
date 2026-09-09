@@ -49,7 +49,11 @@ export default {
     },
     get(langKey, replace = {}, defaultVal='') {
         const blockedKeys = ['__proto__', 'prototype', 'constructor'];
-        let lang = this.allLang;
+        // Read from Vuex so components that call Trans.get() are re-rendered
+        // when the asynchronous language request completes.
+        let lang = this.store && this.store.getters
+            ? this.store.getters.getLang
+            : this.allLang;
         for (const key of String(langKey).split('.')) {
             if (!key || blockedKeys.includes(key) || lang === null || typeof lang !== 'object') {
                 lang = undefined;

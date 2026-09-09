@@ -9,6 +9,20 @@ use Tests\TestCase;
 class SecurityRoutesTest extends TestCase
 {
     /** @test */
+    public function language_endpoint_returns_login_labels(): void
+    {
+        $this->withoutMiddleware();
+
+        $this->getJson('/api/sys/lang?lang=id')
+            ->assertOk()
+            ->assertJsonPath('auth.login.usernamecaption', 'Username/Email')
+            ->assertJsonPath('auth.login.passwordcaption', 'Password')
+            ->assertJsonPath('auth.login.remember_me', 'Ingat Aku')
+            ->assertJsonPath('auth.login.sigincaption', 'Sign In')
+            ->assertJsonPath('auth.login.forgotpassword', 'Lupa Password ?');
+    }
+
+    /** @test */
     public function etask_login_rejects_an_incomplete_request_before_contacting_upstream(): void
     {
         $this->withoutMiddleware();
