@@ -67,23 +67,30 @@ export default {
     //logoutkan session yg sekarang
     // return promise
     logout(goToLogin = true) {
-        this.store.dispatch('logout');
-        if (goToLogin) {
-            this.router.push({
+        const groupApp = this.store.getters.getTenantGroupApp;
+
+        return this.store.dispatch('logout').then(() => {
+            if (!goToLogin) {
+                return;
+            }
+
+            return this.router.push({
                 name: "login",
-                params: { group_app: this.store.getters.getTenantGroupApp }
-            });
-        }
+                params: { group_app: groupApp }
+            }).catch(() => null);
+        });
     },
     // logout & reset local storage, lalu redirect ke halaman login
     logoutAndReset() {
-        this.store.dispatch('logout');
-        var tmpLoginUrl = this.router.resolve({
+        const tmpLoginUrl = this.router.resolve({
             name: "login",
             params: { group_app: this.store.getters.getTenantGroupApp }
-        }).href; 
-        window.localStorage.clear();
-        window.location.href = tmpLoginUrl;
+        }).href;
+
+        return this.store.dispatch('logout').then(() => {
+            window.localStorage.clear();
+            window.location.href = tmpLoginUrl;
+        });
     },
     //cek apakah sedang login atau tidak
     isLogin() {

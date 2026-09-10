@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\RateLimiter;
 use ReflectionMethod;
@@ -11,6 +12,27 @@ use Tests\TestCase;
 
 class SecurityRoutesTest extends TestCase
 {
+    /** @test */
+    public function regular_login_throttle_is_scoped_to_the_username(): void
+    {
+        $limiter = RateLimiter::limiter('auth-login');
+        $first = $limiter(Request::create('/api/auth/login', 'POST', [
+            'username' => 'webdev@example.test',
+        ]));
+        $second = $limiter(Request::create('/api/auth/login', 'POST', [
+            'username' => 'employee@example.test',
+        ]));
+
+        $this->assertCount(2, $first);
+        $this->assertSame(12, $first[0]->maxAttempts);
+        $this->assertNotSame($first[0]->key, $second[0]->key);
+        $this->assertSame($first[1]->key, $second[1]->key);
+
+        $route = app('router')->getRoutes()->getByName('auth.api.login');
+        $this->assertContains('throttle:auth-login', $route->gatherMiddleware());
+        $this->assertNotContains('throttle:5,1', $route->gatherMiddleware());
+    }
+
     /** @test */
     public function etask_otp_throttles_are_scoped_to_the_login_flow(): void
     {
@@ -171,6 +193,32 @@ class SecurityRoutesTest extends TestCase
 
         $this->assertIsArray($cached);
         $this->assertNotSame('Bearer upstream-pending-secret', $cached['pending_token']);
+    }
+
+    /** @test */
+    public function etask_email_otp_failure_keeps_the_safe_upstream_reason(): void
+    {
+        $this->withoutMiddleware();
+        config(['services.etask.base_url' => 'https://etask.example.test/api']);
+
+        $flowToken = str_repeat('f', 64);
+        Cache::put('etask_sso_flow:' . hash('sha256', $flowToken), [
+            'pending_token' => Crypt::encryptString('Bearer upstream-pending-token'),
+            'external_user_id' => 42,
+            'external_email' => 'person@example.test',
+        ], now()->addMinutes(5));
+
+        Http::fake([
+            'https://etask.example.test/api/verify-login' => Http::response([
+                'message' => 'OTP has expired. Please request a new one.',
+            ], 400),
+        ]);
+
+        $this->postJson('/api/employee/etask/verify-login', [
+            'flow_token' => $flowToken,
+            'code' => '123456',
+        ])->assertStatus(422)
+            ->assertJsonPath('error', 'OTP has expired. Please request a new one.');
     }
 
     /** @test */

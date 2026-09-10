@@ -49,6 +49,15 @@ class RouteServiceProvider extends ServiceProvider
 
     private function configureEtaskRateLimiting(): void
     {
+        RateLimiter::for('auth-login', function (Request $request) {
+            $username = strtolower(trim((string) $request->input('username', '')));
+
+            return [
+                Limit::perMinute(12)->by('auth-login-user:' . hash('sha256', $username)),
+                Limit::perMinute(120)->by('auth-login-ip:' . $request->ip()),
+            ];
+        });
+
         RateLimiter::for('etask-login', function (Request $request) {
             $email = strtolower(trim((string) $request->input('email', '')));
 
