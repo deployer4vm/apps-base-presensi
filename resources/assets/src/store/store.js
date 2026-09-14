@@ -15,6 +15,33 @@ import globals from "@/globals";
 
 window.Vue.use(Vuex);
 
+const persistedStore = {
+    getItem(key) {
+        return sessionStorage.getItem(key) || localStorage.getItem(key);
+    },
+    setItem(key, value) {
+        let remember = false;
+
+        try {
+            const state = JSON.parse(value);
+            // Keep legacy sessions persistent until the user explicitly logs in
+            // again and chooses whether this browser should remember them.
+            remember = state.auth && state.auth.remember !== false;
+        } catch (e) {
+            remember = false;
+        }
+
+        const target = remember ? localStorage : sessionStorage;
+        const stale = remember ? sessionStorage : localStorage;
+        target.setItem(key, value);
+        stale.removeItem(key);
+    },
+    removeItem(key) {
+        localStorage.removeItem(key);
+        sessionStorage.removeItem(key);
+    },
+};
+
 let vuexConfig = {
     modules: {
         config: configStore,
@@ -53,7 +80,7 @@ const vuexPersist = new VuexPersist({
         return newState;
     },
     key: globals().AppConfig.client.apps_id,
-    storage: localStorage
+    storage: persistedStore
     // Aktifkan storage dibawah jika localstorage akan di encrypt
     // storage: {
     //     getItem: (storageKey) => {
