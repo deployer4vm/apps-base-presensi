@@ -67,6 +67,42 @@ class SecurityRoutesTest extends TestCase
             'throttle:etask-otp',
             $routes->getByName('employee.api.etask.otp')->gatherMiddleware()
         );
+        $this->assertContains(
+            'throttle:etask-exchange',
+            $routes->getByName('employee.api.etask.exchange')->gatherMiddleware()
+        );
+    }
+
+    /** @test */
+    public function etask_exchange_requires_a_bearer_token(): void
+    {
+        $this->withoutMiddleware();
+
+        $this->postJson('/api/employee/etask/exchange')
+            ->assertUnauthorized()
+            ->assertJsonPath('error', 'Token eTask tidak valid.');
+    }
+
+    /** @test */
+    public function etask_exchange_rejects_a_pending_or_expired_upstream_token(): void
+    {
+        $this->withoutMiddleware();
+        config(['services.etask.base_url' => 'https://etask.example.test/api']);
+        Http::fake([
+            'https://etask.example.test/api/user' => Http::response([
+                'message' => 'Unauthenticated.',
+            ], 401),
+        ]);
+
+        $this->withToken('upstream-token')
+            ->postJson('/api/employee/etask/exchange')
+            ->assertUnauthorized()
+            ->assertJsonPath('error', 'Token eTask tidak valid atau telah kedaluwarsa.');
+
+        Http::assertSent(function ($request) {
+            return $request->url() === 'https://etask.example.test/api/user'
+                && $request->hasHeader('Authorization', 'Bearer upstream-token');
+        });
     }
 
     /** @test */

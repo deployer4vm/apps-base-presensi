@@ -85,6 +85,15 @@ class RouteServiceProvider extends ServiceProvider
             ];
         });
 
+        RateLimiter::for('etask-exchange', function (Request $request) {
+            $bearerToken = (string) $request->bearerToken();
+
+            return [
+                Limit::perMinute(10)->by('etask-exchange-token:' . hash('sha256', $bearerToken)),
+                Limit::perMinute(60)->by('etask-exchange-ip:' . $request->ip()),
+            ];
+        });
+
         RateLimiter::for('presence-write', function (Request $request) {
             $sessionId = optional($request->user())->getAuthIdentifier();
             $sessionKey = $sessionId
