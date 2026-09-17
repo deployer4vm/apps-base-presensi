@@ -152,6 +152,8 @@ class SecurityRoutesTest extends TestCase
             'email' => 'nisa@example.test',
             'jabatan' => ['nama' => 'Programmer'],
             'divisi' => ['nama' => 'Project'],
+            'created_at' => '2024-01-02 03:04:05',
+            'updated_at' => '2026-09-17 12:00:00',
         ];
 
         $userMethod = new ReflectionMethod($controller, 'buildUserPayload');
@@ -167,13 +169,15 @@ class SecurityRoutesTest extends TestCase
         sort($expectedUserKeys);
         sort($actualUserKeys);
 
-        $expectedEmployeeKeys = ['api_id', 'name', 'position', 'division'];
+        $expectedEmployeeKeys = ['api_id', 'name', 'position', 'division', 'created_at', 'updated_at'];
         $actualEmployeeKeys = array_keys($employeePayload);
         sort($expectedEmployeeKeys);
         sort($actualEmployeeKeys);
 
         $this->assertSame($expectedUserKeys, $actualUserKeys);
         $this->assertSame($expectedEmployeeKeys, $actualEmployeeKeys);
+        $this->assertSame('2024-01-02 03:04:05', $employeePayload['created_at']);
+        $this->assertSame('2026-09-17 12:00:00', $employeePayload['updated_at']);
         $this->assertArrayNotHasKey('api_token', $userPayload);
         $this->assertArrayNotHasKey('api_token', $employeePayload);
     }
