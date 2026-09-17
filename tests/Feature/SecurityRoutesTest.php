@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\MainApp\Modules\application\Models\Application;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
@@ -273,6 +275,41 @@ class SecurityRoutesTest extends TestCase
     {
         $this->getJson('/api/application/attachment/1/0')
             ->assertUnauthorized();
+    }
+
+    /** @test */
+    public function application_records_expose_authenticated_attachment_urls(): void
+    {
+        $application = new Application();
+        $application->forceFill([
+            'id' => 91,
+            'attachment' => [[
+                'filepath' => 'attachment/26/example.pdf',
+                'name' => 'example.pdf',
+            ]],
+        ]);
+
+        $files = $application->toArray()['attachment_files'];
+
+        $this->assertSame('example.pdf', $files[0]['name']);
+        $this->assertSame('attachment/26/example.pdf', $files[0]['path']);
+        $this->assertStringContainsString('/api/application/attachment/91/0', $files[0]['url']);
+    }
+
+    /** @test */
+    public function application_upload_accepts_the_mobile_attachment_field(): void
+    {
+        $request = Request::create('/api/application', 'POST');
+        $upload = UploadedFile::fake()->create('request.pdf', 100, 'application/pdf');
+        $request->files->set('attachment', $upload);
+
+        $controller = app(\App\MainApp\Modules\application\Controllers\ApplicationController::class);
+        $method = new ReflectionMethod($controller, 'normalizeAttachmentUpload');
+        $method->setAccessible(true);
+        $method->invoke($controller, $request);
+
+        $this->assertInstanceOf(UploadedFile::class, $request->input('file.0.filepath'));
+        $this->assertSame('request.pdf', $request->input('file.0.name'));
     }
 
     /** @test */
