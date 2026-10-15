@@ -349,15 +349,47 @@ export default function () {
         LocalApi: localapi,
 
         openProtectedFile: function (path, filename = 'attachment') {
-            return localapi.get(path, { responseType: 'blob' }).then(response => {
-                const url = window.URL.createObjectURL(response.data);
+            const token = UserAuth.getToken();
+
+            web.setLoadingPage(true);
+
+            return localapi.get(path, {
+                responseType: 'blob',
+                headers: {
+                    Authorization: 'Bearer ' + token,
+                    'Syn-Api-Token': token,
+                },
+            }).then(response => {
+                const contentType = String(response.headers['content-type'] || '').toLowerCase();
+
+                if (contentType.includes('application/json')) {
+                    throw new Error('Server mengembalikan respons error, bukan file.');
+                }
+
+                const blob = response.data instanceof Blob
+                    ? response.data
+                    : new Blob([response.data], { type: contentType });
+                const url = window.URL.createObjectURL(blob);
                 const link = document.createElement('a');
+
                 link.href = url;
                 link.setAttribute('download', filename);
                 document.body.appendChild(link);
                 link.click();
                 link.remove();
-                window.URL.revokeObjectURL(url);
+
+                // Firefox can cancel the download when the object URL is
+                // revoked in the same event loop as link.click().
+                window.setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+            }).catch(error => {
+                const status = error.response ? error.response.status : null;
+                const message = status === 401
+                    ? 'Sesi login sudah tidak valid. Silakan login ulang lalu unduh kembali.'
+                    : 'File gagal diunduh. Silakan coba kembali.';
+
+                web.showAlert({ text: message, type: 'warning' });
+            }).finally(() => {
+                web.setLoadingPage(false);
             });
         },
 

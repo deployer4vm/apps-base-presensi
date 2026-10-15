@@ -2,13 +2,16 @@
 
 namespace Tests\Feature;
 
+use App\MainApp\Modules\application\Controllers\ApplicationController;
+use App\MainApp\Modules\application\Mail\AdminMessage;
 use App\MainApp\Modules\application\Models\Application;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Validation\ValidationException;
 use ReflectionMethod;
 use Tests\TestCase;
 
@@ -303,13 +306,79 @@ class SecurityRoutesTest extends TestCase
         $upload = UploadedFile::fake()->create('request.pdf', 100, 'application/pdf');
         $request->files->set('attachment', $upload);
 
-        $controller = app(\App\MainApp\Modules\application\Controllers\ApplicationController::class);
+        $controller = app(ApplicationController::class);
         $method = new ReflectionMethod($controller, 'normalizeAttachmentUpload');
         $method->setAccessible(true);
         $method->invoke($controller, $request);
 
         $this->assertInstanceOf(UploadedFile::class, $request->input('file.0.filepath'));
         $this->assertSame('request.pdf', $request->input('file.0.name'));
+    }
+
+    /** @test */
+    public function application_api_normalizes_and_validates_time_fields(): void
+    {
+        $request = Request::create('/api/application', 'POST', [
+            'date' => ['2026-10-15'],
+            'start_time' => '08:05',
+            'end_time' => '17:30:00',
+            'type_overtime' => 1,
+        ]);
+
+        $controller = app(ApplicationController::class);
+        $method = new ReflectionMethod($controller, 'normalizeAndValidateApplicationFields');
+        $method->setAccessible(true);
+        $method->invoke($controller, $request);
+
+        $this->assertSame('08:05:00', $request->input('start_time'));
+        $this->assertSame('17:30:00', $request->input('end_time'));
+    }
+
+    /** @test */
+    public function application_api_rejects_an_end_time_before_the_start_time(): void
+    {
+        $request = Request::create('/api/application', 'POST', [
+            'date' => '2026-10-15',
+            'start_time' => '18:00',
+            'end_time' => '17:00',
+        ]);
+
+        $controller = app(ApplicationController::class);
+        $method = new ReflectionMethod($controller, 'normalizeAndValidateApplicationFields');
+
+        $this->expectException(ValidationException::class);
+        $method->invoke($controller, $request);
+    }
+
+    /** @test */
+    public function application_email_uses_human_readable_date_and_time(): void
+    {
+        $html = (new AdminMessage('Pengajuan', 'Pengajuan baru', [
+            'date' => '2026-10-15',
+            'start_time' => '08:05:00',
+            'end_time' => '17:30:00',
+            'user' => ['name' => 'Nisa'],
+            'category' => ['name' => 'Overtime'],
+            'approval_status' => 0,
+            'note' => 'Test',
+            'type' => null,
+            'type_overtime' => 1,
+            'attachment' => [],
+        ]))->render();
+
+        $this->assertStringContainsString('15 Oktober 2026', $html);
+        $this->assertStringContainsString('08:05 - 17:30 WIB', $html);
+        $this->assertStringNotContainsString('08:05:00', $html);
+    }
+
+    /** @test */
+    public function application_update_has_no_debug_dump(): void
+    {
+        $source = file_get_contents(
+            app_path('MainApp/Modules/application/Controllers/ApplicationController.php')
+        );
+
+        $this->assertStringNotContainsString('dd($input)', $source);
     }
 
     /** @test */
