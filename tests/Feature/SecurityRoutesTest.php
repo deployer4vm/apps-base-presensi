@@ -353,6 +353,26 @@ class SecurityRoutesTest extends TestCase
     }
 
     /** @test */
+    public function application_api_normalizes_legacy_empty_optional_types(): void
+    {
+        $request = Request::create('/api/application/1', 'POST', [
+            'start_time' => '19:00:00',
+            'end_time' => '23:59:00',
+            'type' => '0',
+            'type_overtime' => '1',
+            'is_approved' => 1,
+        ]);
+
+        $controller = app(ApplicationController::class);
+        $method = new ReflectionMethod($controller, 'normalizeAndValidateApplicationFields');
+        $method->setAccessible(true);
+        $method->invoke($controller, $request);
+
+        $this->assertNull($request->input('type'));
+        $this->assertSame('1', $request->input('type_overtime'));
+    }
+
+    /** @test */
     public function application_api_rejects_an_end_time_before_the_start_time(): void
     {
         $request = Request::create('/api/application', 'POST', [
