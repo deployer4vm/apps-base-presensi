@@ -5,8 +5,11 @@ namespace Tests\Feature;
 use App\MainApp\Modules\application\Controllers\ApplicationController;
 use App\MainApp\Modules\application\Mail\AdminMessage;
 use App\MainApp\Modules\application\Models\Application;
+use App\MainApp\Modules\dashboard\Controllers\DashboardController;
+use GuzzleHttp\Psr7\Response as PsrResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Http\Client\Response as HttpClientResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
@@ -145,6 +148,25 @@ class SecurityRoutesTest extends TestCase
             'throttle:presence-write',
             $routes->getByName('dashboard.presence.checkout')->gatherMiddleware()
         );
+    }
+
+    /** @test */
+    public function etask_rate_limit_is_returned_as_a_retryable_error(): void
+    {
+        $upstream = new HttpClientResponse(new PsrResponse(
+            429,
+            ['Retry-After' => '30'],
+            json_encode(['message' => 'Too Many Attempts.'])
+        ));
+
+        $controller = app(DashboardController::class);
+        $method = new ReflectionMethod($controller, 'proxyResponse');
+        $method->setAccessible(true);
+        $response = $method->invoke($controller, $upstream);
+
+        $this->assertSame(429, $response->getStatusCode());
+        $this->assertSame('30', $response->headers->get('Retry-After'));
+        $this->assertSame(429, json_decode($response->getContent(), true)['status']);
     }
 
     /** @test */

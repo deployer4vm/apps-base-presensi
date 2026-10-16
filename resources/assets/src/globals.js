@@ -25,13 +25,17 @@ var localapi = new axios.create();
  **/
 localapi.parseError = function (errResponse) {
 
-    let err = { status: 400, message: "request error", errors: [] };
+    let err = {
+        status: errResponse.status || 400,
+        message: errResponse.message || "request error",
+        errors: []
+    };
     //jika error server
     if (!errResponse.data) {
         err.message = errResponse.message;
     } else {
-        err.message = errResponse.data.message;
-        err.status = errResponse.data.status;
+        err.message = errResponse.data.message || err.message;
+        err.status = errResponse.data.status || err.status;
 
         if (errResponse.data.errors) {
             err.errors = errResponse.data.errors;
@@ -56,6 +60,7 @@ localapi.errAlertText = {
     text: "Session Expired"
 };
 localapi.showAllert = true;
+localapi.isLoggingOut = false;
 localapi.defaults.baseURL = "/";//AppConfig.client.endpoint[AppConfig.system.mode]["domain"];
 localapi.defaults.headers.get["Accept"] = "application/json";
 localapi.defaults.headers.common['Content-Type'] = 'multipart/form-data';
@@ -70,39 +75,36 @@ if (
     // console.log(AppConfig.client.api_key);
 }
 localapi.interceptors.response.use((response) => response, (error) => {
-    if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message &&
-        error.response.data.errors &&
-        error.response.data.status
-    ) {
-        let err = localapi.parseError(error.response);
-        //jika error token expired/auth gagal maka logoutkan
-        if (err.status == 401) {
-            if (localapi.showAllert) {
-                Web.showAlert({
-                    type: "warning",
-                    title: localapi.errAlertText.title,// Trans.get("alert.form_must_complete_title"),
-                    text: localapi.errAlertText.text//Trans.get("alert.session_expired")
-                });
-
-                if (UserAuth.isLogin())
-                    UserAuth.logout(Web.isAuthEndpoint() ? false : true);
-
-                localapi.showAllert = false;
-                //munculkan alert session expired hanya setelah 5 detik kemudian, jadi tidak ada pesan error bertubi-tubi
-                setTimeout(function () {
-                    localapi.showAllert = true;
-                }, 5000);
-            }
-        } else {
-            err.errClass = error;
-        }
-        throw err;
-    } else {
+    if (!error.response) {
         throw error;
     }
+
+    const err = localapi.parseError(error.response);
+    const httpStatus = error.response.status;
+    const responseStatus = error.response.data && error.response.data.status;
+    const isExpiredSession = httpStatus === 401 && responseStatus !== 401001;
+
+    if (
+        isExpiredSession &&
+        !localapi.isLoggingOut &&
+        UserAuth.isActive() &&
+        UserAuth.isLogin()
+    ) {
+        localapi.isLoggingOut = true;
+        Web.showAlert({
+            type: "warning",
+            title: localapi.errAlertText.title,
+            text: localapi.errAlertText.text
+        });
+        UserAuth.logoutAndReset();
+    }
+
+    if (httpStatus === 429 && (!error.response.data || !error.response.data.message)) {
+        err.message = "Terlalu banyak permintaan. Silakan tunggu sebentar lalu coba kembali.";
+    }
+
+    err.errClass = error;
+    throw err;
 });
 
 /*
