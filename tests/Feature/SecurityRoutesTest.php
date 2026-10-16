@@ -316,6 +316,24 @@ class SecurityRoutesTest extends TestCase
     }
 
     /** @test */
+    public function application_update_accepts_an_empty_legacy_file_field(): void
+    {
+        $request = Request::create('/api/application/1', 'POST', [
+            'file' => '',
+            'start_time' => '19:00:00',
+            'end_time' => '23:59:00',
+            'is_approved' => 1,
+        ]);
+
+        $controller = app(ApplicationController::class);
+        $method = new ReflectionMethod($controller, 'validateAttachments');
+        $method->setAccessible(true);
+        $method->invoke($controller, $request);
+
+        $this->assertFalse($request->exists('file'));
+    }
+
+    /** @test */
     public function application_api_normalizes_and_validates_time_fields(): void
     {
         $request = Request::create('/api/application', 'POST', [
