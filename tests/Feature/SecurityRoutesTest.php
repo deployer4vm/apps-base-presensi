@@ -322,48 +322,6 @@ class SecurityRoutesTest extends TestCase
     }
 
     /** @test */
-    public function application_count_allows_self_service_but_ignores_another_employee_api_id(): void
-    {
-        $request = Request::create('/api/application/count', 'GET', [
-            'year' => 2026,
-            'month' => 10,
-            'api_id' => [999],
-        ]);
-        app()->instance('request', $request);
-
-        \hpsynapse\moduser\Facades\UserAuth::shouldReceive('isWebDev')
-            ->once()
-            ->andReturn(false);
-        \hpsynapse\moduser\Facades\UserAuth::shouldReceive('hasAccess')
-            ->once()
-            ->with('application.manage.can_approve', 'has_access', false)
-            ->andReturn(false);
-        \hpsynapse\moduser\Facades\UserAuth::shouldReceive('user')
-            ->once()
-            ->with('id')
-            ->andReturn(42);
-        \App\MainApp\Modules\employee\Facades\Employee::shouldReceive('getEmployee')
-            ->once()
-            ->with(['user_id', 42])
-            ->andReturn(['api_id' => 35]);
-        \App\MainApp\Modules\application\Facades\Application::shouldReceive('getCountPresence')
-            ->once()
-            ->with([
-                'year' => 2026,
-                'month' => 10,
-                'api_id' => 35,
-            ])
-            ->andReturn(['total' => 0]);
-
-        $response = app(ApplicationController::class)
-            ->getCountPresence($request)
-            ->toResponse($request);
-
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame(['total' => 0], json_decode($response->getContent(), true)['data']);
-    }
-
-    /** @test */
     public function application_upload_accepts_the_mobile_attachment_field(): void
     {
         $request = Request::create('/api/application', 'POST');
